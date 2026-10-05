@@ -15,7 +15,8 @@ export interface ApiResponse<T = any> {
   };
 }
 
-const API_BASE_URL = '/api/v1';
+const rawApiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+const API_BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 class ApiClient {
   private getAccessToken(): string | null {
@@ -34,7 +35,8 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${cleanEndpoint}`;
 
     try {
       const response = await fetch(url, {
@@ -90,7 +92,8 @@ class ApiClient {
   // Blob/file download helper
   async downloadFile(endpoint: string, fallbackFilename: string) {
     const token = this.getAccessToken();
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const res = await fetch(`${API_BASE_URL}${cleanEndpoint}`, {
       headers: {
         Authorization: token ? `Bearer ${token}` : '',
       },
