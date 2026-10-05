@@ -1,11 +1,23 @@
 import mysql from 'mysql2/promise';
 import { config } from '../config/index.js';
 
-const dbUri = process.env.MYSQL_URL || process.env.DATABASE_URL;
+function isValidDbUri(uri?: string): boolean {
+  if (!uri || typeof uri !== 'string') return false;
+  if (!uri.startsWith('mysql://') && !uri.startsWith('mysqls://')) return false;
+  try {
+    const parsed = new URL(uri);
+    return !!(parsed.hostname && parsed.hostname.length > 0 && parsed.hostname !== ':');
+  } catch {
+    return false;
+  }
+}
 
-export const pool = dbUri
+const rawDbUri = process.env.MYSQL_URL || process.env.DATABASE_URL;
+const isUriValid = isValidDbUri(rawDbUri);
+
+export const pool = isUriValid
   ? mysql.createPool({
-      uri: dbUri,
+      uri: rawDbUri,
       waitForConnections: true,
       connectionLimit: config.db.connectionLimit,
       queueLimit: 0,
