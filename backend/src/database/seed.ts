@@ -30,6 +30,8 @@ async function seed() {
     await conn.query('TRUNCATE TABLE audit_logs;');
     await conn.query('TRUNCATE TABLE announcements;');
     await conn.query('TRUNCATE TABLE point_rules;');
+    await conn.query('TRUNCATE TABLE participants;');
+    await conn.query("DELETE FROM users WHERE role = 'PARTICIPANT';");
 
     // Clean non-seed records
     await conn.query('DELETE FROM venues WHERE code NOT IN ("MAIN_STAGE", "SEMINAR_HALL", "OAT", "HALL_A");');
