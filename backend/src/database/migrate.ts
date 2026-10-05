@@ -4,7 +4,13 @@ import { pool } from './connection.js';
 
 async function migrate() {
   console.log('🚀 Running database migrations...');
-  const migrationsDir = path.resolve(process.cwd(), 'src/database/migrations');
+  let migrationsDir = path.resolve(process.cwd(), 'src/database/migrations');
+  if (!fs.existsSync(migrationsDir)) {
+    migrationsDir = path.resolve(__dirname, 'migrations');
+  }
+  if (!fs.existsSync(migrationsDir)) {
+    migrationsDir = path.resolve(process.cwd(), 'dist/database/migrations');
+  }
   
   if (!fs.existsSync(migrationsDir)) {
     console.error('Migrations directory not found:', migrationsDir);
