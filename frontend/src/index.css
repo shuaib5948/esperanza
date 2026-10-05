@@ -1,0 +1,261 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-slate-900 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white min-h-screen;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, rgba(10, 15, 30, 1) 100%);
+  }
+}
+
+.font-bento {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-bento-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+
+.font-bento-num {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+.glass-panel {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Festive Theme Utilities (Public Pages) */
+.ios-canvas {
+  background-color: #ffffc5;
+  color: #1C1C1E;
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes festivePulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.03); }
+}
+
+.animate-float {
+  animation: floatSlow 5s ease-in-out infinite;
+}
+
+.animate-festive-glow {
+  animation: festivePulse 4s ease-in-out infinite;
+}
+
+/* Metallic Gold Text Shimmer */
+@keyframes textShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #0f172a 0%,
+    #b45309 25%,
+    #f59e0b 45%,
+    #fbbf24 50%,
+    #f59e0b 55%,
+    #b45309 75%,
+    #0f172a 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmer 4s linear infinite;
+}
+
+@keyframes sparkleGlimmer {
+  0%, 100% { opacity: 0.35; transform: scale(0.85) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.25) rotate(20deg); }
+}
+
+.animate-glimmer {
+  animation: sparkleGlimmer 3s ease-in-out infinite;
+}
+
+.ios-card {
+  background-color: #FFFFFF;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+}
+
+.ios-glass-nav {
+  background-color: rgba(255, 255, 197, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.ios-segmented {
+  background-color: #E5E5EA;
+  border-radius: 0.85rem;
+  padding: 0.25rem;
+}
+
+.ios-segmented-active {
+  background-color: #FFFFFF;
+  color: #1C1C1E;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Festie & Modern Dashboard Enhancements */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  display: flex;
+  width: max-content;
+  animation: ticker 25s linear infinite;
+  will-change: transform;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+.soft-card {
+  background: #FFFFFF;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02), 0 8px 24px rgba(0, 0, 0, 0.03);
+}
+
+.soft-card-elevated {
+  background: #FFFFFF;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+/* Rendezvous-Style Snap Engine & Sliding Flow */
+.snap-slider-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  height: calc(100dvh - 4rem);
+}
+
+.snap-slide-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: calc(100dvh - 4rem);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ========================================================================= */
+/* BENTO PORTAL DESIGN SYSTEM (All Authenticated Internal Pages)             */
+/* ========================================================================= */
+.bento-portal {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.bento-portal h1,
+.bento-portal h2,
+.bento-portal h3,
+.bento-portal h4 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+
+/* Base Bento Table Styles */
+.bento-portal table {
+  color: #0f172a;
+}
+
+.bento-portal table thead tr {
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bento-portal table thead th {
+  color: #64748b;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.bento-portal table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.bento-portal table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.bento-portal table tbody td {
+  color: #1e293b;
+}
+
+/* Base Form Inputs */
+.bento-portal input:not([type="checkbox"]):not([type="radio"]),
+.bento-portal select,
+.bento-portal textarea {
+  border-color: #e2e8f0;
+}
+
+.bento-portal input:focus,
+.bento-portal select:focus,
+.bento-portal textarea:focus {
+  border-color: #0D472D;
+  outline: none;
+  box-shadow: 0 0 0 1px #0D472D;
+}
+
+
+

@@ -1,0 +1,1 @@
+ALTER TABLE judges ADD COLUMN judge_type ENUM('STAGE', 'OFF_STAGE', 'ALL') NOT NULL DEFAULT 'ALL' AFTER judge_code;
