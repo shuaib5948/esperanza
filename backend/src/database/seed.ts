@@ -246,45 +246,39 @@ async function seed() {
     console.log('Inserting 29 official participants...');
     const participantsList = [
       // === J1 Division (Classes 1-4) -> 100 series ===
-      // Diraya
-      { name: 'ZIYAN', teamId: teamAId, catId: categoryIds[0], code: '101', email: 'part1@esperanza.local' },
-      { name: 'ABU THAHIR', teamId: teamAId, catId: categoryIds[0], code: '102', email: 'abuthahir@esperanza.local' },
-      { name: 'ISRAR', teamId: teamAId, catId: categoryIds[0], code: '103', email: 'israr@esperanza.local' },
-      // Rivaya
-      { name: 'FARHAN', teamId: teamBId, catId: categoryIds[0], code: '104', email: 'farhan@esperanza.local' },
-      { name: 'JINAN', teamId: teamBId, catId: categoryIds[0], code: '105', email: 'jinan@esperanza.local' },
-      { name: 'SAHAL', teamId: teamBId, catId: categoryIds[0], code: '106', email: 'sahal@esperanza.local' },
+      { name: 'ABU THAHIR', teamId: teamBId, catId: categoryIds[0], code: '101', email: 'abuthahir@esperanza.local' },
+      { name: 'FARHAN', teamId: teamAId, catId: categoryIds[0], code: '102', email: 'farhan@esperanza.local' },
+      { name: 'ISRAR', teamId: teamBId, catId: categoryIds[0], code: '103', email: 'israr@esperanza.local' },
+      { name: 'JINAN', teamId: teamAId, catId: categoryIds[0], code: '104', email: 'jinan@esperanza.local' },
+      { name: 'MISHAB', teamId: teamBId, catId: categoryIds[0], code: '105', email: 'mishab@esperanza.local' },
+      { name: 'SAHAL', teamId: teamAId, catId: categoryIds[0], code: '106', email: 'sahal@esperanza.local' },
+      { name: 'ZIYAN', teamId: teamBId, catId: categoryIds[0], code: '107', email: 'ziyan@esperanza.local' },
 
       // === J2 Division (Classes 5-7) -> 200 series ===
-      // Diraya
-      { name: 'YASEEN (J)', teamId: teamAId, catId: categoryIds[1], code: '201', email: 'yaseen.j@esperanza.local' },
-      { name: 'THAMEEM', teamId: teamAId, catId: categoryIds[1], code: '202', email: 'thameem@esperanza.local' },
-      { name: 'MISHAB', teamId: teamAId, catId: categoryIds[1], code: '203', email: 'mishab@esperanza.local' },
-      { name: 'MUZAMMIL', teamId: teamAId, catId: categoryIds[1], code: '204', email: 'muzammil@esperanza.local' },
-      { name: 'ADNAN', teamId: teamAId, catId: categoryIds[1], code: '205', email: 'adnan@esperanza.local' },
-      { name: 'BILAL', teamId: teamAId, catId: categoryIds[1], code: '206', email: 'bilal@esperanza.local' },
-      // Rivaya
-      { name: 'RILAN', teamId: teamBId, catId: categoryIds[1], code: '207', email: 'rilan@esperanza.local' },
-      { name: 'SUFIYAN', teamId: teamBId, catId: categoryIds[1], code: '208', email: 'sufiyan@esperanza.local' },
-      { name: 'THOUFEEQ', teamId: teamBId, catId: categoryIds[1], code: '209', email: 'thoufeeq@esperanza.local' },
-      { name: 'FAHAD', teamId: teamBId, catId: categoryIds[1], code: '210', email: 'fahad@esperanza.local' },
-      { name: 'ALI', teamId: teamBId, catId: categoryIds[1], code: '211', email: 'ali@esperanza.local' },
-      { name: 'SALMAN', teamId: teamBId, catId: categoryIds[1], code: '212', email: 'salman@esperanza.local' },
+      { name: 'ADNAN', teamId: teamBId, catId: categoryIds[1], code: '201', email: 'adnan@esperanza.local' },
+      { name: 'ALI', teamId: teamAId, catId: categoryIds[1], code: '202', email: 'ali@esperanza.local' },
+      { name: 'BILAL', teamId: teamBId, catId: categoryIds[1], code: '203', email: 'bilal@esperanza.local' },
+      { name: 'FAHAD', teamId: teamAId, catId: categoryIds[1], code: '204', email: 'fahad@esperanza.local' },
+      { name: 'MUZAMMIL', teamId: teamBId, catId: categoryIds[1], code: '205', email: 'muzammil@esperanza.local' },
+      { name: 'RILAN', teamId: teamAId, catId: categoryIds[1], code: '206', email: 'rilan@esperanza.local' },
+      { name: 'SALMAN', teamId: teamAId, catId: categoryIds[1], code: '207', email: 'salman@esperanza.local' },
+      { name: 'SUFIYAN', teamId: teamAId, catId: categoryIds[1], code: '208', email: 'sufiyan@esperanza.local' },
+      { name: 'THAMEEM', teamId: teamBId, catId: categoryIds[1], code: '209', email: 'thameem@esperanza.local' },
+      { name: 'THOUFEEQ', teamId: teamAId, catId: categoryIds[1], code: '210', email: 'thoufeeq@esperanza.local' },
+      { name: 'YASEEN (J)', teamId: teamBId, catId: categoryIds[1], code: '211', email: 'yaseen.j@esperanza.local' },
 
       // === Senior Division (Classes 8-12) -> 300 series ===
-      // Diraya
-      { name: 'ASLAM', teamId: teamAId, catId: categoryIds[2], code: '301', email: 'aslam@esperanza.local' },
-      { name: 'YASEEN (S)', teamId: teamAId, catId: categoryIds[2], code: '302', email: 'yaseen.s@esperanza.local' },
-      { name: 'SHUHAIB', teamId: teamAId, catId: categoryIds[2], code: '303', email: 'shuhaib@esperanza.local' },
-      { name: 'QASIM', teamId: teamAId, catId: categoryIds[2], code: '304', email: 'qasim@esperanza.local' },
-      { name: 'SAFWAN', teamId: teamAId, catId: categoryIds[2], code: '305', email: 'safwan@esperanza.local' },
-      { name: 'RAEES', teamId: teamAId, catId: categoryIds[2], code: '306', email: 'raees@esperanza.local' },
-      // Rivaya
-      { name: 'SAJID', teamId: teamBId, catId: categoryIds[2], code: '307', email: 'sajid@esperanza.local' },
-      { name: 'JIFRI', teamId: teamBId, catId: categoryIds[2], code: '308', email: 'jifri@esperanza.local' },
-      { name: 'SANEER', teamId: teamBId, catId: categoryIds[2], code: '309', email: 'saneer@esperanza.local' },
-      { name: 'NISHAD', teamId: teamBId, catId: categoryIds[2], code: '310', email: 'nishad@esperanza.local' },
-      { name: 'NAFIH', teamId: teamBId, catId: categoryIds[2], code: '311', email: 'nafih@esperanza.local' },
+      { name: 'ASLAM', teamId: teamBId, catId: categoryIds[2], code: '301', email: 'aslam@esperanza.local' },
+      { name: 'JIFRI', teamId: teamAId, catId: categoryIds[2], code: '302', email: 'jifri@esperanza.local' },
+      { name: 'NAFIH', teamId: teamAId, catId: categoryIds[2], code: '303', email: 'nafih@esperanza.local' },
+      { name: 'NISHAD', teamId: teamAId, catId: categoryIds[2], code: '304', email: 'nishad@esperanza.local' },
+      { name: 'QASIM', teamId: teamBId, catId: categoryIds[2], code: '305', email: 'qasim@esperanza.local' },
+      { name: 'RAEES', teamId: teamBId, catId: categoryIds[2], code: '306', email: 'raees@esperanza.local' },
+      { name: 'SAFWAN', teamId: teamBId, catId: categoryIds[2], code: '307', email: 'safwan@esperanza.local' },
+      { name: 'SAJID', teamId: teamAId, catId: categoryIds[2], code: '308', email: 'sajid@esperanza.local' },
+      { name: 'SANEER', teamId: teamAId, catId: categoryIds[2], code: '309', email: 'saneer@esperanza.local' },
+      { name: 'SHUHAIB', teamId: teamBId, catId: categoryIds[2], code: '310', email: 'shuhaib@esperanza.local' },
+      { name: 'YASEEN (S)', teamId: teamBId, catId: categoryIds[2], code: '311', email: 'yaseen.s@esperanza.local' },
     ];
 
     // Remove any previous participants not in this list
