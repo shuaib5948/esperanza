@@ -1,18 +1,29 @@
 import mysql from 'mysql2/promise';
 import { config } from '../config/index.js';
 
-export const pool = mysql.createPool({
-  host: config.db.host,
-  port: config.db.port,
-  user: config.db.user,
-  password: config.db.password,
-  database: config.db.name,
-  waitForConnections: true,
-  connectionLimit: config.db.connectionLimit,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-});
+const dbUri = process.env.MYSQL_URL || process.env.DATABASE_URL;
+
+export const pool = dbUri
+  ? mysql.createPool({
+      uri: dbUri,
+      waitForConnections: true,
+      connectionLimit: config.db.connectionLimit,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
+    })
+  : mysql.createPool({
+      host: config.db.host,
+      port: config.db.port,
+      user: config.db.user,
+      password: config.db.password,
+      database: config.db.name,
+      waitForConnections: true,
+      connectionLimit: config.db.connectionLimit,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
+    });
 
 /**
  * Executes a parameterized query using the connection pool
