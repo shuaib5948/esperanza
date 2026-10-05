@@ -4,18 +4,35 @@ import { pool } from './connection.js';
 
 async function migrate() {
   console.log('🚀 Running database migrations...');
-  let migrationsDir = path.resolve(process.cwd(), 'src/database/migrations');
-  if (!fs.existsSync(migrationsDir)) {
-    migrationsDir = path.resolve(__dirname, 'migrations');
+  const candidateDirs = [
+    path.resolve(process.cwd(), 'src/database/migrations'),
+    path.resolve(process.cwd(), 'dist/database/migrations'),
+    path.resolve(process.cwd(), 'backend/src/database/migrations'),
+    path.resolve(__dirname, 'migrations'),
+    path.resolve(__dirname, '../../src/database/migrations'),
+    path.resolve(__dirname, '../migrations'),
+  ];
+
+  let migrationsDir = '';
+  let files: string[] = [];
+
+  for (const dir of candidateDirs) {
+    if (fs.existsSync(dir)) {
+      const sqlFiles = fs.readdirSync(dir).filter((f) => f.endsWith('.sql'));
+      if (sqlFiles.length > 0) {
+        migrationsDir = dir;
+        files = sqlFiles.sort();
+        break;
+      }
+    }
   }
-  if (!fs.existsSync(migrationsDir)) {
-    migrationsDir = path.resolve(process.cwd(), 'dist/database/migrations');
-  }
-  
-  if (!fs.existsSync(migrationsDir)) {
-    console.error('Migrations directory not found:', migrationsDir);
+
+  if (!migrationsDir || files.length === 0) {
+    console.error('❌ No .sql migration files found in candidate directories:', candidateDirs);
     process.exit(1);
   }
+
+  console.log(`📂 Found ${files.length} migrations in: ${migrationsDir}`);
 
   // Ensure migrations registry table exists
   await pool.query(`
@@ -24,8 +41,6 @@ async function migrate() {
       applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `);
-
-  const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
 
   for (const file of files) {
     const [rows] = await pool.query<any[]>(

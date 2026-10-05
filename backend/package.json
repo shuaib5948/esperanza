@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc && node -e \"const fs=require('fs'),path=require('path'); const src=path.resolve('src/database/migrations'),dest=path.resolve('dist/database/migrations'); if(fs.existsSync(src)){fs.mkdirSync(dest,{recursive:true}); fs.cpSync(src,dest,{recursive:true});}\"",
     "start": "node dist/server.js",
     "db:init": "node dist/database/migrate.js && node dist/database/seed.js",
     "db:migrate": "node dist/database/migrate.js",
