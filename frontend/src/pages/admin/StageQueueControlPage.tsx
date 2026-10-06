@@ -458,6 +458,57 @@ export const StageQueueControlPage: React.FC = () => {
     }
   };
 
+  // Resequence lots so queue_order is strictly 1..N and code_letter is A, B, C...
+  const resequenceLots = (lotsArray: DrawnLot[]): DrawnLot[] => {
+    return lotsArray.map((item, idx) => ({
+      ...item,
+      queue_order: idx + 1,
+      code_letter: CODE_LETTERS[idx] || `L${idx + 1}`,
+    }));
+  };
+
+  // Move a participant up or down by 1 spot
+  const handleMoveLot = (index: number, direction: 'UP' | 'DOWN') => {
+    const targetIndex = direction === 'UP' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= drawnLots.length) return;
+    const updated = [...drawnLots];
+    const temp = updated[index];
+    updated[index] = updated[targetIndex];
+    updated[targetIndex] = temp;
+    setDrawnLots(resequenceLots(updated));
+  };
+
+  // Move a participant directly to a specific 1-based position
+  const handleSetPosition = (fromIndex: number, targetPosition: number) => {
+    const toIndex = targetPosition - 1;
+    if (toIndex < 0 || toIndex >= drawnLots.length || toIndex === fromIndex) return;
+    const updated = [...drawnLots];
+    const [moved] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, moved);
+    setDrawnLots(resequenceLots(updated));
+  };
+
+  // Initialize manual lots in attendance / roll-call order (A, B, C...) without random shuffling
+  const handleInitializeManualLots = () => {
+    const reportedOnly = modalQueue.filter((q: QueueItem) => q.check_in_status === 'REPORTED');
+    if (reportedOnly.length === 0) {
+      error('At least one participant must be marked Present to set lots.');
+      return;
+    }
+    const lots: DrawnLot[] = reportedOnly.map((item, idx) => ({
+      queue_id: item.id,
+      participant_id: item.participant_id,
+      participant_name: item.participant_name,
+      participant_code: item.participant_code,
+      team_name: item.team_name,
+      code_letter: CODE_LETTERS[idx] || `L${idx + 1}`,
+      queue_order: idx + 1,
+    }));
+    setDrawnLots(lots);
+    setActiveModalTab('LOTS_DRAW');
+    success(`Initialized lots in roll-call order. Use arrows or position selector to adjust order.`);
+  };
+
   // Random Lot Drawing Function (Requires at least 1 present participant in modalQueue)
   const handleDrawLots = () => {
     if (modalQueue.length === 0) {
@@ -1104,22 +1155,39 @@ export const StageQueueControlPage: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 2: RANDOM LOTS DRAW */}
+          {/* TAB 2: RANDOM & MANUAL LOTS DRAW */}
           {activeModalTab === 'LOTS_DRAW' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-                <h5 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <Shuffle className="w-4 h-4 text-[#0D472D]" />
-                  <span>Blind Lot Order (A, B, C...)</span>
-                </h5>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                <div>
+                  <h5 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                    <Shuffle className="w-4 h-4 text-[#0D472D]" />
+                    <span>Performer Lot Order (A, B, C...)</span>
+                  </h5>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Draw random lots or manually adjust order using the arrows or position selectors.
+                  </p>
+                </div>
 
-                <button
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs shrink-0 cursor-pointer"
-                  onClick={handleDrawLots}
-                >
-                  <Shuffle className="w-3.5 h-3.5" />
-                  <span>{drawnLots.length > 0 ? 'Re-Draw' : 'Draw Lots'}</span>
-                </button>
+                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 shadow-2xs cursor-pointer transition-colors"
+                    onClick={handleInitializeManualLots}
+                    title="Reset to attendance/roll-call order"
+                  >
+                    <span>Roll-Call Order</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs shrink-0 cursor-pointer transition-colors"
+                    onClick={handleDrawLots}
+                    title="Randomly shuffle all lots"
+                  >
+                    <Shuffle className="w-3.5 h-3.5" />
+                    <span>{drawnLots.length > 0 ? 'Shuffle Lots' : 'Random Draw'}</span>
+                  </button>
+                </div>
               </div>
 
               {drawnLots.length === 0 ? (
@@ -1136,41 +1204,92 @@ export const StageQueueControlPage: React.FC = () => {
                       </button>
                     </div>
                   ) : (
-                    <button
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs mx-auto cursor-pointer"
-                      onClick={handleDrawLots}
-                    >
-                      <Shuffle className="w-4 h-4" />
-                      <span>Draw Lots for {reportedCount} Contestants</span>
-                    </button>
+                    <div className="flex flex-col items-center gap-3">
+                      <p className="text-slate-600 font-medium">Choose how to assign lots for {reportedCount} present contestants:</p>
+                      <div className="flex flex-wrap items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs cursor-pointer"
+                          onClick={handleDrawLots}
+                        >
+                          <Shuffle className="w-4 h-4" />
+                          <span>Random Draw ({reportedCount})</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 text-xs font-semibold shadow-xs cursor-pointer"
+                          onClick={handleInitializeManualLots}
+                        >
+                          <span>Manual / Roll-Call Order</span>
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[42vh] overflow-y-auto pr-1">
-                  {drawnLots.map((lot) => (
+                <div className="space-y-2 max-h-[44vh] overflow-y-auto pr-1">
+                  {drawnLots.map((lot, idx) => (
                     <div
                       key={lot.queue_id}
-                      className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between"
+                      className="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#0D472D] text-white font-mono font-bold text-lg flex items-center justify-center shadow-xs">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Order & Lot Code Badge */}
+                        <div className="w-9 h-9 rounded-xl bg-[#0D472D] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
                           {lot.code_letter}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h5 className="font-bold text-slate-900 text-sm">{lot.participant_name}</h5>
-                            <span className="font-mono text-xs text-[#0D472D] font-bold bg-[#E6F4EA] px-2 py-0.5 rounded-full border border-emerald-200/60">
+
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h5 className="font-bold text-slate-900 text-sm truncate">{lot.participant_name}</h5>
+                            <span className="font-mono text-[11px] text-[#0D472D] font-bold bg-[#E6F4EA] px-2 py-0.5 rounded-full border border-emerald-200/60 shrink-0">
                               {lot.participant_code}
                             </span>
                           </div>
-                          <span className="text-xs text-slate-500 font-semibold">{lot.team_name}</span>
+                          <span className="text-xs text-slate-500 font-semibold truncate block">{lot.team_name}</span>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="text-xs font-mono font-bold text-[#0D472D] bg-[#E6F4EA] border border-emerald-200 px-2.5 py-1 rounded-full">
-                          Order {lot.queue_order}
-                        </span>
+                      {/* Manual Reordering Controls */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Position select */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Pos:</span>
+                          <select
+                            value={lot.queue_order}
+                            onChange={(e) => handleSetPosition(idx, Number(e.target.value))}
+                            className="text-xs font-mono font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:ring-1 focus:ring-emerald-600 focus:outline-hidden cursor-pointer"
+                            title="Directly jump to position"
+                          >
+                            {drawnLots.map((_, pIdx) => (
+                              <option key={pIdx + 1} value={pIdx + 1}>
+                                #{pIdx + 1}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Up / Down Swap Buttons */}
+                        <div className="flex items-center gap-0.5 bg-slate-50 p-0.5 rounded-lg border border-slate-200">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => handleMoveLot(idx, 'UP')}
+                            title="Move Up"
+                            className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-white disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          >
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === drawnLots.length - 1}
+                            onClick={() => handleMoveLot(idx, 'DOWN')}
+                            title="Move Down"
+                            className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-white disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
