@@ -188,7 +188,55 @@ export class ScheduleService {
       }
     }
 
+    // Safety guard when discarding back to SCHEDULED: cannot discard if official marks are already submitted
+    if (data.status === 'SCHEDULED' && existing.status === 'LIVE') {
+      const submittedScores = await query<any[]>(`
+        SELECT COUNT(*) as count 
+        FROM score_sheets 
+        WHERE competition_id = ? AND status IN ('SUBMITTED', 'LOCKED')
+      `, [existing.competition_id]);
+
+      const count = Number(submittedScores[0]?.count || 0);
+      if (count > 0) {
+        throw {
+          statusCode: 400,
+          code: 'MARKS_ALREADY_SUBMITTED',
+          message: 'Cannot discard live programme: Official marks have already been submitted by the judge.',
+        };
+      }
+    }
+
     await ScheduleRepository.update(id, data);
+
+    // If discarded back to SCHEDULED from LIVE: wipe lot letters, attendance check-in, and reset stage queue
+    if (data.status === 'SCHEDULED' && existing.status === 'LIVE') {
+      // 1. Reset stage queue to clean initial state (wiping lot codes and check-in)
+      await query(`
+        UPDATE stage_queue 
+        SET stage_status = 'WAITING',
+            check_in_status = 'PENDING',
+            code_letter = NULL,
+            call_count = 0,
+            called_at = NULL,
+            stage_started_at = NULL,
+            stage_ended_at = NULL
+        WHERE competition_id = ?
+      `, [existing.competition_id]);
+
+      // 2. Reset attendance for registrations of this competition
+      await query(`
+        DELETE a FROM attendance a
+        JOIN registrations r ON r.id = a.registration_id
+        WHERE r.competition_id = ?
+      `, [existing.competition_id]);
+
+      // 3. Ensure competition is back to SCHEDULED
+      await query(`
+        UPDATE competitions 
+        SET status = 'SCHEDULED' 
+        WHERE id = ?
+      `, [existing.competition_id]);
+    }
 
     if (data.status === 'COMPLETED') {
       await query(`

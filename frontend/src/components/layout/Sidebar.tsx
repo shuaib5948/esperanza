@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
+import { THEME } from '../../theme/theme.js';
 import {
   LayoutGrid,
   CheckSquare,
@@ -67,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 onClose();
               }}
             >
-              <h1 className="text-xl font-black text-[#0D472D] tracking-tight leading-none">
+              <h1 className="text-xl font-black text-amber-900 tracking-tight leading-none">
                 Esperanza
               </h1>
               <p className="text-[10px] font-bold text-amber-700 tracking-wide mt-1">
@@ -101,15 +102,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <LayoutGrid className="w-4 h-4 stroke-[2.2]" />
                       <span>Dashboard</span>
@@ -124,15 +125,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
                         <CheckSquare className="w-4 h-4" />
@@ -141,8 +142,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       <span
                         className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
                           isActive
-                            ? 'bg-white/20 text-white'
-                            : 'bg-[#E6F4EA] text-[#0D472D]'
+                            ? THEME.classes.badgeActive
+                            : THEME.classes.badgeInactive
                         }`}
                       >
                         60
@@ -158,15 +159,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <Calendar className="w-4 h-4" />
                       <span>Schedule & Lineup</span>
@@ -181,15 +182,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <UserCheck className="w-4 h-4" />
                       <span>Participants</span>
@@ -204,18 +205,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
-                        <Radio className={`w-4 h-4 ${isActive ? 'text-white' : 'text-emerald-600 animate-pulse'}`} />
+                        <Radio className={`w-4 h-4 ${isActive ? 'text-slate-950' : 'text-emerald-600 animate-pulse'}`} />
                         <span>Stage Queue</span>
                       </div>
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -230,15 +231,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
                         <BarChart2 className="w-4 h-4" />
@@ -248,7 +249,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <span
                           className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                             isActive
-                              ? 'bg-white/20 text-white'
+                              ? 'bg-black/10 text-slate-950 font-bold'
                               : 'bg-amber-100 text-amber-800'
                           }`}
                         >
@@ -273,15 +274,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <Award className="w-4 h-4" />
                       <span>Results</span>
@@ -296,15 +297,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
                         <Megaphone className="w-4 h-4" />
@@ -314,7 +315,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <span
                           className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                             isActive
-                              ? 'bg-white/20 text-white'
+                              ? 'bg-black/10 text-slate-950 font-bold'
                               : 'bg-amber-100 text-amber-800'
                           }`}
                         >
@@ -332,15 +333,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
                         <FileText className="w-4 h-4" />
@@ -350,7 +351,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <span
                           className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                             isActive
-                              ? 'bg-white/20 text-white'
+                              ? 'bg-black/10 text-slate-950 font-bold'
                               : 'bg-amber-100 text-amber-800'
                           }`}
                         >
@@ -368,15 +369,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                       isActive
-                        ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
                         <SlidersHorizontal className="w-4 h-4" />
@@ -386,7 +387,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <span
                           className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                             isActive
-                              ? 'bg-white/20 text-white'
+                              ? 'bg-black/10 text-slate-950 font-bold'
                               : 'bg-amber-100 text-amber-800'
                           }`}
                         >
@@ -411,15 +412,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                     isActive
-                      ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                      ? THEME.classes.activeTab
+                      : THEME.classes.inactiveTab
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                     )}
                     <LayoutGrid className="w-4 h-4" />
                     <span>Team Overview</span>
@@ -433,15 +434,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                     isActive
-                      ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                      ? THEME.classes.activeTab
+                      : THEME.classes.inactiveTab
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                     )}
                     <Users className="w-4 h-4" />
                     <span>Team Roster</span>
@@ -455,15 +456,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                     isActive
-                      ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                      ? THEME.classes.activeTab
+                      : THEME.classes.inactiveTab
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                     )}
                     <ClipboardList className="w-4 h-4" />
                     <span>Registrations</span>
@@ -477,15 +478,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
                     isActive
-                      ? 'bg-[#0D472D] text-white font-semibold shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                      ? THEME.classes.activeTab
+                      : THEME.classes.inactiveTab
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0D472D] rounded-r-md -ml-4" />
+                      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                     )}
                     <div className="flex items-center gap-3">
                       <Megaphone className="w-4 h-4" />
@@ -495,7 +496,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       <span
                         className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                           isActive
-                            ? 'bg-white/20 text-white'
+                            ? 'bg-black/10 text-slate-950 font-bold'
                             : 'bg-amber-100 text-amber-800'
                         }`}
                       >
@@ -511,30 +512,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* Bottom Section: Stage Kiosk Launcher + User Logout */}
         <div className="pt-3 border-t border-slate-100 flex flex-col gap-3">
-          {/* Bottom Stage Kiosk Launcher Card with Wavy Green Background */}
+          {/* Bottom Stage Kiosk Launcher Card with Luxury Amber Gold Background */}
           {isAdmin && (
-            <div className="relative rounded-2xl p-3 bg-gradient-to-br from-[#0D472D] to-[#062618] text-white overflow-hidden shadow-xs dark-card">
+            <div className={`relative rounded-2xl p-3 ${THEME.classes.heroCardSubtle} overflow-hidden`}>
               <svg
                 className="absolute inset-0 w-full h-full opacity-30 pointer-events-none"
                 viewBox="0 0 100 100"
                 preserveAspectRatio="none"
               >
-                <path d="M0 20 Q 30 60 60 20 T 100 40 L 100 100 L 0 100 Z" fill="#157347" opacity="0.4" />
-                <path d="M0 50 Q 40 10 80 50 T 100 80 L 100 100 L 0 100 Z" fill="#20c997" opacity="0.2" />
+                <path d="M0 20 Q 30 60 60 20 T 100 40 L 100 100 L 0 100 Z" fill="#d97706" opacity="0.3" />
+                <path d="M0 50 Q 40 10 80 50 T 100 80 L 100 100 L 0 100 Z" fill="#f59e0b" opacity="0.15" />
               </svg>
 
               <div className="relative z-10 flex flex-col items-start">
-                <div className="w-6 h-6 rounded-full bg-black/40 border border-white/20 flex items-center justify-center mb-1.5">
-                  <Tv className="w-3 h-3 text-white" />
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center mb-1.5">
+                  <Tv className="w-3 h-3 text-amber-300" />
                 </div>
-                <h4 className="text-xs font-bold font-bento-title text-white">Stage Screen</h4>
-                <p className="text-[10px] text-white/70 mb-2 leading-tight">Live single stage display</p>
+                <h4 className="text-xs font-black font-bento-title text-amber-100">Stage Screen</h4>
+                <p className="text-[10px] text-amber-200/70 mb-2 leading-tight font-medium">Live single stage display</p>
                 <button
                   onClick={() => {
                     navigate('/admin/stage-queue');
                     onClose();
                   }}
-                  className="w-full py-1 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold flex items-center justify-center gap-1 border border-white/15 transition-colors cursor-pointer"
+                  className="w-full py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-[10px] font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition-all cursor-pointer"
                 >
                   <span>Launch Kiosk</span>
                   <ArrowUpRight className="w-3 h-3" />

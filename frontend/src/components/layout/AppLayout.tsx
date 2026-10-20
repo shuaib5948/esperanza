@@ -19,7 +19,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ requireAuth = false, allow
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 font-bento">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+          <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-400 animate-spin" />
           <p className="text-sm font-semibold text-slate-400">Loading Esperanza 2026...</p>
         </div>
       </div>

@@ -57,7 +57,7 @@ export const TeamDashboardPage: React.FC = () => {
   const groupRegs = registrations.group_count || 0;
 
   return (
-    <div className="w-full h-full flex flex-col justify-between space-y-3 overflow-hidden text-slate-900">
+    <div className="w-full min-h-full flex flex-col space-y-3 text-slate-900">
       {/* =================================================================== */}
       {/* 1. COMPACT TOP HEADER BAR                                           */}
       {/* =================================================================== */}
@@ -110,11 +110,11 @@ export const TeamDashboardPage: React.FC = () => {
       {/* =================================================================== */}
       {/* 2. BENTO GRID MAIN CONTAINER (100% Single-Screen Non-Scrolling)     */}
       {/* =================================================================== */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3.5 min-h-0 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3.5">
         {/* ----------------------------------------------------------------- */}
         {/* LEFT COLUMN (4 Cols): Hero KPI & Podium Analytics Donut Chart     */}
         {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+        <div className="md:col-span-4 flex flex-col gap-3">
           {/* Hero KPI Tile: Dark Emerald Accent */}
           <div
             onClick={() => navigate('/leaderboard')}
@@ -153,7 +153,7 @@ export const TeamDashboardPage: React.FC = () => {
           </div>
 
           {/* Podium Donut Analytics Chart Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between min-h-0 overflow-hidden">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-[#0D472D]" />
@@ -226,9 +226,9 @@ export const TeamDashboardPage: React.FC = () => {
         {/* ----------------------------------------------------------------- */}
         {/* CENTER COLUMN (5 Cols): Live Dispatch Radar & Cap Monitor        */}
         {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-5 flex flex-col min-h-0 overflow-hidden">
+        <div className="md:col-span-5 flex flex-col">
           {/* Card 3: Live Stage Dispatch Radar */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between min-h-0 overflow-hidden">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
@@ -314,7 +314,7 @@ export const TeamDashboardPage: React.FC = () => {
                       return (
                         <div key={compName} className="space-y-0.5">
                           <h4 className="text-xs sm:text-sm font-bento-title font-bold text-slate-900 truncate">
-                            {compName || 'General - DTP'}
+                            {compName || 'Live Competition'}
                           </h4>
                           <p className="text-xs font-semibold text-amber-900 truncate">
                             {studentsInComp.map((s: any) => s.participant_name).filter(Boolean).join(', ')}
@@ -354,9 +354,9 @@ export const TeamDashboardPage: React.FC = () => {
         {/* ----------------------------------------------------------------- */}
         {/* RIGHT COLUMN (3 Cols): Admin Feed & Quick Tools Hub               */}
         {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-3 flex flex-col gap-3 min-h-0 overflow-hidden">
+        <div className="md:col-span-3 flex flex-col gap-3">
           {/* Card 5: Live Admin Announcements Ticker */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between min-h-0 overflow-hidden">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <Megaphone className="w-4 h-4 text-[#0D472D]" />

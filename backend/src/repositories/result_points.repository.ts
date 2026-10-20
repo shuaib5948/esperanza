@@ -27,11 +27,15 @@ export class ResultRepository {
              c.name as competition_name,
              c.competition_code,
              c.programme_number,
+             c.participation_type,
+             (c.participation_type = 'GROUP') as is_group,
              pg.name as programme_group,
              p.participant_code,
              u.name as participant_name,
              t.name as team_name,
              t.code as team_code,
+             COALESCE(gm.member_count, 1) as member_count,
+             COALESCE(gm.member_names, u.name) as member_names,
              v_user.name as verified_by_name,
              pub_user.name as published_by_name
       FROM results r
@@ -40,6 +44,16 @@ export class ResultRepository {
       LEFT JOIN participants p ON p.id = r.participant_id
       LEFT JOIN users u ON u.id = p.user_id
       LEFT JOIN teams t ON t.id = r.team_id
+      LEFT JOIN (
+        SELECT r2.competition_id, p2.team_id,
+               COUNT(p2.id) as member_count,
+               GROUP_CONCAT(u2.name ORDER BY p2.id ASC SEPARATOR ', ') as member_names
+        FROM registrations r2
+        JOIN participants p2 ON p2.id = r2.participant_id
+        JOIN users u2 ON u2.id = p2.user_id
+        WHERE r2.status = 'ASSIGNED'
+        GROUP BY r2.competition_id, p2.team_id
+      ) gm ON gm.competition_id = r.competition_id AND gm.team_id = r.team_id
       LEFT JOIN users v_user ON v_user.id = r.verified_by
       LEFT JOIN users pub_user ON pub_user.id = r.published_by
       ${whereClause}
@@ -52,15 +66,29 @@ export class ResultRepository {
       SELECT r.*,
              c.name as competition_name,
              c.competition_code,
+             c.participation_type,
+             (c.participation_type = 'GROUP') as is_group,
              p.participant_code,
              u.name as participant_name,
              t.name as team_name,
-             t.code as team_code
+             t.code as team_code,
+             COALESCE(gm.member_count, 1) as member_count,
+             COALESCE(gm.member_names, u.name) as member_names
       FROM results r
       JOIN competitions c ON c.id = r.competition_id
       LEFT JOIN participants p ON p.id = r.participant_id
       LEFT JOIN users u ON u.id = p.user_id
       LEFT JOIN teams t ON t.id = r.team_id
+      LEFT JOIN (
+        SELECT r2.competition_id, p2.team_id,
+               COUNT(p2.id) as member_count,
+               GROUP_CONCAT(u2.name ORDER BY p2.id ASC SEPARATOR ', ') as member_names
+        FROM registrations r2
+        JOIN participants p2 ON p2.id = r2.participant_id
+        JOIN users u2 ON u2.id = p2.user_id
+        WHERE r2.status = 'ASSIGNED'
+        GROUP BY r2.competition_id, p2.team_id
+      ) gm ON gm.competition_id = r.competition_id AND gm.team_id = r.team_id
       WHERE r.id = ?
     `, [id]);
     return rows && rows.length > 0 ? rows[0] : null;

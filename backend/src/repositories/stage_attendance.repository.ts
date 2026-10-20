@@ -11,37 +11,90 @@ export class StageAttendanceRepository {
              t.id as team_id,
              t.name as team_name,
              t.color as team_color,
+             c.participation_type,
+             (c.participation_type = 'GROUP') as is_group,
+             COALESCE(gm.member_count, 1) as member_count,
+             COALESCE(gm.member_names, u.name) as member_names,
              COALESCE(MAX(ss.status), 'NOT_STARTED') as scoring_status,
              COUNT(DISTINCT CASE WHEN ss.status IN ('SUBMITTED', 'LOCKED') THEN ss.id END) as judges_submitted_count
       FROM stage_queue sq
+      JOIN competitions c ON c.id = sq.competition_id
       JOIN participants p ON p.id = sq.participant_id
       JOIN users u ON u.id = p.user_id
       JOIN teams t ON t.id = p.team_id
+      LEFT JOIN (
+        SELECT r2.competition_id, p2.team_id,
+               COUNT(p2.id) as member_count,
+               GROUP_CONCAT(u2.name ORDER BY p2.id ASC SEPARATOR ', ') as member_names
+        FROM registrations r2
+        JOIN participants p2 ON p2.id = r2.participant_id
+        JOIN users u2 ON u2.id = p2.user_id
+        WHERE r2.status = 'ASSIGNED'
+        GROUP BY r2.competition_id, p2.team_id
+      ) gm ON gm.competition_id = sq.competition_id AND gm.team_id = p.team_id
       LEFT JOIN score_sheets ss ON ss.competition_id = sq.competition_id AND ss.participant_id = sq.participant_id
       WHERE sq.competition_id = ?
-      GROUP BY sq.id, p.participant_code, u.name, t.id, t.name, t.color
+      GROUP BY sq.id, p.participant_code, u.name, t.id, t.name, t.color, c.participation_type, gm.member_count, gm.member_names
       ORDER BY sq.queue_order ASC, sq.code_letter ASC, p.id ASC
     `, [competitionId]);
   }
 
   static async initStageQueue(competitionId: number) {
     return withTransaction(async (conn) => {
-      // Find approved registrations
-      const [regs] = await conn.query<any[]>(`
-        SELECT participant_id FROM registrations
-        WHERE competition_id = ? AND status = 'ASSIGNED'
-        ORDER BY id ASC
-      `, [competitionId]);
+      const [compRows] = await conn.query<any[]>(
+        'SELECT participation_type FROM competitions WHERE id = ?',
+        [competitionId]
+      );
+      const isGroup = compRows[0]?.participation_type === 'GROUP';
 
-      if (!regs || regs.length === 0) return [];
+      if (isGroup) {
+        // Group competition: 1 queue entry per team (anchored to first registered participant)
+        const [teamRegs] = await conn.query<any[]>(`
+          SELECT p.team_id, MIN(r.participant_id) as anchor_participant_id
+          FROM registrations r
+          JOIN participants p ON p.id = r.participant_id
+          WHERE r.competition_id = ? AND r.status = 'ASSIGNED'
+          GROUP BY p.team_id
+          ORDER BY MIN(r.id) ASC
+        `, [competitionId]);
 
-      let order = 1;
-      for (const r of regs) {
-        await conn.query(`
-          INSERT INTO stage_queue (competition_id, participant_id, queue_order, stage_status)
-          VALUES (?, ?, ?, 'WAITING')
-          ON DUPLICATE KEY UPDATE queue_order = VALUES(queue_order)
-        `, [competitionId, r.participant_id, order++]);
+        if (!teamRegs || teamRegs.length === 0) return [];
+
+        // Clean up redundant queue entries for same teams if they were previously created
+        const anchorIds = teamRegs.map((t: any) => t.anchor_participant_id);
+        if (anchorIds.length > 0) {
+          await conn.query(
+            'DELETE FROM stage_queue WHERE competition_id = ? AND participant_id NOT IN (?)',
+            [competitionId, anchorIds]
+          );
+        }
+
+        let order = 1;
+        for (const t of teamRegs) {
+          await conn.query(`
+            INSERT INTO stage_queue (competition_id, participant_id, queue_order, stage_status)
+            VALUES (?, ?, ?, 'WAITING')
+            ON DUPLICATE KEY UPDATE queue_order = VALUES(queue_order)
+          `, [competitionId, t.anchor_participant_id, order++]);
+        }
+      } else {
+        // Individual competition: 1 queue entry per participant
+        const [regs] = await conn.query<any[]>(`
+          SELECT participant_id FROM registrations
+          WHERE competition_id = ? AND status = 'ASSIGNED'
+          ORDER BY id ASC
+        `, [competitionId]);
+
+        if (!regs || regs.length === 0) return [];
+
+        let order = 1;
+        for (const r of regs) {
+          await conn.query(`
+            INSERT INTO stage_queue (competition_id, participant_id, queue_order, stage_status)
+            VALUES (?, ?, ?, 'WAITING')
+            ON DUPLICATE KEY UPDATE queue_order = VALUES(queue_order)
+          `, [competitionId, r.participant_id, order++]);
+        }
       }
 
       const [updated] = await conn.query<any[]>(
@@ -89,7 +142,7 @@ export class StageAttendanceRepository {
 
   static async notifyTeamLeader(queueId: number, adminUserId: number) {
     const rows = await query<any[]>(`
-      SELECT sq.*, p.participant_code, u.name as participant_name, p.team_id, t.name as team_name, c.name as competition_name, c.programme_number
+      SELECT sq.*, p.participant_code, u.name as participant_name, p.team_id, t.name as team_name, c.name as competition_name, c.programme_number, c.participation_type
       FROM stage_queue sq
       JOIN participants p ON p.id = sq.participant_id
       JOIN users u ON u.id = p.user_id
@@ -104,8 +157,13 @@ export class StageAttendanceRepository {
 
     const item = rows[0];
     const uuid = crypto.randomUUID();
-    const title = `URGENT CALL: ${item.participant_name} (${item.participant_code}) Not Reported`;
-    const content = `Participant ${item.participant_name} (${item.participant_code}) from ${item.team_name} has not reported backstage for #${item.programme_number} ${item.competition_name}. Please send the contestant to the stage area immediately.`;
+    const isGroup = item.participation_type === 'GROUP';
+    const title = isGroup
+      ? `URGENT CALL: ${item.team_name} Not Reported`
+      : `URGENT CALL: ${item.participant_name} (${item.participant_code}) Not Reported`;
+    const content = isGroup
+      ? `${item.team_name} has not reported backstage for #${item.programme_number} ${item.competition_name}. Please send the group to the stage area immediately.`
+      : `Participant ${item.participant_name} (${item.participant_code}) from ${item.team_name} has not reported backstage for #${item.programme_number} ${item.competition_name}. Please send the contestant to the stage area immediately.`;
 
     await query(`
       INSERT INTO announcements (uuid, title, content, target_role, target_team_id, published_at, created_by, status)

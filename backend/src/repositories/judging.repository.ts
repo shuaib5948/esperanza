@@ -121,6 +121,12 @@ export class JudgeRepository {
   }
 
   static async getAssignedParticipantsForCompetition(competitionId: number, judgeId: number) {
+    const compRows = await query<any[]>(
+      'SELECT participation_type FROM competitions WHERE id = ?',
+      [competitionId]
+    );
+    const isGroup = compRows && compRows[0]?.participation_type === 'GROUP';
+
     // If backstage check-in has occurred, only present participants (REPORTED and not ABSENT) are fetched
     const queueRows = await query<any[]>(`
       SELECT COUNT(*) as count 
@@ -140,15 +146,29 @@ export class JudgeRepository {
                COALESCE(sq.queue_order, 999) as queue_order,
                sq.check_in_status,
                sq.stage_status,
+               (c.participation_type = 'GROUP') as is_group,
+               COALESCE(gm.member_count, 1) as member_count,
+               COALESCE(gm.member_names, u.name) as member_names,
                ss.id as score_sheet_id,
                COALESCE(ss.status, 'NOT_STARTED') as status,
                COALESCE(ss.status, 'NOT_STARTED') as scoring_status,
                ss.total_marks,
                ss.remarks
         FROM stage_queue sq
+        JOIN competitions c ON c.id = sq.competition_id
         JOIN participants p ON p.id = sq.participant_id
         JOIN users u ON u.id = p.user_id
         JOIN teams t ON t.id = p.team_id
+        LEFT JOIN (
+          SELECT r2.competition_id, p2.team_id,
+                 COUNT(p2.id) as member_count,
+                 GROUP_CONCAT(u2.name ORDER BY p2.id ASC SEPARATOR ', ') as member_names
+          FROM registrations r2
+          JOIN participants p2 ON p2.id = r2.participant_id
+          JOIN users u2 ON u2.id = p2.user_id
+          WHERE r2.status = 'ASSIGNED'
+          GROUP BY r2.competition_id, p2.team_id
+        ) gm ON gm.competition_id = sq.competition_id AND gm.team_id = p.team_id
         LEFT JOIN registrations r ON r.competition_id = sq.competition_id AND r.participant_id = p.id
         LEFT JOIN score_sheets ss ON ss.competition_id = sq.competition_id 
                                   AND ss.participant_id = p.id 
@@ -161,6 +181,53 @@ export class JudgeRepository {
       `, [judgeId, competitionId]);
     }
 
+    if (isGroup) {
+      // Off-stage or pre-checkin GROUP competition: 1 evaluation entry per team
+      return query(`
+        SELECT p.id as participant_id, p.participant_code, p.registration_number,
+               u.name as participant_name,
+               t.name as team_name, t.code as team_code,
+               sq.id as queue_id,
+               sq.code_letter,
+               COALESCE(sq.queue_order, 999) as queue_order,
+               COALESCE(sq.check_in_status, 'REPORTED') as check_in_status,
+               COALESCE(sq.stage_status, 'WAITING') as stage_status,
+               1 as is_group,
+               COALESCE(gm.member_count, 1) as member_count,
+               COALESCE(gm.member_names, u.name) as member_names,
+               ss.id as score_sheet_id,
+               COALESCE(ss.status, 'NOT_STARTED') as status,
+               COALESCE(ss.status, 'NOT_STARTED') as scoring_status,
+               ss.total_marks,
+               ss.remarks
+        FROM (
+          SELECT r_inner.competition_id, p_inner.team_id, MIN(r_inner.participant_id) as anchor_id
+          FROM registrations r_inner
+          JOIN participants p_inner ON p_inner.id = r_inner.participant_id
+          WHERE r_inner.competition_id = ? AND r_inner.status = 'ASSIGNED'
+          GROUP BY r_inner.competition_id, p_inner.team_id
+        ) anchor
+        JOIN participants p ON p.id = anchor.anchor_id
+        JOIN users u ON u.id = p.user_id
+        JOIN teams t ON t.id = anchor.team_id
+        LEFT JOIN (
+          SELECT r2.competition_id, p2.team_id,
+                 COUNT(p2.id) as member_count,
+                 GROUP_CONCAT(u2.name ORDER BY p2.id ASC SEPARATOR ', ') as member_names
+          FROM registrations r2
+          JOIN participants p2 ON p2.id = r2.participant_id
+          JOIN users u2 ON u2.id = p2.user_id
+          WHERE r2.status = 'ASSIGNED'
+          GROUP BY r2.competition_id, p2.team_id
+        ) gm ON gm.competition_id = anchor.competition_id AND gm.team_id = anchor.team_id
+        LEFT JOIN stage_queue sq ON sq.competition_id = anchor.competition_id AND sq.participant_id = p.id
+        LEFT JOIN score_sheets ss ON ss.competition_id = anchor.competition_id 
+                                  AND ss.participant_id = p.id 
+                                  AND ss.judge_id = ?
+        ORDER BY COALESCE(sq.queue_order, 999) ASC, sq.code_letter ASC, p.id ASC
+      `, [competitionId, judgeId]);
+    }
+
     return query(`
       SELECT p.id as participant_id, p.participant_code, p.registration_number,
              u.name as participant_name,
@@ -170,6 +237,9 @@ export class JudgeRepository {
              COALESCE(sq.queue_order, 999) as queue_order,
              sq.check_in_status,
              sq.stage_status,
+             0 as is_group,
+             1 as member_count,
+             u.name as member_names,
              ss.id as score_sheet_id,
              COALESCE(ss.status, 'NOT_STARTED') as status,
              COALESCE(ss.status, 'NOT_STARTED') as scoring_status,

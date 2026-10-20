@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Calendar, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { THEME } from '../../theme/theme.js';
 
 interface BentoHeaderProps {
   onToggleSidebar?: () => void;
@@ -75,7 +76,7 @@ export const BentoHeader: React.FC<BentoHeaderProps> = ({ onToggleSidebar }) => 
         <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold ${
           isJudge ? 'bg-white/10 border border-white/20 text-emerald-100 shadow-inner' : 'bg-slate-50 border border-slate-200 text-slate-700 shadow-2xs'
         }`}>
-          <Calendar className={`w-3.5 h-3.5 ${isJudge ? 'text-emerald-300' : 'text-[#0D472D]'}`} />
+          <Calendar className={`w-3.5 h-3.5 ${isJudge ? 'text-amber-300' : 'text-amber-600'}`} />
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span>{currentDateTime}</span>
         </div>
@@ -93,7 +94,7 @@ export const BentoHeader: React.FC<BentoHeaderProps> = ({ onToggleSidebar }) => 
             }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs shadow-xs ${
-              isJudge ? 'bg-white text-[#0D472D]' : 'bg-[#0D472D] text-white'
+              isJudge ? 'bg-amber-400 text-slate-950 font-black' : THEME.classes.avatarCircle
             }`}>
               {avatarChar}
             </div>

@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button.js';
+import { THEME } from '../../theme/theme.js';
 
 export const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -142,7 +143,7 @@ export const AdminDashboardPage: React.FC = () => {
   const areaRivaya = `${dPathRivaya} L ${pointsRivaya[pointsRivaya.length - 1].x} ${svgHeight - padYBot} L ${pointsRivaya[0].x} ${svgHeight - padYBot} Z`;
 
   return (
-    <div className="w-full h-full flex flex-col justify-between space-y-2.5 overflow-hidden text-slate-900">
+    <div className="w-full min-h-full flex flex-col space-y-3 text-slate-900">
       {/* =================================================================== */}
       {/* 1. TOP HEADER (Frameless, Clean Typography)                         */}
       {/* =================================================================== */}
@@ -171,9 +172,9 @@ export const AdminDashboardPage: React.FC = () => {
             variant="primary"
             size="sm"
             onClick={() => navigate('/admin/results')}
-            className="bg-[#0D472D] hover:bg-[#07321e] text-white font-bold text-xs shadow-xs rounded-xl px-3.5 py-1.5 cursor-pointer"
+            className="rounded-xl px-3.5 py-1.5 cursor-pointer text-xs"
           >
-            <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+            <ShieldCheck className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
             <span>Verify Scores</span>
           </Button>
         </div>
@@ -183,28 +184,30 @@ export const AdminDashboardPage: React.FC = () => {
       {/* 2. TOP KPI ROW (4 Bento Stat Tiles with Generous Height & Spacing) */}
       {/* =================================================================== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 shrink-0">
-        {/* KPI Tile 1: Total Programmes (Dark Emerald Lead Tile) */}
+        {/* KPI Tile 1: Total Programmes (Dark Bronze & Golden Luxury Lead Tile) */}
         <div
           onClick={() => navigate('/admin/competitions')}
-          className="bg-[#0D472D] text-white rounded-2xl p-4 sm:p-4.5 min-h-[110px] shadow-xs flex flex-col justify-between cursor-pointer hover:bg-[#093923] transition-all relative overflow-hidden group"
+          className={`${THEME.classes.heroCard} rounded-2xl p-4 sm:p-4.5 min-h-[110px] flex flex-col justify-between cursor-pointer hover:border-amber-400/60 hover:scale-[1.01] transition-all relative overflow-hidden group`}
         >
           <div className="flex items-center justify-between z-10">
-            <span className="text-[11.5px] font-bento-title uppercase tracking-wider text-emerald-200 font-semibold">
+            <span className="text-[11.5px] font-bento-title uppercase tracking-wider text-amber-300 font-bold">
               Total Programmes
             </span>
-            <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+            <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 group-hover:scale-110 transition-transform">
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="my-1.5 z-10 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bento-num tracking-[-0.04em] text-white font-bold">{totalEvents}</span>
-            <span className="text-xs font-bento-title text-emerald-300 font-semibold">Events</span>
+            <span className={`text-2xl sm:text-3xl font-bento-num tracking-[-0.04em] ${THEME.classes.goldTextGradient}`}>
+              {totalEvents}
+            </span>
+            <span className="text-xs font-bento-title text-amber-400/80 font-bold">Events</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[10px] text-emerald-100 font-semibold z-10">
+          <div className="flex items-center gap-1.5 text-[10px] text-amber-200 font-semibold z-10">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             <span>{liveEvents} Active Stage Items Now</span>
           </div>
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/20 rounded-full blur-xl group-hover:bg-emerald-500/30 transition-all" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/15 rounded-full blur-xl group-hover:bg-amber-500/25 transition-all" />
         </div>
 
         {/* KPI Tile 2: House Standings Lead */}
@@ -226,7 +229,7 @@ export const AdminDashboardPage: React.FC = () => {
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-[10px] text-slate-600 font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#0D472D]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
             <span>{leadingTeamName} Contingent Leading</span>
           </div>
         </div>
@@ -296,7 +299,7 @@ export const AdminDashboardPage: React.FC = () => {
             <span className="text-[11.5px] font-bento-title uppercase tracking-wider text-slate-500 font-semibold">
               Results Published
             </span>
-            <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200/60 flex items-center justify-center text-[#0D472D] group-hover:scale-110 transition-transform">
+            <div className="w-6 h-6 rounded-full bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-700 group-hover:scale-110 transition-transform">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -304,8 +307,8 @@ export const AdminDashboardPage: React.FC = () => {
             <span className="text-2xl sm:text-3xl font-bento-num text-slate-900 tracking-[-0.04em] font-bold">{completedEvents}</span>
             <span className="text-xs font-bento-title text-slate-400 font-normal">/ {totalEvents}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-bold">
-            <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200">
+          <div className="flex items-center gap-1.5 text-[10px] text-amber-900 font-bold">
+            <span className="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200/80">
               {Math.round((completedEvents / totalEvents) * 100)}% Verified
             </span>
           </div>
@@ -315,15 +318,15 @@ export const AdminDashboardPage: React.FC = () => {
       {/* =================================================================== */}
       {/* 3. BENTO GRID MAIN CONTAINER (100% Single-Screen Non-Scrolling)     */}
       {/* =================================================================== */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 min-h-0 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3">
         {/* ----------------------------------------------------------------- */}
         {/* LEFT COLUMN (4 Cols): 🏆 House Battle Card & Pie Analytics       */}
         {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-4 flex flex-col gap-2.5 min-h-0 overflow-hidden">
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-xs flex-1 flex flex-col justify-between min-h-0 overflow-hidden">
+        <div className="md:col-span-4 flex flex-col gap-2.5">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-xs flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2 shrink-0">
               <div className="flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5 text-[#0D472D]" />
+                <Trophy className="w-3.5 h-3.5 text-amber-600" />
                 <h3 className="text-xs font-bento-title uppercase tracking-wider text-slate-800">
                   House Championship Battle
                 </h3>
@@ -342,8 +345,8 @@ export const AdminDashboardPage: React.FC = () => {
                     Points Progression
                   </span>
                   <div className="flex items-center gap-2.5">
-                    <span className="flex items-center gap-1 text-[9px] font-bold text-[#0D472D]">
-                      <span className="w-2 h-2 rounded-full bg-[#0D472D]" /> Diraya
+                    <span className="flex items-center gap-1 text-[9px] font-bold text-amber-800">
+                      <span className="w-2 h-2 rounded-full bg-amber-600" /> Diraya
                     </span>
                     <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-600">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" /> Rivaya
@@ -355,12 +358,12 @@ export const AdminDashboardPage: React.FC = () => {
                   <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
                     <defs>
                       <linearGradient id="dirayaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0D472D" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#0D472D" stopOpacity="0.0" />
+                        <stop offset="0%" stopColor={THEME.colors.diraya} stopOpacity="0.25" />
+                        <stop offset="100%" stopColor={THEME.colors.diraya} stopOpacity="0.0" />
                       </linearGradient>
                       <linearGradient id="rivayaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+                        <stop offset="0%" stopColor={THEME.colors.rivaya} stopOpacity="0.25" />
+                        <stop offset="100%" stopColor={THEME.colors.rivaya} stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
 
@@ -374,16 +377,16 @@ export const AdminDashboardPage: React.FC = () => {
                     <path d={areaRivaya} fill="url(#rivayaGrad)" />
 
                     {/* Polyline / Curved lines */}
-                    <path d={dPathRivaya} fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d={dPathDiraya} fill="none" stroke="#0D472D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={dPathRivaya} fill="none" stroke={THEME.colors.rivaya} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={dPathDiraya} fill="none" stroke={THEME.colors.diraya} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
                     {/* Node points & X labels */}
                     {pointsRivaya.map((p: any, idx: number) => (
-                      <circle key={`r-${idx}`} cx={p.x} cy={p.y} r="3" fill="#10B981" stroke="#FFFFFF" strokeWidth="1.5" />
+                      <circle key={`r-${idx}`} cx={p.x} cy={p.y} r="3" fill={THEME.colors.rivaya} stroke="#FFFFFF" strokeWidth="1.5" />
                     ))}
                     {pointsDiraya.map((p: any, idx: number) => (
                       <g key={`d-${idx}`}>
-                        <circle cx={p.x} cy={p.y} r="3" fill="#0D472D" stroke="#FFFFFF" strokeWidth="1.5" />
+                        <circle cx={p.x} cy={p.y} r="3" fill={THEME.colors.diraya} stroke="#FFFFFF" strokeWidth="1.5" />
                         {/* X-axis Programme label */}
                         <text
                           x={p.x}
@@ -403,7 +406,7 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#0D472D] shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0" />
                     <span className="font-bento-title text-slate-900 font-bold text-xs truncate">Diraya</span>
                   </div>
                   <strong className="font-bento-num text-slate-900 text-xs shrink-0">
@@ -426,13 +429,13 @@ export const AdminDashboardPage: React.FC = () => {
             {/* Battle Line Progress Bar */}
             <div className="space-y-1 pt-2 border-t border-slate-100 shrink-0">
               <div className="flex items-center justify-between text-[10px] font-bento-title uppercase">
-                <span className="text-[#0D472D] font-bold">Diraya House</span>
+                <span className="text-amber-800 font-bold">Diraya House</span>
                 <span className="text-slate-400 font-normal">Live Battle Line</span>
                 <span className="text-emerald-700 font-bold">Rivaya House</span>
               </div>
               <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden flex items-center p-0.5 border border-slate-200/60">
                 <div
-                  className="h-full bg-[#0D472D] rounded-l-full transition-all duration-500"
+                  className="h-full bg-amber-600 rounded-l-full transition-all duration-500"
                   style={{ width: `${dirayaPct}%` }}
                 />
                 <div
@@ -442,7 +445,7 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
               <div className="text-center pt-0.5">
                 <span className="text-[10px] text-slate-500 font-semibold">
-                  Battle Line Margin: <strong className="text-[#0D472D] font-bento-num">{leadingTeamName} +{pointDiff} PTS</strong>
+                  Battle Line Margin: <strong className="text-amber-800 font-bento-num">{leadingTeamName} +{pointDiff} PTS</strong>
                 </span>
               </div>
             </div>
@@ -452,8 +455,8 @@ export const AdminDashboardPage: React.FC = () => {
         {/* ----------------------------------------------------------------- */}
         {/* CENTER COLUMN (5 Cols): ⚡ Stage Live Card (Full Height)          */}
         {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-5 flex flex-col min-h-0 overflow-hidden">
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-xs flex-1 flex flex-col justify-between min-h-0 overflow-hidden">
+        <div className="md:col-span-5 flex flex-col">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-xs flex-1 flex flex-col justify-between space-y-3">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-2 shrink-0">
               <div className="flex items-center gap-1.5">
@@ -462,7 +465,7 @@ export const AdminDashboardPage: React.FC = () => {
                   Live Stage Control Radar
                 </h3>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-[#E6F4EA] text-[#0D472D] text-[9px] font-bento-title uppercase border border-emerald-200 font-bold">
+              <span className={`px-2 py-0.5 rounded-md ${THEME.classes.badgeInactive} text-[9px] font-bento-title uppercase`}>
                 DISPATCH ACTIVE
               </span>
             </div>
@@ -477,13 +480,13 @@ export const AdminDashboardPage: React.FC = () => {
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                       Now On Stage
                     </span>
-                    <span className="text-[10px] font-bento-num font-bold text-[#0D472D] bg-white px-1.5 py-0.5 rounded border border-slate-200 uppercase">
+                    <span className={`text-[10px] font-bento-num font-bold ${THEME.classes.badgeInactive} px-1.5 py-0.5 rounded uppercase`}>
                       {nextDispatch.venue_name || 'MAIN STAGE'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#0D472D] text-white font-bento-num text-lg flex items-center justify-center shadow-xs shrink-0 font-bold">
+                    <div className={`w-10 h-10 rounded-xl ${THEME.classes.lotBadge} font-bento-num text-lg flex items-center justify-center shrink-0`}>
                       {nextDispatch.code_letter || 'A'}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -556,12 +559,12 @@ export const AdminDashboardPage: React.FC = () => {
         {/* ----------------------------------------------------------------- */}
         {/* RIGHT COLUMN (3 Cols): 📢 Ticker Card & 🛠️ Tool Hub Card          */}
         {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-3 flex flex-col gap-2.5 min-h-0 overflow-hidden">
+        <div className="md:col-span-3 flex flex-col gap-2.5">
           {/* Card 1: 📢 Ticker Card (Control Broadcast Ticker) */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-xs flex-1 flex flex-col justify-between min-h-0 overflow-hidden">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-xs flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2 shrink-0">
               <div className="flex items-center gap-1.5">
-                <Megaphone className="w-3.5 h-3.5 text-[#0D472D]" />
+                <Megaphone className="w-3.5 h-3.5 text-amber-600" />
                 <h3 className="text-xs font-bento-title uppercase tracking-wider text-slate-800">
                   Control Broadcasts
                 </h3>
@@ -574,7 +577,7 @@ export const AdminDashboardPage: React.FC = () => {
                 recentAudits.slice(0, 5).map((log: any, idx: number) => (
                   <div key={log.id || idx} className="px-2 py-1.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-bento-title text-[#0D472D] uppercase truncate max-w-[120px] font-bold">
+                      <span className="text-[9px] font-bento-title text-amber-800 uppercase truncate max-w-[120px] font-bold">
                         {log.action || 'System Notice'}
                       </span>
                       <span className="text-[8px] text-slate-400 font-medium shrink-0">
@@ -590,7 +593,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <>
                   <div className="px-2 py-1.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-bento-title text-[#0D472D] uppercase font-bold">Stage Control</span>
+                      <span className="text-[9px] font-bento-title text-amber-800 uppercase font-bold">Stage Control</span>
                       <span className="text-[8px] text-slate-400 font-medium">Just Now</span>
                     </div>
                     <p className="text-[11px] text-slate-700 leading-snug">

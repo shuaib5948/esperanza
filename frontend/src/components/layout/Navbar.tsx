@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
+import { THEME } from '../../theme/theme.js';
 import {
   Trophy,
   LogOut,
@@ -169,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
           <div className="flex items-center gap-3">
             {/* Festival Date Pill */}
             <div className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/80 text-xs text-slate-700 shadow-2xs">
-              <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+              <Calendar className="w-3.5 h-3.5 text-amber-600" />
               <div className="flex flex-col text-left leading-tight">
                 <span className="font-bold text-[11px] text-slate-800">Fri, 10 Oct 2026</span>
                 <span className="text-[9px] text-slate-400 font-medium">Esperanza Cultural Fest</span>
@@ -187,7 +188,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
 
             {/* User Dropdown Pill */}
             <div className="flex items-center gap-2 pl-1 cursor-pointer">
-              <div className="w-9 h-9 rounded-full bg-[#064E3B] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+              <div className={`w-9 h-9 rounded-full ${THEME.classes.avatarCircle} flex items-center justify-center font-black text-xs shadow-xs`}>
                 {user.name ? user.name.charAt(0).toUpperCase() : 'A'}
               </div>
               <div className="hidden md:flex flex-col text-left leading-tight">
@@ -224,7 +225,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#0D472D] hover:bg-[#07321e] shadow-md transition-all cursor-pointer"
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs ${THEME.classes.primaryBtn} transition-all transform hover:scale-[1.02] cursor-pointer`}
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 <span>Portal Login</span>

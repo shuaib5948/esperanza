@@ -252,9 +252,9 @@
 .bento-portal input:focus,
 .bento-portal select:focus,
 .bento-portal textarea:focus {
-  border-color: #0D472D;
+  border-color: #f59e0b;
   outline: none;
-  box-shadow: 0 0 0 1px #0D472D;
+  box-shadow: 0 0 0 1px #f59e0b;
 }
 
 

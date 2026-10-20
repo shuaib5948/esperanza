@@ -1,4 +1,5 @@
 import React from 'react';
+import { THEME } from '../../theme/theme.js';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'success';
@@ -20,9 +21,9 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary:
-      'bg-[#0D472D] hover:bg-[#07301D] text-white shadow-2xs shadow-emerald-950/15 focus:ring-[#0D472D]',
+      THEME.classes.primaryBtn,
     secondary:
-      'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200/80 focus:ring-slate-400',
+      THEME.classes.secondaryBtn,
     success:
       'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs focus:ring-emerald-500',
     danger:

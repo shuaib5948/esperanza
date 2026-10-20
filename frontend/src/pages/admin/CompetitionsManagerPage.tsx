@@ -539,7 +539,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               });
               setIsAddModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Add Programme</span>
@@ -561,7 +561,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 onClick={() => setSelectedStatus(pill.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-[#0D472D] text-white shadow-2xs font-semibold'
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 shadow-xs font-bold'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
                 }`}
               >
@@ -569,7 +569,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 <span>{pill.label}</span>
                 <span
                   className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200'
+                    isActive ? 'bg-black/10 text-slate-950 font-bold' : 'bg-white text-slate-600 border border-slate-200'
                   }`}
                 >
                   {count}
@@ -585,7 +585,7 @@ export const CompetitionsManagerPage: React.FC = () => {
           <select
             value={selectedGroup}
             onChange={(e) => setSelectedGroup(e.target.value)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-700 focus:outline-hidden focus:border-[#0D472D] cursor-pointer shrink-0"
+            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-700 focus:outline-hidden focus:border-amber-500 cursor-pointer shrink-0"
           >
             <option value="ALL">All Categories ({competitions.length})</option>
             {['J1', 'J2', 'JUNIOR', 'SENIOR', 'GENERAL'].map((grp) => {
@@ -610,7 +610,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search 60 programmes..."
-              className="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-[#0D472D]"
+              className="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
             {search && (
               <button
@@ -676,7 +676,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                     <tr key={comp.id} className="hover:bg-slate-50/90 transition-colors">
                       {/* Programme Number */}
                       <td className="py-3.5 px-4 text-center">
-                        <span className="font-mono text-xs font-bold text-[#0D472D] bg-[#E6F4EA] border border-emerald-200/80 px-3 py-1 rounded-full inline-block shadow-2xs">
+                        <span className="font-mono text-xs font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-3 py-1 rounded-full inline-block shadow-2xs">
                           {comp.programme_number}
                         </span>
                       </td>
@@ -873,7 +873,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={formData.programme_number}
                 onChange={(e) => setFormData({ ...formData, programme_number: e.target.value })}
                 placeholder="e.g. 61"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
@@ -887,7 +887,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g. Classical Monologue"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D]"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500"
               />
             </div>
           </div>
@@ -902,7 +902,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 required
                 value={formData.programme_group_id}
                 onChange={(e) => setFormData({ ...formData, programme_group_id: e.target.value })}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 <option value="">Select Group</option>
                 {programmeGroups.map((g) => (
@@ -920,7 +920,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               <select
                 value={formData.competition_type_id}
                 onChange={(e) => handleTypeChange(e.target.value, false)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 <option value="">Select Type</option>
                 {competitionTypes.map((t) => (
@@ -938,7 +938,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               <select
                 value={formData.participation_type}
                 onChange={(e) => setFormData({ ...formData, participation_type: e.target.value })}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 <option value="INDIVIDUAL">INDIVIDUAL</option>
                 <option value="GROUP">GROUP</option>
@@ -960,7 +960,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   value={formData.max_participants}
                   onChange={(e) => setFormData({ ...formData, max_participants: e.target.value })}
                   placeholder="e.g. 4"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
               <div>
@@ -973,7 +973,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   value={formData.max_entries_per_team}
                   onChange={(e) => setFormData({ ...formData, max_entries_per_team: e.target.value })}
                   placeholder="Leave blank for Unlimited"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
             </div>
@@ -988,7 +988,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={formData.max_entries_per_team}
                 onChange={(e) => setFormData({ ...formData, max_entries_per_team: e.target.value })}
                 placeholder="Leave blank for Unlimited"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
               />
             </div>
           )}
@@ -1003,7 +1003,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Brief description of the event format or background..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-[#0D472D]"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
           </div>
 
@@ -1017,7 +1017,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               value={formData.rules}
               onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
               placeholder="e.g. Time limit 5 mins, no electronic aids permitted..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-[#0D472D]"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
           </div>
 
@@ -1032,7 +1032,7 @@ export const CompetitionsManagerPage: React.FC = () => {
             <button
               type="submit"
               disabled={createCompetitionMutation.isPending}
-              className="px-5 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+              className="px-5 py-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
             >
               {createCompetitionMutation.isPending ? 'Creating...' : 'Create Competition'}
             </button>
@@ -1063,7 +1063,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   required
                   value={editFormData.programme_number}
                   onChange={(e) => setEditFormData({ ...editFormData, programme_number: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
 
@@ -1076,7 +1076,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   required
                   value={editFormData.name}
                   onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500"
                 />
               </div>
             </div>
@@ -1091,7 +1091,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   required
                   value={editFormData.programme_group_id}
                   onChange={(e) => setEditFormData({ ...editFormData, programme_group_id: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="">Select Group</option>
                   {programmeGroups.map((g) => (
@@ -1109,7 +1109,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 <select
                   value={editFormData.competition_type_id}
                   onChange={(e) => handleTypeChange(e.target.value, true)}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="">Select Type</option>
                   {competitionTypes.map((t) => (
@@ -1127,7 +1127,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 <select
                   value={editFormData.participation_type}
                   onChange={(e) => setEditFormData({ ...editFormData, participation_type: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="INDIVIDUAL">INDIVIDUAL</option>
                   <option value="GROUP">GROUP</option>
@@ -1149,7 +1149,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                     value={editFormData.max_participants}
                     onChange={(e) => setEditFormData({ ...editFormData, max_participants: e.target.value })}
                     placeholder="e.g. 4"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                   />
                 </div>
                 <div>
@@ -1162,7 +1162,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                     value={editFormData.max_entries_per_team}
                     onChange={(e) => setEditFormData({ ...editFormData, max_entries_per_team: e.target.value })}
                     placeholder="Leave blank for Unlimited"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -1177,7 +1177,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   value={editFormData.max_entries_per_team}
                   onChange={(e) => setEditFormData({ ...editFormData, max_entries_per_team: e.target.value })}
                   placeholder="Leave blank for Unlimited"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
             )}
@@ -1192,7 +1192,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={editFormData.description}
                 onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                 placeholder="Event format or details..."
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-[#0D472D]"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
@@ -1206,7 +1206,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={editFormData.rules}
                 onChange={(e) => setEditFormData({ ...editFormData, rules: e.target.value })}
                 placeholder="Specific rules or constraints..."
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-[#0D472D]"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
@@ -1241,7 +1241,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={updateCompetitionMutation.isPending}
-                  className="px-5 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
                 >
                   {updateCompetitionMutation.isPending ? 'Saving...' : 'Save Changes'}
                 </button>

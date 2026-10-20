@@ -25,6 +25,7 @@ import { Card } from '../../components/ui/Card.js';
 import { Badge } from '../../components/ui/Badge.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
+import { THEME } from '../../theme/theme.js';
 
 interface CompetitionItem {
   id: number;
@@ -65,6 +66,9 @@ interface ResultItem {
   participant_code: string;
   team_name: string;
   team_code?: string;
+  is_group?: boolean;
+  member_count?: number;
+  member_names?: string;
   verified_by_name?: string;
   published_by_name?: string;
 }
@@ -354,7 +358,7 @@ export const ResultsVerificationPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <Award className="w-7 h-7 text-[#0D472D]" />
+              <Award className="w-7 h-7 text-amber-700" />
               <h1 className="text-3xl font-black text-slate-900">Results & Points Verification</h1>
             </div>
             <p className="text-sm text-slate-500 mt-1">
@@ -382,14 +386,14 @@ export const ResultsVerificationPage: React.FC = () => {
               onClick={() => setStatusFilter('ALL')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                 statusFilter === 'ALL'
-                  ? 'bg-[#0D472D] text-white border-[#0D472D] shadow-xs'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
               }`}
             >
               <span>All</span>
               <span
                 className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'ALL' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  statusFilter === 'ALL' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-slate-100 text-slate-600'
                 }`}
               >
                 {counts.all}
@@ -400,7 +404,7 @@ export const ResultsVerificationPage: React.FC = () => {
               onClick={() => setStatusFilter('DRAFT')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                 statusFilter === 'DRAFT'
-                  ? 'bg-[#0D472D] text-white border-[#0D472D] shadow-xs'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
                   : 'bg-white text-amber-800 border-slate-200 hover:bg-amber-50/50'
               }`}
             >
@@ -408,7 +412,7 @@ export const ResultsVerificationPage: React.FC = () => {
               <span>Draft</span>
               <span
                 className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'DRAFT' ? 'bg-white/20 text-white' : 'bg-amber-50 text-amber-800 border border-amber-200'
+                  statusFilter === 'DRAFT' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-amber-50 text-amber-800 border border-amber-200'
                 }`}
               >
                 {counts.draft}
@@ -419,7 +423,7 @@ export const ResultsVerificationPage: React.FC = () => {
               onClick={() => setStatusFilter('VERIFIED')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                 statusFilter === 'VERIFIED'
-                  ? 'bg-[#0D472D] text-white border-[#0D472D] shadow-xs'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
                   : 'bg-white text-blue-800 border-slate-200 hover:bg-blue-50/50'
               }`}
             >
@@ -427,7 +431,7 @@ export const ResultsVerificationPage: React.FC = () => {
               <span>Verified</span>
               <span
                 className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'VERIFIED' ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-800 border border-blue-200'
+                  statusFilter === 'VERIFIED' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-blue-50 text-blue-800 border border-blue-200'
                 }`}
               >
                 {counts.verified}
@@ -438,7 +442,7 @@ export const ResultsVerificationPage: React.FC = () => {
               onClick={() => setStatusFilter('PUBLISHED')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                 statusFilter === 'PUBLISHED'
-                  ? 'bg-[#0D472D] text-white border-[#0D472D] shadow-xs'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
                   : 'bg-white text-emerald-800 border-slate-200 hover:bg-emerald-50/50'
               }`}
             >
@@ -446,7 +450,7 @@ export const ResultsVerificationPage: React.FC = () => {
               <span>Published</span>
               <span
                 className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'PUBLISHED' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  statusFilter === 'PUBLISHED' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                 }`}
               >
                 {counts.published}
@@ -462,7 +466,7 @@ export const ResultsVerificationPage: React.FC = () => {
               placeholder="Search programme, code, category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-full pl-9 pr-4 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#0D472D] focus:ring-1 focus:ring-[#0D472D] shadow-2xs"
+              className="w-full bg-slate-50 border border-slate-200 rounded-full pl-9 pr-4 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
             />
           </div>
         </div>
@@ -537,7 +541,7 @@ export const ResultsVerificationPage: React.FC = () => {
                     </div>
 
                     {/* Programme Name */}
-                    <h4 className="text-lg font-bold text-slate-900 group-hover:text-[#0D472D] transition-colors leading-snug">
+                    <h4 className="text-lg font-bold text-slate-900 group-hover:text-amber-700 transition-colors leading-snug">
                       {comp.group_name || comp.programme_group_name ? `${comp.group_name || comp.programme_group_name} - ` : ''}{comp.name}
                     </h4>
                   </div>
@@ -558,13 +562,13 @@ export const ResultsVerificationPage: React.FC = () => {
                           setSelectedCompId(comp.id);
                         }}
                         disabled={evaluateMutation.isPending}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white border border-[#0D472D] text-xs font-semibold shadow-2xs transition-all cursor-pointer hover:scale-[1.02]"
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full ${THEME.classes.primaryBtn} text-xs font-black shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02]`}
                       >
                         <Gavel className="w-3.5 h-3.5" />
                         <span>Evaluate (Send to Judges)</span>
                       </button>
                     ) : (
-                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 group-hover:bg-[#0D472D] text-slate-700 group-hover:text-white border border-slate-200 group-hover:border-[#0D472D] text-xs font-semibold shadow-2xs transition-all">
+                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 group-hover:bg-gradient-to-r group-hover:from-amber-400 group-hover:to-yellow-400 text-slate-700 group-hover:text-slate-950 border border-slate-200 group-hover:border-amber-400 text-xs font-semibold shadow-2xs transition-all">
                         <span>View Results</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </div>
@@ -626,7 +630,7 @@ export const ResultsVerificationPage: React.FC = () => {
             <button
               disabled={generateMutation.isPending}
               onClick={() => generateMutation.mutate()}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white font-bold text-xs shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full ${THEME.classes.primaryBtn} font-black text-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50`}
             >
               <Sparkles className="w-4 h-4" />
               <span>Calculate Results</span>
@@ -644,7 +648,7 @@ export const ResultsVerificationPage: React.FC = () => {
               className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer ${
                 allPublished
                   ? 'bg-emerald-50 hover:bg-rose-50 text-emerald-800 hover:text-rose-700 border border-emerald-300 hover:border-rose-300 group'
-                  : 'bg-[#0D472D] hover:bg-[#07321e] text-white'
+                  : `${THEME.classes.primaryBtn} font-black`
               }`}
               title={allPublished ? 'Click to unpublish results and rollback points' : 'Publish results to live leaderboard'}
             >
@@ -689,14 +693,27 @@ export const ResultsVerificationPage: React.FC = () => {
             {secondPlace ? (
               <div className="space-y-3 flex-1 flex flex-col justify-between">
                 <div>
-                  <h4 className="text-base font-black text-slate-900 truncate" title={secondPlace.participant_name}>
-                    {secondPlace.participant_name}
+                  <h4 className="text-base font-black text-slate-900 truncate" title={secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}>
+                    {secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}
                   </h4>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="font-mono text-[11px] text-[#0D472D] font-bold bg-[#E6F4EA] px-2 py-0.5 rounded-md border border-emerald-200/80">
-                      {secondPlace.participant_code}
-                    </span>
-                    <span className="text-xs text-slate-500 font-semibold">{secondPlace.team_name}</span>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    {secondPlace.is_group ? (
+                      <>
+                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
+                          {secondPlace.member_count} Members
+                        </span>
+                        <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]" title={secondPlace.member_names}>
+                          {secondPlace.member_names}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
+                          {secondPlace.participant_code}
+                        </span>
+                        <span className="text-xs text-slate-500 font-semibold">{secondPlace.team_name}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -704,7 +721,7 @@ export const ResultsVerificationPage: React.FC = () => {
                   <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
                     Grade {secondPlace.grade || 'A'} ({formatMark(secondPlace.raw_marks)})
                   </span>
-                  <span className="font-mono font-black text-[#0D472D] text-lg">
+                  <span className="font-mono font-black text-amber-700 text-lg">
                     +{secondPlace.final_score} <span className="text-xs font-bold text-slate-500">pts</span>
                   </span>
                 </div>
@@ -736,16 +753,29 @@ export const ResultsVerificationPage: React.FC = () => {
             {firstPlace ? (
               <div className="space-y-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h4 className="text-xl font-black text-slate-900 truncate" title={firstPlace.participant_name}>
-                    {firstPlace.participant_name}
+                  <h4 className="text-xl font-black text-slate-900 truncate" title={firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}>
+                    {firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}
                   </h4>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="font-mono text-xs text-[#0D472D] font-black bg-[#E6F4EA] px-2.5 py-1 rounded-lg border border-emerald-300">
-                      {firstPlace.participant_code}
-                    </span>
-                    <span className="text-xs text-slate-700 font-bold bg-amber-100/70 px-2.5 py-1 rounded-lg border border-amber-200">
-                      {firstPlace.team_name}
-                    </span>
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    {firstPlace.is_group ? (
+                      <>
+                        <span className="font-mono text-xs text-amber-950 font-black bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-300">
+                          {firstPlace.member_count} Members
+                        </span>
+                        <span className="text-xs text-slate-700 font-medium bg-amber-100/70 px-2.5 py-1 rounded-lg border border-amber-200 truncate max-w-xs" title={firstPlace.member_names}>
+                          {firstPlace.member_names}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-mono text-xs text-amber-950 font-black bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-300">
+                          {firstPlace.participant_code}
+                        </span>
+                        <span className="text-xs text-slate-700 font-bold bg-amber-100/70 px-2.5 py-1 rounded-lg border border-amber-200">
+                          {firstPlace.team_name}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -753,7 +783,7 @@ export const ResultsVerificationPage: React.FC = () => {
                   <span className="text-xs font-black text-amber-900 bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-300">
                     Grade {firstPlace.grade || 'A'} ({formatMark(firstPlace.raw_marks)})
                   </span>
-                  <span className="font-mono font-black text-[#0D472D] text-2xl">
+                  <span className="font-mono font-black text-amber-700 text-2xl">
                     +{firstPlace.final_score} <span className="text-xs font-bold text-slate-500">pts</span>
                   </span>
                 </div>
@@ -785,14 +815,27 @@ export const ResultsVerificationPage: React.FC = () => {
             {thirdPlace ? (
               <div className="space-y-3 flex-1 flex flex-col justify-between">
                 <div>
-                  <h4 className="text-base font-black text-slate-900 truncate" title={thirdPlace.participant_name}>
-                    {thirdPlace.participant_name}
+                  <h4 className="text-base font-black text-slate-900 truncate" title={thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}>
+                    {thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}
                   </h4>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="font-mono text-[11px] text-[#0D472D] font-bold bg-[#E6F4EA] px-2 py-0.5 rounded-md border border-emerald-200/80">
-                      {thirdPlace.participant_code}
-                    </span>
-                    <span className="text-xs text-slate-500 font-semibold">{thirdPlace.team_name}</span>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    {thirdPlace.is_group ? (
+                      <>
+                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
+                          {thirdPlace.member_count} Members
+                        </span>
+                        <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]" title={thirdPlace.member_names}>
+                          {thirdPlace.member_names}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
+                          {thirdPlace.participant_code}
+                        </span>
+                        <span className="text-xs text-slate-500 font-semibold">{thirdPlace.team_name}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -800,7 +843,7 @@ export const ResultsVerificationPage: React.FC = () => {
                   <span className="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
                     Grade {thirdPlace.grade || 'B'} ({formatMark(thirdPlace.raw_marks)})
                   </span>
-                  <span className="font-mono font-black text-[#0D472D] text-lg">
+                  <span className="font-mono font-black text-amber-700 text-lg">
                     +{thirdPlace.final_score} <span className="text-xs font-bold text-slate-500">pts</span>
                   </span>
                 </div>
@@ -819,7 +862,7 @@ export const ResultsVerificationPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
             <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <Award className="w-5 h-5 text-[#0D472D]" />
+              <Award className="w-5 h-5 text-amber-700" />
               <span>Official Scoreboard</span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -837,7 +880,7 @@ export const ResultsVerificationPage: React.FC = () => {
               }}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
             >
-              <Eye className="w-3.5 h-3.5 text-[#0D472D]" />
+              <Eye className="w-3.5 h-3.5 text-amber-700" />
               <span>Audit Judge Sheets ({judgeScores.length})</span>
             </button>
           </div>
@@ -860,7 +903,7 @@ export const ResultsVerificationPage: React.FC = () => {
               <button
                 onClick={() => generateMutation.mutate()}
                 disabled={generateMutation.isPending}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white font-bold text-xs shadow-xs mx-auto cursor-pointer"
+                className={`flex items-center gap-1.5 px-5 py-2 rounded-full ${THEME.classes.primaryBtn} font-black text-xs mx-auto cursor-pointer`}
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Calculate Results Now</span>
@@ -869,7 +912,7 @@ export const ResultsVerificationPage: React.FC = () => {
               <button
                 onClick={() => evaluateMutation.mutate(selectedComp.id)}
                 disabled={evaluateMutation.isPending}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white font-bold text-xs shadow-xs mx-auto cursor-pointer hover:scale-[1.02]"
+                className={`flex items-center gap-1.5 px-5 py-2 rounded-full ${THEME.classes.primaryBtn} font-black text-xs mx-auto cursor-pointer hover:scale-[1.02]`}
               >
                 <Gavel className="w-4 h-4" />
                 <span>{evaluateMutation.isPending ? 'Sending...' : 'Send to Judges for Evaluation'}</span>
@@ -884,7 +927,7 @@ export const ResultsVerificationPage: React.FC = () => {
                   <th className="py-3 px-4 w-24">Rank</th>
                   <th className="py-3 px-4">Contestant & Team</th>
                   <th className="py-3 px-4 text-center w-28">Grade</th>
-                  <th className="py-3 px-4 text-center w-40 font-bold text-[#0D472D]">Total Fest Points</th>
+                  <th className="py-3 px-4 text-center w-40 font-bold text-amber-900">Total Fest Points</th>
                   <th className="py-3 px-4 text-right w-24">Audit</th>
                 </tr>
               </thead>
@@ -928,15 +971,31 @@ export const ResultsVerificationPage: React.FC = () => {
 
                       {/* 2. Contestant & Team */}
                       <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 text-sm">{res.participant_name}</span>
-                          <span className="font-mono text-xs text-[#0D472D] font-bold bg-[#E6F4EA] px-2 py-0.5 rounded-full border border-emerald-200/60">
-                            {res.participant_code}
-                          </span>
-                        </div>
-                        <span className="text-xs text-slate-500 font-semibold block mt-0.5">
-                          {res.team_name}
-                        </span>
+                        {res.is_group ? (
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-slate-900 text-sm">{res.team_name}</span>
+                              <span className="font-mono text-xs text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shrink-0">
+                                {res.member_count} Members
+                              </span>
+                            </div>
+                            <span className="text-xs text-slate-500 font-medium block mt-0.5 truncate max-w-md" title={res.member_names}>
+                              {res.member_names}
+                            </span>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900 text-sm">{res.participant_name}</span>
+                              <span className="font-mono text-xs text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
+                                {res.participant_code}
+                              </span>
+                            </div>
+                            <span className="text-xs text-slate-500 font-semibold block mt-0.5">
+                              {res.team_name}
+                            </span>
+                          </div>
+                        )}
                       </td>
 
                       {/* 3. Grade & Quality */}
@@ -947,7 +1006,7 @@ export const ResultsVerificationPage: React.FC = () => {
                               res.grade === 'A+'
                                 ? 'bg-amber-50 text-amber-900 border-amber-300'
                                 : res.grade === 'A'
-                                ? 'bg-[#E6F4EA] text-[#0D472D] border-emerald-300'
+                                ? 'bg-amber-100 text-amber-950 border-amber-300'
                                 : res.grade === 'B'
                                 ? 'bg-blue-50 text-blue-900 border-blue-200'
                                 : res.grade === 'C'
@@ -965,7 +1024,7 @@ export const ResultsVerificationPage: React.FC = () => {
 
                       {/* 4. Total Fest Points (with transparent breakdown) */}
                       <td className="py-3.5 px-4 text-center">
-                        <span className="font-mono font-black text-[#0D472D] text-base block">
+                        <span className="font-mono font-black text-amber-900 text-base block">
                           {Number(res.final_score).toFixed(0)} pts
                         </span>
                         <span className="text-[10px] text-slate-400 block font-medium">
@@ -1022,7 +1081,7 @@ export const ResultsVerificationPage: React.FC = () => {
                     <div>
                       <span className="font-bold text-slate-900 text-sm block">{js.participant_name}</span>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="font-mono text-[10px] text-[#0D472D] font-bold bg-[#E6F4EA] px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="font-mono text-[10px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
                           {js.participant_code}
                         </span>
                         <span className="text-slate-500 font-semibold">{js.team_name}</span>
@@ -1030,7 +1089,7 @@ export const ResultsVerificationPage: React.FC = () => {
                     </div>
 
                     <div className="text-right">
-                      <span className="font-mono font-black text-[#0D472D] text-base block">
+                      <span className="font-mono font-black text-amber-900 text-base block">
                         {formatMark(js.total_marks)} pts
                       </span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">

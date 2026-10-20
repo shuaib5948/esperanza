@@ -16,6 +16,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal.js';
+import { THEME } from '../../theme/theme.js';
 
 interface Participant {
   id: number;
@@ -297,7 +298,7 @@ export const ParticipantsManagerPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-1">
         <div>
           <h1 className="text-2xl xl:text-3xl font-bento-title text-slate-900 tracking-[-0.035em] leading-none flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-[#0D472D]" />
+            <Users className="w-6 h-6 text-amber-700" />
             Participants & Roster
           </h1>
           <p className="text-xs text-slate-400 font-medium mt-1">
@@ -307,7 +308,7 @@ export const ParticipantsManagerPage: React.FC = () => {
 
         <button
           onClick={handleOpenAddParticipant}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer shrink-0"
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-full ${THEME.classes.primaryBtn} text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shrink-0`}
         >
           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
           <span>Add Participant</span>
@@ -322,14 +323,14 @@ export const ParticipantsManagerPage: React.FC = () => {
             {/* Team Dropdown */}
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                <Shield className={`w-3.5 h-3.5 ${selectedTeamFilter !== 'ALL' ? 'text-white' : 'text-slate-400'}`} />
+                <Shield className={`w-3.5 h-3.5 ${selectedTeamFilter !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
               </div>
               <select
                 value={selectedTeamFilter}
                 onChange={(e) => setSelectedTeamFilter(e.target.value)}
                 className={`appearance-none rounded-full pl-9 pr-9 py-2 text-xs font-semibold border transition-all cursor-pointer focus:outline-hidden ${
                   selectedTeamFilter !== 'ALL'
-                    ? 'bg-[#0D472D] text-white border-[#0D472D] shadow-xs'
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs font-bold'
                     : 'bg-slate-50 hover:bg-slate-100/80 text-slate-700 border-slate-200/80 hover:border-slate-300'
                 }`}
               >
@@ -344,21 +345,21 @@ export const ParticipantsManagerPage: React.FC = () => {
                 })}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <ChevronDown className={`w-3.5 h-3.5 ${selectedTeamFilter !== 'ALL' ? 'text-white' : 'text-slate-400'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 ${selectedTeamFilter !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
               </div>
             </div>
 
             {/* Category Dropdown */}
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                <Layers className={`w-3.5 h-3.5 ${selectedCatFilter !== 'ALL' ? 'text-white' : 'text-slate-400'}`} />
+                <Layers className={`w-3.5 h-3.5 ${selectedCatFilter !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
               </div>
               <select
                 value={selectedCatFilter}
                 onChange={(e) => setSelectedCatFilter(e.target.value)}
                 className={`appearance-none rounded-full pl-9 pr-9 py-2 text-xs font-semibold border transition-all cursor-pointer focus:outline-hidden ${
                   selectedCatFilter !== 'ALL'
-                    ? 'bg-[#0D472D] text-white border-[#0D472D] shadow-xs'
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs font-bold'
                     : 'bg-slate-50 hover:bg-slate-100/80 text-slate-700 border-slate-200/80 hover:border-slate-300'
                 }`}
               >
@@ -373,7 +374,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 })}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <ChevronDown className={`w-3.5 h-3.5 ${selectedCatFilter !== 'ALL' ? 'text-white' : 'text-slate-400'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 ${selectedCatFilter !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
               </div>
             </div>
 
@@ -401,7 +402,7 @@ export const ParticipantsManagerPage: React.FC = () => {
               value={participantSearch}
               onChange={(e) => setParticipantSearch(e.target.value)}
               placeholder="Search contestant, reg number..."
-              className="w-full bg-slate-50 border border-slate-200/80 rounded-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-[#0D472D]"
+              className="w-full bg-slate-50 border border-slate-200/80 rounded-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
             {participantSearch && (
               <button
@@ -452,7 +453,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                     <tr key={p.id} className="hover:bg-slate-50/90 transition-colors">
                       {/* 3-Digit Registration Number */}
                       <td className="py-3.5 px-4 text-center">
-                        <span className="font-mono text-xs font-bold text-[#0D472D] bg-[#E6F4EA] border border-emerald-200/80 px-3 py-1 rounded-full inline-block shadow-2xs">
+                        <span className="font-mono text-xs font-bold text-amber-950 bg-amber-50 border border-amber-200/80 px-3 py-1 rounded-full inline-block shadow-2xs">
                           {regNum}
                         </span>
                       </td>
@@ -469,8 +470,8 @@ export const ParticipantsManagerPage: React.FC = () => {
                         <span
                           className={`text-xs font-bold px-3 py-1 rounded-full border inline-block ${
                             isDiraya
-                              ? 'bg-[#E6F4EA] text-[#0D472D] border-emerald-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                              ? 'bg-amber-50 text-amber-900 border-amber-200'
+                              : 'bg-yellow-50 text-yellow-900 border-yellow-200'
                           }`}
                         >
                           {p.team_name}
@@ -504,7 +505,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                           className="flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 hover:border-slate-800 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer mx-auto"
                           title="Edit contestant profile"
                         >
-                          <Pencil className="w-3 h-3 text-[#0D472D]" />
+                          <Pencil className="w-3 h-3 text-amber-700" />
                           <span>Edit</span>
                         </button>
                       </td>
@@ -540,7 +541,7 @@ export const ParticipantsManagerPage: React.FC = () => {
               value={newPartData.name}
               onChange={(e) => setNewPartData({ ...newPartData, name: e.target.value })}
               placeholder="e.g. Salman Faris"
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D]"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500"
             />
           </div>
 
@@ -554,7 +555,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 required
                 value={newPartData.team_id}
                 onChange={(e) => setNewPartData({ ...newPartData, team_id: e.target.value })}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 {teams.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -572,7 +573,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 required
                 value={newPartData.category_id}
                 onChange={(e) => handleAddCategoryChange(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -596,7 +597,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 setNewPartData({ ...newPartData, registration_number: e.target.value })
               }
               placeholder="e.g. 101, 201, 301..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
             />
           </div>
 
@@ -612,7 +613,7 @@ export const ParticipantsManagerPage: React.FC = () => {
             <button
               type="submit"
               disabled={createParticipantMutation.isPending}
-              className="px-5 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+              className={`px-5 py-2 rounded-full ${THEME.classes.primaryBtn} text-xs font-black transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50`}
             >
               {createParticipantMutation.isPending ? 'Creating...' : 'Create Participant'}
             </button>
@@ -642,7 +643,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 required
                 value={editPartData.name}
                 onChange={(e) => setEditPartData({ ...editPartData, name: e.target.value })}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D]"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
@@ -656,7 +657,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                   required
                   value={editPartData.team_id}
                   onChange={(e) => setEditPartData({ ...editPartData, team_id: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   {teams.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -676,7 +677,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                   onChange={(e) =>
                     setEditPartData({ ...editPartData, category_id: e.target.value })
                   }
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -699,7 +700,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                   onChange={(e) =>
                     setEditPartData({ ...editPartData, registration_number: e.target.value })
                   }
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-[#0D472D]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
 
@@ -710,7 +711,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 <select
                   value={editPartData.status}
                   onChange={(e) => setEditPartData({ ...editPartData, status: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#0D472D] cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="INACTIVE">INACTIVE</option>
@@ -750,7 +751,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={updateParticipantMutation.isPending}
-                  className="px-5 py-2 rounded-full bg-[#0D472D] hover:bg-[#07321e] text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+                  className={`px-5 py-2 rounded-full ${THEME.classes.primaryBtn} text-xs font-black transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50`}
                 >
                   {updateParticipantMutation.isPending ? 'Saving...' : 'Save Changes'}
                 </button>

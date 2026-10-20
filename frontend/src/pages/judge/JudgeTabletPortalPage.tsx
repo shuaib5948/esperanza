@@ -460,7 +460,7 @@ export const JudgeTabletPortalPage: React.FC = () => {
                 </span>
               </div>
               <h2 className="text-lg sm:text-xl font-black text-slate-900 leading-tight">
-                General - DTP
+                {competition?.name || 'Programme Evaluation'}
               </h2>
               <p className="text-xs font-bold text-slate-500 mt-0.5 uppercase tracking-wider">
                 Score Overview
@@ -642,7 +642,7 @@ export const JudgeTabletPortalPage: React.FC = () => {
                   </span>
                 </div>
                 <h2 className="text-base sm:text-lg font-black text-slate-900 truncate leading-tight">
-                  General - DTP
+                  {competition?.name || 'Programme Evaluation'}
                 </h2>
                 <p className="text-xs font-bold text-slate-500 truncate mt-0.5 uppercase tracking-wider">
                   Scorecard
@@ -979,7 +979,9 @@ export const JudgeTabletPortalPage: React.FC = () => {
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
             <div className="flex justify-between text-slate-600">
               <span>Programme:</span>
-              <strong className="text-slate-900">General - DTP</strong>
+              <strong className="text-slate-900">
+                {competition?.programme_number ? `#${competition.programme_number} - ` : ''}{competition?.name || 'Programme Evaluation'}
+              </strong>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Present Contestants Evaluated:</span>

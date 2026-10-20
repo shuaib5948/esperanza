@@ -29,9 +29,9 @@ export class ResultService {
   /**
    * Generates results from judges' score sheets for a competition
    * Follows Esperanza Mark & Scoring Structure:
-   * 1. Evaluated performer count (N) excludes no-shows/absentees
+   * 1. Programme participant count (N): Individual = 1, Group = 2, 3, or 4+ members
    * 2. Raw marks determine Grade (A+, A, B, C, NG)
-   * 3. N determines Grade Marks
+   * 3. N determines Grade Marks (N=1: 6,5,3,1; N=2: 7,6,4,2; N=3: 10,9,6,3; N>=4: 18,15,10,5)
    * 4. Dense ranking determines Position & Position Points (5, 3, 1, 0)
    * 5. Final Programme Score = Grade Marks + Position Points
    */
@@ -58,10 +58,27 @@ export class ResultService {
         };
       }
 
-      // Evaluated performer density (N) - counts only contestants who performed and received submitted scores
-      const evaluatedCount = sheets.length;
+      // 2. Fetch competition details to determine programme participant scale (N)
+      const [compRows] = await conn.query<any[]>(`
+        SELECT id, participation_type, max_participants
+        FROM competitions
+        WHERE id = ?
+      `, [competitionId]);
 
-      // 2. Compute Raw Marks, Grade, and Grade Marks for each evaluated performer
+      const comp = compRows && compRows[0];
+      const isIndividual = !comp || comp.participation_type === 'INDIVIDUAL';
+
+      // Determine N strictly from the programme definition:
+      // - For individual programmes: N = 1
+      // - For group programmes: N = max_participants configured on the programme (e.g., 2, 3, 4+) or minimum 2
+      let programmeParticipantCount = 1;
+      if (!isIndividual) {
+        programmeParticipantCount = comp?.max_participants && Number(comp.max_participants) > 1
+          ? Number(comp.max_participants)
+          : 2;
+      }
+
+      // 3. Compute Raw Marks, Grade, and Grade Marks for each evaluated performer
       const computed = sheets.map((s) => {
         let rawMarks = Number(s.avg_marks);
         if (calculationMethod === 'HIGHEST') {
@@ -70,7 +87,7 @@ export class ResultService {
         rawMarks = Math.round(rawMarks * 100) / 100;
 
         const grade = ResultService.calculateGrade(rawMarks);
-        const gradeMarks = ResultService.calculateGradeMarks(grade, evaluatedCount);
+        const gradeMarks = ResultService.calculateGradeMarks(grade, programmeParticipantCount);
 
         return {
           participant_id: s.participant_id,
@@ -84,7 +101,7 @@ export class ResultService {
         };
       });
 
-      // 3. Dense Ranking by descending raw_marks (no rank skipping on ties)
+      // 4. Dense Ranking by descending raw_marks (no rank skipping on ties)
       computed.sort((a, b) => b.raw_marks - a.raw_marks);
 
       let currentRank = 1;
