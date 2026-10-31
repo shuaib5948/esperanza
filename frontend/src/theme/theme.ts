@@ -20,9 +20,9 @@ export const THEME = {
     champagneCanvas: '#FFFFC5', // Festival Poster Pale Yellow
     warmWhite: '#FCFBF7',       // Soft off-white
     
-    // Contingent / Battle Colors
-    diraya: '#D97706',          // Team 1 (Golden Amber)
-    rivaya: '#10B981',          // Team 2 (Emerald)
+    // Contingent / Battle Colors (Antique Forest Leather vs Oxblood Burgundy Leather)
+    diraya: '#059669',          // Team 1 (Antique Forest Leather Green)
+    rivaya: '#BE123C',          // Team 2 (Oxblood Burgundy Leather)
     
     // Real-Time Telemetry
     telemetryPulse: '#10B981',  // Emerald Green for Live Radar Signals

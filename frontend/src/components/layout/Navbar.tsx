@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
 import { THEME } from '../../theme/theme.js';
 import {
@@ -7,13 +7,15 @@ import {
   LogOut,
   User as UserIcon,
   Shield,
-  Radio,
-  CheckCircle,
   Menu,
   Search,
   Calendar,
   Bell,
   ChevronDown,
+  Home,
+  Award,
+  Camera,
+  BookOpen,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -24,6 +26,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -39,15 +42,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
   };
 
   const isAdmin = user?.role === 'ADMIN';
+  const isDarkHome = isPublic && location.pathname === '/';
+
+  const scrollToSection = (id: string) => {
+    if (id === 'home' || id === 'hero') {
+      if (location.pathname === '/') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        navigate('/');
+      }
+      return;
+    }
+
+    if (location.pathname === '/') {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate(`/#${id}`);
+    }
+  };
 
   return (
     <header
-      className={`sticky top-0 z-30 w-full transition-colors ${
-        isPublic
-          ? 'bg-[#ffffc5]/85 border-b border-amber-200/70 backdrop-blur-xl shadow-xs'
+      className={`w-full transition-all ${
+        isDarkHome
+          ? 'absolute top-0 inset-x-0 z-30 bg-gradient-to-b from-[#070503]/90 via-[#070503]/40 to-transparent border-b border-amber-500/15'
+          : isPublic
+          ? 'sticky top-0 z-30 bg-[#ffffc5]/85 border-b border-amber-200/70 backdrop-blur-xl shadow-xs'
           : isAdmin
-          ? 'bg-[#F8FAFC]/90 border-b border-slate-200/80 backdrop-blur-md lg:pl-64'
-          : 'glass-panel border-b border-slate-800 bg-slate-900/80'
+          ? 'sticky top-0 z-30 bg-[#F8FAFC]/90 border-b border-slate-200/80 backdrop-blur-md lg:pl-64'
+          : 'sticky top-0 z-30 glass-panel border-b border-slate-800 bg-slate-900/80'
       }`}
     >
       <div className="flex items-center justify-between px-4 lg:px-8 h-16">
@@ -58,6 +84,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
               className={`p-2 rounded-lg ${
                 isAdmin
                   ? 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60 lg:hidden'
+                  : isDarkHome
+                  ? 'text-slate-300 hover:text-white hover:bg-white/10 lg:hidden'
                   : isPublic
                   ? 'text-slate-600 hover:text-slate-950 hover:bg-slate-100 lg:hidden'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden'
@@ -67,16 +95,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
             </button>
           )}
 
-          {/* Logo on mobile or non-admin portals */}
+          {/* Professional & Classic Text Logo with Original Emblem in Corner */}
           {(!isAdmin || !user) && (
-            <Link to={getPortalHome()} className="flex items-center gap-3 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#007AFF] via-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                <Trophy className="w-4 h-4 text-white" />
+            <Link
+              to={getPortalHome()}
+              className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-300 hover:scale-[1.01]"
+              title="Esperanza 9.0"
+            >
+              {/* Original Geometric Emblem */}
+              <div className="relative flex items-center justify-center shrink-0">
+                <img
+                  src="/assets/esperanza-logo.png"
+                  alt="Esperanza Emblem"
+                  className={`h-7 sm:h-8 w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
+                    isDarkHome
+                      ? 'drop-shadow-[0_2px_12px_rgba(245,158,11,0.35)]'
+                      : 'brightness-0 opacity-85'
+                  }`}
+                />
               </div>
-              <div>
+
+              {/* Classic Horizontal Text Logo */}
+              <div className="flex items-baseline gap-1.5 sm:gap-2">
                 <span
-                  className={`font-display font-black text-base tracking-wider ${
-                    isPublic
+                  className={`font-display font-black text-sm sm:text-base tracking-[0.2em] uppercase transition-colors ${
+                    isDarkHome
+                      ? 'text-white group-hover:text-amber-100'
+                      : isPublic
                       ? 'text-slate-900'
                       : 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-purple-200'
                   }`}
@@ -84,13 +129,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
                   ESPERANZA
                 </span>
                 <span
-                  className={`hidden sm:inline-block ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
-                    isPublic
-                      ? 'text-[#007AFF] bg-blue-50 border-blue-100'
-                      : 'text-indigo-400 bg-indigo-950/60 border-indigo-800/40'
+                  className={`text-xs sm:text-sm font-black tracking-widest transition-colors ${
+                    isDarkHome
+                      ? 'text-amber-400 drop-shadow-[0_1px_8px_rgba(245,158,11,0.5)] group-hover:text-amber-300'
+                      : isPublic
+                      ? 'text-amber-600'
+                      : 'text-amber-400'
                   }`}
                 >
-                  2026–27
+                  9.0
                 </span>
               </div>
             </Link>
@@ -117,52 +164,71 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
           )}
         </div>
 
-        {/* Public navigation shortcuts */}
+        {/* Public In-Page Navigation: Home, Standings, Results, Gallery */}
         {!user && (
-          <div className="hidden md:flex items-center gap-1">
-            <Link
-              to="/"
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                isPublic
-                  ? 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/80'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <span>Home</span>
-            </Link>
-            <Link
-              to="/schedule"
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                isPublic
-                  ? 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/80'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <span>Schedule</span>
-            </Link>
-            <Link
-              to="/leaderboard"
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                isPublic
-                  ? 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/80'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
-              <span>Leaderboard</span>
-            </Link>
-            <Link
-              to="/verify"
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                isPublic
-                  ? 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/80'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <CheckCircle className={`w-3.5 h-3.5 ${isPublic ? 'text-[#007AFF]' : 'text-indigo-400'}`} />
-              <span>Verify</span>
-            </Link>
-          </div>
+          <nav aria-label="Main Navigation" className="hidden md:flex items-center">
+            <div className="flex items-center gap-1 px-1.5 py-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shadow-xs">
+              <button
+                onClick={() => scrollToSection('home')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-sans font-medium tracking-wide transition-all cursor-pointer ${
+                  isDarkHome
+                    ? 'text-slate-300 hover:text-white hover:bg-white/10'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Home className="w-3.5 h-3.5 text-amber-400" />
+                <span>Home</span>
+              </button>
+
+              <button
+                onClick={() => scrollToSection('about')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-sans font-medium tracking-wide transition-all cursor-pointer ${
+                  isDarkHome
+                    ? 'text-slate-300 hover:text-white hover:bg-white/10'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                <span>Manifesto</span>
+              </button>
+
+              <button
+                onClick={() => scrollToSection('standings')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-sans font-medium tracking-wide transition-all cursor-pointer ${
+                  isDarkHome
+                    ? 'text-slate-300 hover:text-white hover:bg-white/10'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>Standings</span>
+              </button>
+
+              <button
+                onClick={() => scrollToSection('results')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-sans font-medium tracking-wide transition-all cursor-pointer ${
+                  isDarkHome
+                    ? 'text-slate-300 hover:text-white hover:bg-white/10'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <span>Results</span>
+              </button>
+
+              <button
+                onClick={() => scrollToSection('gallery')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-sans font-medium tracking-wide transition-all cursor-pointer ${
+                  isDarkHome
+                    ? 'text-slate-300 hover:text-white hover:bg-white/10'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Camera className="w-3.5 h-3.5 text-amber-400" />
+                <span>Gallery</span>
+              </button>
+            </div>
+          </nav>
         )}
 
         {/* Admin Right Elements */}

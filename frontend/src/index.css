@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'OvercameBold';
+  src: url('/fonts/OvercameDemoBold.ttf') format('truetype');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -139,6 +147,29 @@
   background-color: #FFFFFF;
   color: #1C1C1E;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Luxury Hero Glass and Shimmer Utilities */
+.hero-glass-card {
+  background: rgba(18, 16, 12, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.08);
+}
+
+.hero-glass-pill {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+@keyframes goldShineSweep {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  50%, 100% { transform: translateX(220%) skewX(-20deg); }
+}
+
+.animate-gold-sweep {
+  animation: goldShineSweep 5s ease-in-out infinite;
 }
 
 /* Festie & Modern Dashboard Enhancements */

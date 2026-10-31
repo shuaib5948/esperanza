@@ -10,6 +10,7 @@ export default {
         sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
         display: ['"Plus Jakarta Sans"', 'sans-serif'],
         jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+        overcame: ['"OvercameBold"', 'sans-serif'],
       },
       colors: {
         brand: {
