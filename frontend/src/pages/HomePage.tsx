@@ -236,21 +236,21 @@ export const HomePage: React.FC = () => {
       =================================================================== */}
       <section
         id="about"
-        className="relative h-[100dvh] min-h-[580px] w-full bg-[#070503] overflow-hidden select-none flex items-center justify-center"
+        className="relative h-[100dvh] min-h-[580px] w-full bg-[#070503] overflow-hidden select-none flex items-center justify-center px-2 sm:px-0"
         aria-label="Official Festival Manifesto"
       >
-        {/* Full-Bleed Master Artwork Image */}
+        {/* Full-Bleed Master Artwork Image (object-contain on mobile so text/book is 100% visible, object-cover on desktop) */}
         <img
           src="/about/esperanza-manifesto.png"
           alt="Esperanza 9.0 Manifesto: Esperanza 9.0 is the flagship inter-house cultural, literary, and arts championship organized by the ADSA Project Council. Bringing together House Diraya and House Rivaya across 60+ competitive disciplines, the festival celebrates creative distinction, student talent, and impartial blind digital evaluation under the enduring motto Nexus Veritatis."
-          className="w-full h-full object-cover object-center pointer-events-none select-none"
+          className="w-full h-auto max-h-[86dvh] md:max-h-none md:h-full object-contain md:object-cover object-center pointer-events-none select-none drop-shadow-[0_4px_24px_rgba(245,158,11,0.12)]"
         />
 
         {/* Top Seamless Dark Gradient Blend (Connecting Flush with Hero) */}
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-28 sm:h-44 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-36 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
 
         {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Live Standings) */}
-        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-32 sm:h-48 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-16 sm:h-40 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
       </section>
 
       {/* ===================================================================

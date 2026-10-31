@@ -400,7 +400,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       className={
         isLiveScreen
           ? "relative w-full h-full flex flex-col justify-between items-center pt-2 pb-0 px-2 select-none"
-          : "relative h-[100dvh] max-h-[100dvh] min-h-[580px] w-full flex flex-col justify-between items-center pt-5 sm:pt-7 pb-2 sm:pb-3 px-4 sm:px-6 overflow-hidden bg-[#070503] select-none"
+          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-between items-center pt-3 sm:pt-7 pb-2 sm:pb-3 px-2 sm:px-6 overflow-hidden bg-[#070503] select-none"
       }
       aria-label="Official Team Standings"
     >
@@ -485,7 +485,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       >
         
         {/* The Two Stepped Podium Blocks Side-by-Side (Sitting Flush on the Dais Base) */}
-        <div className="flex items-end justify-center gap-3 sm:gap-5 md:gap-6 w-full z-10">
+        <div className="flex items-end justify-center gap-2 sm:gap-5 md:gap-6 w-full z-10">
           
           {/* -------------------------------------------------------------
               TEAM 1 — RIVAYA (BURGUNDY • TIED AT 115, THEN SURGES TO 148)
@@ -493,7 +493,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => cheerTeam('RIVAYA')}
-            className="flex flex-col items-center w-34 sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
+            className="flex flex-col items-center w-[44vw] max-w-[155px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
           >
             {/* 3D Gold Crown (Descends on Crowning Stage only if single winner; hidden if tied) */}
             <div className="flex flex-col items-center -mb-1 relative z-20">
@@ -568,7 +568,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => cheerTeam('DIRAYA')}
-            className="flex flex-col items-center w-34 sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
+            className="flex flex-col items-center w-[44vw] max-w-[155px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
           >
             {/* 3D Gold Crown (Descends on Crowning Stage only if single winner; hidden if tied) */}
             <div className="flex flex-col items-center -mb-1 relative z-20">

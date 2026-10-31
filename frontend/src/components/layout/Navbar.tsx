@@ -16,6 +16,7 @@ import {
   Award,
   Camera,
   BookOpen,
+  X,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const handleLogout = () => {
     logout();
@@ -45,6 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
   const isDarkHome = isPublic && location.pathname === '/';
 
   const scrollToSection = (id: string) => {
+    setMobileMenuOpen(false);
     if (id === 'home' || id === 'hero') {
       if (location.pathname === '/') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -289,17 +292,72 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs ${THEME.classes.primaryBtn} transition-all transform hover:scale-[1.02] cursor-pointer`}
-              >
-                <UserIcon className="w-3.5 h-3.5" />
-                <span>Portal Login</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs ${THEME.classes.primaryBtn} transition-all transform hover:scale-[1.02] cursor-pointer`}
+                >
+                  <UserIcon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Portal Login</span>
+                  <span className="sm:hidden">Login</span>
+                </Link>
+
+                {/* Mobile Menu Toggle Button */}
+                {isDarkHome && (
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 md:hidden transition-colors"
+                    aria-label="Toggle navigation menu"
+                  >
+                    {mobileMenuOpen ? <X className="w-5 h-5 text-amber-400" /> : <Menu className="w-5 h-5" />}
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}
       </div>
+
+      {/* Mobile Slide-down Navigation Panel for Public Homepage */}
+      {isDarkHome && mobileMenuOpen && !user && (
+        <div className="md:hidden w-full bg-[#070503]/95 backdrop-blur-2xl border-b border-amber-500/20 px-5 py-4 flex flex-col gap-1.5 transition-all shadow-2xl">
+          <button
+            onClick={() => scrollToSection('home')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+          >
+            <Home className="w-4 h-4 text-amber-400" />
+            <span>[00] HOME</span>
+          </button>
+          <button
+            onClick={() => scrollToSection('about')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+          >
+            <BookOpen className="w-4 h-4 text-amber-400" />
+            <span>[01] MANIFESTO</span>
+          </button>
+          <button
+            onClick={() => scrollToSection('standings')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+          >
+            <Trophy className="w-4 h-4 text-amber-400" />
+            <span>[02] TEAM STANDINGS</span>
+          </button>
+          <button
+            onClick={() => scrollToSection('results')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+          >
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>[03] RESULT POSTERS</span>
+          </button>
+          <button
+            onClick={() => scrollToSection('gallery')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+          >
+            <Camera className="w-4 h-4 text-amber-400" />
+            <span>[04] FESTIVAL GALLERY</span>
+          </button>
+        </div>
+      )}
     </header>
   );
 };

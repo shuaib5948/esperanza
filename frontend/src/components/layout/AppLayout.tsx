@@ -46,19 +46,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ requireAuth = false, allow
   const isDashboard = location.pathname === '/admin';
   const isHome = location.pathname === '/';
 
-
-
   const isJudge = user?.role === 'JUDGE';
-  const isProduction = import.meta.env.VITE_APP_MODE === 'production';
   const isLoginPage = location.pathname === '/login';
 
   // 2. Public Pages
   if (isPublicPage || (!user && !requireAuth)) {
-    if (isProduction || isLoginPage) {
+    if (isLoginPage) {
       return <Outlet />;
     }
     return (
-      <div className="min-h-screen flex flex-col bg-[#ffffc5] text-slate-900">
+      <div className={`min-h-screen flex flex-col ${isHome ? 'bg-[#070503] text-white relative' : 'bg-[#ffffc5] text-slate-900'}`}>
         <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} isPublic={true} />
         <main className={`flex-1 w-full ${isHome ? 'p-0 max-w-none' : 'p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto'}`}>
           <Outlet />

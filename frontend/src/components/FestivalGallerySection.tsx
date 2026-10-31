@@ -182,7 +182,7 @@ export const FestivalGallerySection: React.FC = () => {
   return (
     <section
       id="gallery"
-      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[580px] flex flex-col justify-center items-center py-4 sm:py-6 px-4 sm:px-8 bg-[#070503] overflow-hidden select-none"
+      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-3 sm:py-6 px-3 sm:px-8 bg-[#070503] overflow-hidden select-none"
       aria-label="Official Festival Photo Archive"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -210,9 +210,9 @@ export const FestivalGallerySection: React.FC = () => {
             FLUID LAYOUT GLIDE STAGE (ALL 5 FRAMES SWAP POSITIONS IN 16:9)
         =================================================================== */}
         <LayoutGroup id="festival-gallery-glide-group">
-          <div className="flex flex-col gap-2.5 sm:gap-3 w-full">
+          <div className="flex flex-col gap-2 sm:gap-3 w-full">
             {/* Top Tier: 2 Large 16:9 Spotlight Frames */}
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
               {photoOrder.slice(0, 2).map((photo) => (
                 <motion.div
                   layout
