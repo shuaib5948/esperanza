@@ -64,13 +64,7 @@ export const App: React.FC = () => {
               <Route element={<AppLayout requireAuth={false} />}>
                 <Route
                   path="/"
-                  element={
-                    isProduction ? (
-                      <PublicComingSoon />
-                    ) : (
-                      <HomePage />
-                    )
-                  }
+                  element={<HomePage />}
                 />
                 <Route
                   path="/schedule"
