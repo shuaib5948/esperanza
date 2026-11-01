@@ -53,16 +53,17 @@ export const ResultPostersSection: React.FC = () => {
   // Compute card dimensions dynamically per viewport matching 2200px x 2600px ratio (22:26)
   const getCardDimensions = () => {
     if (windowWidth < 640) {
-      const w = Math.min(290, windowWidth - 56);
+      const w = Math.min(260, windowWidth - 64);
       const h = Math.round(w * (2600 / 2200));
       return { width: w, height: h, gap: 16 };
     }
     if (windowWidth < 1024) {
-      const w = 330;
+      const w = 270;
       const h = Math.round(w * (2600 / 2200));
       return { width: w, height: h, gap: 20 };
     }
-    const w = 380;
+    // Reduced desktop dimension preserving exact 2200:2600 (11:13) portrait ratio
+    const w = 300;
     const h = Math.round(w * (2600 / 2200));
     return { width: w, height: h, gap: 24 };
   };
@@ -129,14 +130,14 @@ export const ResultPostersSection: React.FC = () => {
       ref={sectionRef}
       id="results"
       data-alias="result-posters"
-      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-16 px-4 sm:px-8 pb-20 md:pb-16 bg-transparent overflow-hidden select-none snap-start"
+      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center pt-6 sm:pt-8 md:pt-14 pb-20 md:pb-8 px-4 sm:px-8 bg-transparent overflow-hidden select-none snap-start"
       aria-label="Official Competition Posters"
     >
       {/* Top Seamless Dark Gradient Blend (Connecting Flush with Standings - Behind Content) */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-12 md:h-48 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-10 md:h-24 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
 
       {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Gallery - Behind Content) */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-12 md:h-48 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 md:h-28 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
 
       {/* Background Volumetric Ambience */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/3 to-transparent blur-[140px] z-0" />
@@ -144,11 +145,11 @@ export const ResultPostersSection: React.FC = () => {
       {/* Floating Festival Bokeh Lights Field */}
       <FestivalBokehField variant="gold" />
 
-      <div className="relative z-10 max-w-6xl mx-auto w-full my-auto space-y-4 md:space-y-8 flex flex-col items-center justify-center">
+      <div className="relative z-10 max-w-6xl mx-auto w-full my-auto space-y-3 sm:space-y-4 md:space-y-5 flex flex-col items-center justify-center">
         {/* ===================================================================
             SECTION TITLE: "RESULT POSTERS"
         =================================================================== */}
-        <div className="flex flex-col items-center justify-center text-center">
+        <div className="flex flex-col items-center justify-center text-center pt-1 md:pt-2 mb-1">
           <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.24em] uppercase text-white">
             <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">RESULT </span>
             <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">POSTERS</span>
@@ -169,7 +170,7 @@ export const ResultPostersSection: React.FC = () => {
           <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-28 bg-gradient-to-l from-[#070503] via-[#070503]/80 to-transparent z-40" />
 
           {/* Sliding Track Stage with 2200x2600 Proportional Clearance */}
-          <div className="relative h-[390px] sm:h-[450px] md:h-[510px] overflow-hidden w-full">
+          <div className="relative h-[360px] sm:h-[380px] md:h-[410px] overflow-hidden w-full">
             <motion.div
               className="flex items-center absolute top-0 bottom-0 left-1/2 my-auto"
               animate={{
@@ -258,8 +259,8 @@ export const ResultPostersSection: React.FC = () => {
                           alt="Esperanza Logo"
                           className={`w-auto object-contain pointer-events-none select-none transition-all duration-500 ${
                             isCenter
-                              ? 'h-24 sm:h-28 md:h-32 drop-shadow-[0_0_24px_rgba(245,158,11,0.5)] scale-105'
-                              : 'h-16 sm:h-20 md:h-24 drop-shadow-[0_0_12px_rgba(245,158,11,0.25)] opacity-80'
+                              ? 'h-20 sm:h-24 md:h-28 drop-shadow-[0_0_24px_rgba(245,158,11,0.5)] scale-105'
+                              : 'h-14 sm:h-16 md:h-20 drop-shadow-[0_0_12px_rgba(245,158,11,0.25)] opacity-80'
                           }`}
                         />
 

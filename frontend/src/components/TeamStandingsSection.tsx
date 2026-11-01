@@ -401,7 +401,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       className={
         isLiveScreen
           ? "relative w-full h-full flex flex-col justify-between items-center pt-2 pb-0 px-2 select-none"
-          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-center md:justify-between items-center pt-4 sm:pt-6 md:pt-7 pb-20 md:pb-3 px-2 sm:px-6 overflow-hidden bg-transparent select-none snap-start"
+          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-center md:justify-between items-center pt-4 sm:pt-6 md:pt-7 pb-20 md:pb-8 px-2 sm:px-6 overflow-hidden bg-transparent select-none snap-start"
       }
       aria-label="Official Team Standings"
     >
