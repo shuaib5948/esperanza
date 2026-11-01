@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { FestivalBokehField } from './ui/FestivalBokehField.js';
 
 interface TeamStandingsSectionProps {
   rivayaPoints?: number;
@@ -292,7 +293,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       observer.disconnect();
       if (cleanupTimers) cleanupTimers();
     };
-  }, [autoTrigger, tiePoint, rivayaPoints, isLiveScreen]);
+  }, [autoTrigger, tiePoint, rivayaPoints, dirayaPoints, isLiveScreen]);
 
   // 2. Synchronized & Tie-Break Counting Math
   useEffect(() => {
@@ -400,7 +401,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       className={
         isLiveScreen
           ? "relative w-full h-full flex flex-col justify-between items-center pt-2 pb-0 px-2 select-none"
-          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-center md:justify-between items-center pt-4 sm:pt-6 md:pt-7 pb-20 md:pb-3 px-2 sm:px-6 overflow-hidden bg-[#070503] select-none snap-start"
+          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-center md:justify-between items-center pt-4 sm:pt-6 md:pt-7 pb-20 md:pb-3 px-2 sm:px-6 overflow-hidden bg-transparent select-none snap-start"
       }
       aria-label="Official Team Standings"
     >
@@ -441,14 +442,8 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
         </span>
       </div>
 
-      {/* Subtle Floating Golden Bokeh Sparks */}
-      <div className="pointer-events-none absolute top-1/4 left-1/5 w-2 h-2 rounded-full bg-amber-400/50 blur-[1px] animate-pulse z-0" />
-      <div className="pointer-events-none absolute top-1/3 right-1/5 w-2.5 h-2.5 rounded-full bg-yellow-300/40 blur-[1.5px] animate-pulse [animation-delay:1.5s] z-0" />
-      <div className="pointer-events-none absolute bottom-1/3 left-1/4 w-2 h-2 rounded-full bg-amber-400/40 blur-[1px] animate-pulse [animation-delay:2.5s] z-0" />
-      <div className="pointer-events-none absolute bottom-1/4 right-1/3 w-1.5 h-1.5 rounded-full bg-yellow-200/50 blur-[1px] animate-pulse [animation-delay:3s] z-0" />
-
-      {/* Dynamic Rising Stage Light Motes */}
-      <StageMotes />
+      {/* Comprehensive Dynamic Festival Bokeh Light Field (Flank Embers & Stage Sparkles) */}
+      <FestivalBokehField variant="standings" />
 
       {/* ===================================================================
           2 & 3. UNIFIED BALANCED CORE: HEADING + PODIUM CLUSTER
@@ -462,7 +457,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="relative z-10 flex flex-col items-center pt-1 sm:pt-2 text-center mb-11 sm:mb-14 md:mb-0"
+          className="relative z-10 flex flex-col items-center pt-1 sm:pt-2 text-center mb-16 sm:mb-20 md:mb-0"
         >
           <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.24em] uppercase text-white">
             <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">TEAM </span>
@@ -643,7 +638,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
             4. THE RAISED CIRCULAR GOLDEN STAGE DAIS / BASE
             (Straight-On Front Eye-Level Perspective • Seamlessly Joined to Blocks)
         =================================================================== */}
-        <div className="relative w-[88vw] max-w-[316px] sm:w-full sm:max-w-xl md:max-w-2xl -mt-2 sm:-mt-6 flex flex-col items-center pointer-events-none z-0">
+        <div className="relative w-[92vw] max-w-[330px] sm:w-full sm:max-w-xl md:max-w-2xl -mt-5 sm:-mt-6 flex flex-col items-center pointer-events-none z-0">
           
           {/* Top Surface of the Circular Raised Dais (Matching Eye-Level Horizon) */}
           <div className="w-full h-11 sm:h-14 rounded-[100%] border-2 border-amber-500/70 bg-gradient-to-b from-[#181105] via-[#0d0903] to-[#040301] shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_0_12px_rgba(245,158,11,0.18)] relative flex items-center justify-center overflow-hidden">
@@ -651,9 +646,9 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
             <div className="w-[96%] h-[82%] rounded-[100%] border border-amber-300/40 bg-gradient-to-b from-amber-500/10 to-transparent" />
 
             {/* Subtle Vertical Reflections Across the Dais Platform */}
-            <div className="absolute inset-0 flex items-center justify-center gap-6 sm:gap-10 opacity-35 blur-[2px]">
-              <div className="w-24 sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-rose-500/40 to-transparent rounded-[100%]" />
-              <div className="w-24 sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-emerald-500/40 to-transparent rounded-[100%]" />
+            <div className="absolute inset-0 flex items-center justify-center gap-2 sm:gap-5 md:gap-6 opacity-35 blur-[2px]">
+              <div className="w-[38vw] max-w-[130px] sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-rose-500/40 to-transparent rounded-[100%]" />
+              <div className="w-[38vw] max-w-[130px] sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-emerald-500/40 to-transparent rounded-[100%]" />
             </div>
           </div>
 
@@ -664,9 +659,9 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <div className="w-[94%] h-4 sm:h-6 rounded-[100%] bg-black/98 blur-sm sm:blur-md -mt-2 sm:-mt-3" />
 
           {/* Glossy Floor Mirror Reflections Falling Downward Directly Beneath Plinth */}
-          <div className="w-full flex items-start justify-center gap-4 sm:gap-8 opacity-25 sm:opacity-30 transform scale-y-[-1] blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_80%)] overflow-hidden h-10 sm:h-16 mt-0.5">
-            <div className="w-24 sm:w-48 h-16 sm:h-20 bg-gradient-to-t from-transparent via-[#2b050b]/60 to-[#FF2A6D]/30" />
-            <div className="w-24 sm:w-48 h-12 sm:h-16 bg-gradient-to-t from-transparent via-[#082212]/60 to-[#00E676]/30" />
+          <div className="w-full flex items-start justify-center gap-2 sm:gap-5 md:gap-6 opacity-30 transform scale-y-[-1] blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_80%)] overflow-hidden h-10 sm:h-16 mt-0.5">
+            <div className="w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 h-16 sm:h-20 bg-gradient-to-t from-transparent via-[#2b050b]/60 to-[#FF2A6D]/30" />
+            <div className="w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 h-12 sm:h-16 bg-gradient-to-t from-transparent via-[#082212]/60 to-[#00E676]/30" />
           </div>
         </div>
       </div>

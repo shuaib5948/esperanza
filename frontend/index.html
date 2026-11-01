@@ -2,15 +2,91 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/assets/esperanza-logo.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/assets/esperanza-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Esperanza 2026–27 | Festival Management System</title>
+    <title>ESPERANZA 9.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      @keyframes esp-pulse {
+        0%, 100% { transform: scale(1); opacity: 0.88; filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.35)); }
+        50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.7)); }
+      }
+      @keyframes esp-sweep {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(200%); }
+      }
+      .esp-loader-bg {
+        position: fixed;
+        inset: 0;
+        background-color: #070503;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        user-select: none;
+      }
+      .esp-glow-blob {
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        border-radius: 9999px;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .esp-logo {
+        width: 68px;
+        height: 68px;
+        object-fit: contain;
+        animation: esp-pulse 2.2s ease-in-out infinite;
+      }
+      .esp-title {
+        margin-top: 20px;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.35em;
+        color: rgba(251, 191, 36, 0.92);
+        text-transform: uppercase;
+        text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      }
+      .esp-track {
+        margin-top: 10px;
+        width: 60px;
+        height: 2px;
+        background: rgba(245, 158, 11, 0.2);
+        border-radius: 9999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .esp-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 50%;
+        background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+        box-shadow: 0 0 8px rgba(245, 158, 11, 0.9);
+        border-radius: 9999px;
+        animation: esp-sweep 1.6s ease-in-out infinite;
+      }
+    </style>
   </head>
-  <body class="bg-[#ffffc5] text-slate-900 antialiased min-h-screen">
-    <div id="root"></div>
+  <body class="bg-[#070503] text-white antialiased min-h-screen">
+    <div id="root">
+      <div class="esp-loader-bg">
+        <div class="esp-glow-blob"></div>
+        <img src="/assets/esperanza-logo.png" alt="Esperanza 9.0" class="esp-logo" />
+        <div class="esp-title">ESPERANZA 9.0</div>
+        <div class="esp-track">
+          <div class="esp-bar"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

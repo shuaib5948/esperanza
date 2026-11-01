@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Download, Sparkles } from 'lucide-react';
+import { FestivalBokehField } from './ui/FestivalBokehField.js';
 
 export interface GalleryPhoto {
   id: number;
@@ -182,7 +183,7 @@ export const FestivalGallerySection: React.FC = () => {
   return (
     <section
       id="gallery"
-      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-6 px-3 sm:px-8 pb-20 md:pb-6 bg-[#070503] overflow-hidden select-none snap-start"
+      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-6 px-3 sm:px-8 pb-20 md:pb-6 bg-transparent overflow-hidden select-none snap-start"
       aria-label="Official Festival Photo Archive"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -196,9 +197,12 @@ export const FestivalGallerySection: React.FC = () => {
       {/* Background Volumetric Gold Glow */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/5 to-transparent blur-[150px] z-0" />
 
+      {/* Subtle Floating Ambient Bokeh Lights (Warm Gold Festival Dust on Flanks) */}
+      <FestivalBokehField variant="gold" />
+
       <div className="relative z-10 max-w-3xl sm:max-w-4xl lg:max-w-[880px] mx-auto w-full my-2 md:my-auto flex flex-col justify-center items-center space-y-3 sm:space-y-4">
         {/* Minimal Header with Controls & Progress Pulse */}
-        <div className="flex flex-col items-center justify-center text-center">
+        <div className="flex flex-col items-center justify-center text-center mb-7 sm:mb-9 md:mb-0">
           <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.24em] uppercase text-white">
             <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">GALLERY </span>
             <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">ARCHIVE</span>
@@ -212,58 +216,75 @@ export const FestivalGallerySection: React.FC = () => {
         </div>
 
         {/* ===================================================================
-            MOBILE VIEW (< sm): 3D RISING STACKED CARD DECK (BOTTOM-UP ANIMATION)
+            MOBILE VIEW (< sm): VERTICAL SPOTLIGHT REEL (LARGE HEIGHT & VARYING OPACITY)
         =================================================================== */}
-        <div className="sm:hidden w-full flex flex-col items-center py-2 select-none">
-          <div className="relative w-[90vw] max-w-[345px] h-[265px] mx-auto flex items-center justify-center">
-            {photoOrder.slice(0, 3).reverse().map((photo, reverseIndex) => {
-              // reverseIndex 0 = deepest (bottom), 1 = middle, 2 = top active
-              const stackPosition = 2 - reverseIndex;
-              const isActive = stackPosition === 0;
+        <div className="sm:hidden w-full flex flex-col items-center py-1 select-none">
+          <div className="relative w-[92vw] max-w-[350px] flex flex-col items-center gap-3 mx-auto">
+            
+            {/* 1. TOP PREVIEW FRAME (Previous Photo • Large Canvas • Soft Ambient Opacity 30%) */}
+            <motion.div
+              key={`prev-${photoOrder[photoOrder.length - 1].id}`}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 0.3, y: 0, scale: 0.94 }}
+              transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
+              onClick={handleCyclePrev}
+              className="w-full h-14 rounded-xl overflow-hidden border border-white/15 bg-black cursor-pointer shadow-sm relative active:scale-95 transition-transform"
+              title="Click to view previous frame"
+            >
+              <img
+                src={photoOrder[photoOrder.length - 1].imageUrl}
+                alt="Previous festival moment"
+                className="w-full h-full object-cover object-center filter brightness-75 select-none pointer-events-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#070503]/60 via-transparent to-[#070503]/60 pointer-events-none" />
+            </motion.div>
 
-              return (
-                <motion.div
-                  key={photo.id}
-                  layout
-                  initial={false}
-                  animate={{
-                    y: stackPosition === 0 ? 0 : stackPosition === 1 ? 24 : 46,
-                    scale: stackPosition === 0 ? 1 : stackPosition === 1 ? 0.94 : 0.88,
-                    opacity: stackPosition === 0 ? 1 : stackPosition === 1 ? 0.6 : 0.28,
-                    zIndex: 30 - stackPosition * 10,
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    ease: [0.25, 1, 0.5, 1],
-                  }}
-                  drag={isActive ? true : false}
-                  dragElastic={0.2}
-                  dragSnapToOrigin={true}
-                  onDragEnd={(_e, info) => {
-                    if (info.offset.y < -30 || info.offset.x < -30) {
-                      handleCycleNext();
-                    } else if (info.offset.y > 30 || info.offset.x > 30) {
-                      handleCyclePrev();
-                    }
-                  }}
-                  onClick={() => {
-                    if (isActive) setActivePhoto(photo);
-                    else handleCycleNext();
-                  }}
-                  className={`absolute inset-x-0 top-0 h-[215px] rounded-2xl overflow-hidden cursor-pointer bg-black transition-shadow duration-300 ${
-                    isActive
-                      ? 'border border-amber-400/90 shadow-[0_8px_32px_rgba(245,158,11,0.35)]'
-                      : 'border border-white/10 shadow-lg pointer-events-auto'
-                  }`}
-                >
-                  <img
-                    src={photo.imageUrl}
-                    alt={photo.title || `Festival Moment ${photo.id}`}
-                    className="w-full h-full object-cover select-none pointer-events-none"
-                  />
-                </motion.div>
-              );
-            })}
+            {/* 2. CENTER ACTIVE SPOTLIGHT FRAME (Expanded Large Frame • 100% Opacity • Gold Aura) */}
+            <motion.div
+              key={`active-${photoOrder[0].id}`}
+              initial={{ opacity: 0.6, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.25}
+              onDragEnd={(_e, info) => {
+                if (info.offset.y < -35) {
+                  handleCycleNext();
+                } else if (info.offset.y > 35) {
+                  handleCyclePrev();
+                }
+              }}
+              onClick={() => setActivePhoto(photoOrder[0])}
+              className="relative w-full h-[215px] rounded-2xl overflow-hidden cursor-pointer bg-black border-2 border-amber-400/90 shadow-[0_8px_32px_rgba(245,158,11,0.4),0_0_16px_rgba(245,158,11,0.2)] active:scale-[0.99] transition-transform"
+              title="Tap to expand fullscreen"
+            >
+              <img
+                src={photoOrder[0].imageUrl}
+                alt={photoOrder[0].title || `Festival Moment ${photoOrder[0].id}`}
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
+
+            {/* 3. BOTTOM PREVIEW FRAME (Next Photo • Large Canvas • Ambient Opacity 45%) */}
+            <motion.div
+              key={`next-${photoOrder[1].id}`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 0.45, y: 0, scale: 0.94 }}
+              transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
+              onClick={handleCycleNext}
+              className="w-full h-14 rounded-xl overflow-hidden border border-white/20 bg-black cursor-pointer shadow-sm relative active:scale-95 transition-transform"
+              title="Click to view next frame"
+            >
+              <img
+                src={photoOrder[1].imageUrl}
+                alt="Next festival moment"
+                className="w-full h-full object-cover object-center filter brightness-90 select-none pointer-events-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#070503]/60 via-transparent to-[#070503]/60 pointer-events-none" />
+            </motion.div>
+
           </div>
 
           {/* Interactive Golden Dots for Mobile */}

@@ -178,11 +178,22 @@ export const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-[#070503] text-slate-100 selection:bg-amber-400 selection:text-black font-sans antialiased overflow-x-hidden relative">
       {/* ===================================================================
+          PERSISTENT CONTINUOUS FESTIVAL BOKEH & ATMOSPHERE BACKDROP
+          (Flows seamlessly behind Hero, Manifesto, Standings, Posters, Gallery)
+      =================================================================== */}
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat pointer-events-none select-none z-0 opacity-20"
+        style={{ backgroundImage: `url('/hero/hero-bg.png')` }}
+      />
+      {/* Persistent Soft Radial Vignette Overlay to maintain Obsidian Depth */}
+      <div className="fixed inset-0 pointer-events-none select-none z-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#070503_85%)]" />
+
+      {/* ===================================================================
           SECTION 1: FIXED SINGLE-SCREEN CINEMATIC FESTIVAL HERO
       =================================================================== */}
       <section
         id="home"
-        className="relative h-[100dvh] min-h-[560px] w-full flex flex-col justify-center items-center text-center overflow-hidden px-4 sm:px-8 pt-16 md:pt-20 pb-16 md:pb-6 bg-[#070503] snap-start"
+        className="relative h-[100dvh] min-h-[560px] w-full flex flex-col justify-center items-center text-center overflow-hidden px-4 sm:px-8 pt-16 md:pt-20 pb-16 md:pb-6 bg-transparent snap-start"
       >
         {/* Official Festival Bokeh & Cyber Atmosphere Backdrop */}
         <div
@@ -241,15 +252,15 @@ export const HomePage: React.FC = () => {
 
       {/* ===================================================================
           SECTION 1.5: FULL-SCREEN CINEMATIC ABOUT / MANIFESTO PAGE
-          (Fixed Full Viewport Height • Edge-to-Edge • Seamless Dark Gradient Joins)
+          (Fixed Full Viewport Height • Zoomed-out Frame with Edge Gradient Bleeds)
       =================================================================== */}
       <section
         id="about"
-        className="relative h-[100dvh] min-h-[560px] w-full bg-[#070503] overflow-hidden select-none flex items-center justify-center snap-start"
+        className="relative h-[100dvh] min-h-[560px] w-full bg-transparent overflow-hidden select-none flex items-center justify-center snap-start"
         aria-label="Official Festival Manifesto"
       >
-        {/* Full-Bleed Master Artwork Image (Zero Boxiness, Native 9:16 Edge-to-Edge Flow) */}
-        <picture className="w-full h-full flex items-center justify-center">
+        {/* Master Artwork Image (Clean Zoom-out Proportions with Zero Edge Clipping) */}
+        <picture className="w-full h-full flex items-center justify-center relative z-0 px-1 sm:px-0">
           {/* Mobile Portrait View (Exact Native 9:16 Smartphone Artwork) */}
           <source media="(max-width: 767px)" srcSet="/about/esperanza-manifesto-mobile.png" />
           {/* Desktop & Tablet Landscape View (Full-Bleed Widescreen Master Artwork) */}
@@ -257,23 +268,27 @@ export const HomePage: React.FC = () => {
           <img
             src="/about/esperanza-manifesto.png"
             alt="Esperanza 9.0 Manifesto: Flagship inter-house cultural, literary, and arts championship organized by the ADSA Project Council. Bringing together House Diraya and House Rivaya across 60+ competitive disciplines, the festival celebrates creative distinction, student talent, and impartial blind digital evaluation under the enduring motto Nexus Veritatis."
-            className="w-full h-full object-cover object-center pointer-events-none select-none"
+            className="w-full h-full max-h-[88dvh] sm:max-h-full object-contain sm:object-cover object-center pointer-events-none select-none transition-transform duration-500 scale-95 sm:scale-100"
           />
         </picture>
 
-        {/* Top Seamless Dark Gradient Blend (Connecting Flush with Hero - Behind Content) */}
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-36 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-0" />
+        {/* Top Seamless Dark Gradient Blend (Feathering Top Edge Flush into Hero) */}
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-20 sm:h-36 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
 
-        {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Live Standings - Behind Content) */}
-        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-16 sm:h-40 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/80 via-35% to-transparent z-0" />
+        {/* Bottom Seamless Dark Gradient Blend (Feathering Bottom Edge Flush into Standings) */}
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-24 sm:h-40 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/85 via-40% to-transparent z-10" />
+
+        {/* Left & Right Side Vignette Gradients for Flawless Atmospheric Integration */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-6 sm:w-14 bg-gradient-to-r from-[#070503] via-[#070503]/60 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-6 sm:w-14 bg-gradient-to-l from-[#070503] via-[#070503]/60 to-transparent z-10" />
       </section>
 
       {/* ===================================================================
-          SECTION 2: CINEMATIC TEAM STANDINGS (DEMO MOCK - REAL VALUES HIDDEN)
+          SECTION 2: CINEMATIC TEAM STANDINGS (LIVE DATABASE SCORES)
       =================================================================== */}
       <TeamStandingsSection
-        rivayaPoints={148}
-        dirayaPoints={115}
+        rivayaPoints={rivayaPts}
+        dirayaPoints={dirayaPts}
       />
 
       {/* ===================================================================

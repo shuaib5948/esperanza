@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { FestivalBokehField } from './ui/FestivalBokehField.js';
 
 export interface PosterCardItem {
   id: number;
@@ -128,7 +129,7 @@ export const ResultPostersSection: React.FC = () => {
       ref={sectionRef}
       id="results"
       data-alias="result-posters"
-      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-16 px-4 sm:px-8 pb-20 md:pb-16 bg-[#070503] overflow-hidden select-none snap-start"
+      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-16 px-4 sm:px-8 pb-20 md:pb-16 bg-transparent overflow-hidden select-none snap-start"
       aria-label="Official Competition Posters"
     >
       {/* Top Seamless Dark Gradient Blend (Connecting Flush with Standings - Behind Content) */}
@@ -139,6 +140,9 @@ export const ResultPostersSection: React.FC = () => {
 
       {/* Background Volumetric Ambience */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/3 to-transparent blur-[140px] z-0" />
+
+      {/* Floating Festival Bokeh Lights Field */}
+      <FestivalBokehField variant="gold" />
 
       <div className="relative z-10 max-w-6xl mx-auto w-full my-auto space-y-4 md:space-y-8 flex flex-col items-center justify-center">
         {/* ===================================================================
