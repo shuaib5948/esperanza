@@ -180,7 +180,10 @@ export const HomePage: React.FC = () => {
       {/* ===================================================================
           SECTION 1: FIXED SINGLE-SCREEN CINEMATIC FESTIVAL HERO
       =================================================================== */}
-      <section className="relative h-[100dvh] min-h-[580px] w-full flex flex-col justify-center items-center text-center overflow-hidden px-4 sm:px-8 pt-16 sm:pt-20 pb-6 bg-[#070503]">
+      <section
+        id="home"
+        className="relative h-[100dvh] min-h-[560px] w-full flex flex-col justify-center items-center text-center overflow-hidden px-4 sm:px-8 pt-16 md:pt-20 pb-16 md:pb-6 bg-[#070503] snap-start"
+      >
         {/* Official Festival Bokeh & Cyber Atmosphere Backdrop */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none select-none z-0"
@@ -189,23 +192,23 @@ export const HomePage: React.FC = () => {
 
         {/* Soft Vignettes for Navbar & Section Bleed */}
         <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#070503]/80 via-[#070503]/30 to-transparent pointer-events-none z-0" />
-        <div className="absolute bottom-0 inset-x-0 h-44 sm:h-60 bg-gradient-to-t from-[#070503] via-[#070503]/85 via-40% to-transparent pointer-events-none z-10" />
+        <div className="absolute bottom-0 inset-x-0 h-24 sm:h-60 bg-gradient-to-t from-[#070503] via-[#070503]/85 via-40% to-transparent pointer-events-none z-0" />
 
         {/* Centerpiece Hero Title & Subtitle Lockup */}
-        <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center justify-center space-y-3 sm:space-y-4 px-2">
+        <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center justify-center space-y-3 sm:space-y-4 px-2 my-auto">
           {/* Brand Logo, Motto & Subtitle Lockup */}
           <div className="flex flex-col items-center">
-            {/* Festival Official Motto: NEXUS VERITATIS (Tight Lockup above Title) */}
+            {/* Festival Official Motto: NEXUS VERITATIS (Tight Lockup above Title on Desktop) */}
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex items-center justify-center select-none mb-2 sm:mb-3"
+              className="hidden md:flex items-center justify-center select-none mb-2 sm:mb-3"
             >
               <img
                 src="/hero/nexus-veritatis.png"
                 alt="Nexus Veritatis - Enduring Testament"
-                className="h-9 sm:h-12 md:h-14 w-auto object-contain mix-blend-screen drop-shadow-[0_4px_16px_rgba(245,158,11,0.35)] pointer-events-none select-none"
+                className="h-8 sm:h-12 md:h-14 w-auto object-contain mix-blend-screen drop-shadow-[0_4px_16px_rgba(245,158,11,0.35)] pointer-events-none select-none"
               />
             </motion.div>
 
@@ -216,15 +219,21 @@ export const HomePage: React.FC = () => {
               transition={{ duration: 0.7, ease: 'easeOut' }}
               onClick={burstTitleStars}
               title="Click to celebrate!"
-              className="relative cursor-pointer group select-none inline-block max-w-[90vw]"
+              className="relative cursor-pointer group select-none flex items-center justify-center w-full"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <img
-                src="/hero/esperanza-master-title.png"
-                alt="ESPERANZA - Campus Life Festival 2026"
-                className="w-full max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-3xl max-h-[30vh] sm:max-h-[36vh] object-contain drop-shadow-[0_12px_32px_rgba(245,158,11,0.5)] transition-all duration-300"
-              />
+              <picture className="flex items-center justify-center">
+                {/* Mobile Portrait View: Native Stacked Festival Typography & Emblem Lockup */}
+                <source media="(max-width: 767px)" srcSet="/hero/esperanza-hero-mobile.png" />
+                {/* Desktop & Tablet Landscape View: Horizontal Master Title Artwork */}
+                <source media="(min-width: 768px)" srcSet="/hero/esperanza-master-title.png" />
+                <img
+                  src="/hero/esperanza-master-title.png"
+                  alt="ESPERANZA - Campus Life Festival 2026"
+                  className="w-auto max-w-[82vw] sm:max-w-lg md:max-w-2xl lg:max-w-3xl max-h-[58dvh] sm:max-h-[36vh] object-contain drop-shadow-[0_12px_36px_rgba(245,158,11,0.5)] transition-all duration-300"
+                />
+              </picture>
             </motion.div>
           </div>
         </div>
@@ -236,21 +245,27 @@ export const HomePage: React.FC = () => {
       =================================================================== */}
       <section
         id="about"
-        className="relative h-[100dvh] min-h-[580px] w-full bg-[#070503] overflow-hidden select-none flex items-center justify-center px-2 sm:px-0"
+        className="relative h-[100dvh] min-h-[560px] w-full bg-[#070503] overflow-hidden select-none flex items-center justify-center snap-start"
         aria-label="Official Festival Manifesto"
       >
-        {/* Full-Bleed Master Artwork Image (object-contain on mobile so text/book is 100% visible, object-cover on desktop) */}
-        <img
-          src="/about/esperanza-manifesto.png"
-          alt="Esperanza 9.0 Manifesto: Esperanza 9.0 is the flagship inter-house cultural, literary, and arts championship organized by the ADSA Project Council. Bringing together House Diraya and House Rivaya across 60+ competitive disciplines, the festival celebrates creative distinction, student talent, and impartial blind digital evaluation under the enduring motto Nexus Veritatis."
-          className="w-full h-auto max-h-[86dvh] md:max-h-none md:h-full object-contain md:object-cover object-center pointer-events-none select-none drop-shadow-[0_4px_24px_rgba(245,158,11,0.12)]"
-        />
+        {/* Full-Bleed Master Artwork Image (Zero Boxiness, Native 9:16 Edge-to-Edge Flow) */}
+        <picture className="w-full h-full flex items-center justify-center">
+          {/* Mobile Portrait View (Exact Native 9:16 Smartphone Artwork) */}
+          <source media="(max-width: 767px)" srcSet="/about/esperanza-manifesto-mobile.png" />
+          {/* Desktop & Tablet Landscape View (Full-Bleed Widescreen Master Artwork) */}
+          <source media="(min-width: 768px)" srcSet="/about/esperanza-manifesto.png" />
+          <img
+            src="/about/esperanza-manifesto.png"
+            alt="Esperanza 9.0 Manifesto: Flagship inter-house cultural, literary, and arts championship organized by the ADSA Project Council. Bringing together House Diraya and House Rivaya across 60+ competitive disciplines, the festival celebrates creative distinction, student talent, and impartial blind digital evaluation under the enduring motto Nexus Veritatis."
+            className="w-full h-full object-cover object-center pointer-events-none select-none"
+          />
+        </picture>
 
-        {/* Top Seamless Dark Gradient Blend (Connecting Flush with Hero) */}
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-36 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
+        {/* Top Seamless Dark Gradient Blend (Connecting Flush with Hero - Behind Content) */}
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-36 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-0" />
 
-        {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Live Standings) */}
-        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-16 sm:h-40 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
+        {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Live Standings - Behind Content) */}
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-16 sm:h-40 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/80 via-35% to-transparent z-0" />
       </section>
 
       {/* ===================================================================
@@ -274,65 +289,15 @@ export const HomePage: React.FC = () => {
       {/* ===================================================================
           SECTION 5: CLEAN MINIMAL SEMANTIC FOOTER
       =================================================================== */}
-      <footer className="max-w-6xl mx-auto px-4 sm:px-8 py-8 border-t border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+      <footer className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-8 pb-24 md:pb-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs">
+        {/* Soft Centered Fading Hairline (No harsh cut-off edge) */}
+        <div className="absolute top-0 inset-x-8 sm:inset-x-24 h-[1px] bg-gradient-to-r from-transparent via-amber-500/25 to-transparent" />
+
         <div className="flex items-center gap-2 text-xs sm:text-sm font-sans tracking-wide">
           <span className="text-slate-300 font-normal">Project Council</span>
           <span className="text-amber-500/70 font-semibold mx-1">.</span>
           <span className="font-semibold text-white tracking-wider">ESPERANZA 9.0</span>
         </div>
-
-        <nav aria-label="Quick Navigation" className="flex items-center gap-5 font-mono text-slate-400 text-xs">
-          <a
-            href="#hero"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="hover:text-amber-400 transition-colors cursor-pointer"
-          >
-            [00] HOME
-          </a>
-          <a
-            href="#about"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="hover:text-amber-400 transition-colors cursor-pointer"
-          >
-            [00] MANIFESTO
-          </a>
-          <a
-            href="#standings"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('standings')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="hover:text-amber-400 transition-colors cursor-pointer"
-          >
-            [01] STANDINGS
-          </a>
-          <a
-            href="#results"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="hover:text-amber-400 transition-colors cursor-pointer"
-          >
-            [02] RESULTS
-          </a>
-          <a
-            href="#gallery"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="hover:text-amber-400 transition-colors cursor-pointer"
-          >
-            [03] GALLERY
-          </a>
-        </nav>
       </footer>
     </div>
   );

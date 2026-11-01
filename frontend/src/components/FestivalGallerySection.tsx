@@ -182,35 +182,122 @@ export const FestivalGallerySection: React.FC = () => {
   return (
     <section
       id="gallery"
-      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-3 sm:py-6 px-3 sm:px-8 bg-[#070503] overflow-hidden select-none"
+      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-6 px-3 sm:px-8 pb-20 md:pb-6 bg-[#070503] overflow-hidden select-none snap-start"
       aria-label="Official Festival Photo Archive"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      {/* Top Seamless Dark Gradient Blend (Connecting Flush with Posters - Behind Content) */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-10 md:h-48 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
+
+      {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Footer - Behind Content) */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 md:h-48 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
+
       {/* Background Volumetric Gold Glow */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/5 to-transparent blur-[150px] z-0" />
 
-      <div className="relative z-10 max-w-3xl sm:max-w-4xl lg:max-w-[880px] mx-auto w-full my-auto flex flex-col justify-center items-center space-y-3 sm:space-y-4">
+      <div className="relative z-10 max-w-3xl sm:max-w-4xl lg:max-w-[880px] mx-auto w-full my-2 md:my-auto flex flex-col justify-center items-center space-y-3 sm:space-y-4">
         {/* Minimal Header with Controls & Progress Pulse */}
-        <div className="flex flex-col items-center justify-center text-center space-y-1.5 pb-0.5">
-          <div className="flex items-center gap-2">
-            <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.22em] uppercase text-white">
-              GALLERY <span className="text-amber-400">ARCHIVE</span>
-            </h2>
-          </div>
+        <div className="flex flex-col items-center justify-center text-center">
+          <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.24em] uppercase text-white">
+            <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">GALLERY </span>
+            <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">ARCHIVE</span>
+          </h2>
 
-          <div className="flex items-center justify-center gap-2.5 pt-0.5">
-            <div className="h-[1px] w-8 sm:w-14 bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400" />
-            <div className="w-1.5 h-1.5 rotate-45 bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
-            <div className="h-[1px] w-8 sm:w-14 bg-gradient-to-l from-transparent via-amber-400/60 to-amber-400" />
+          <div className="flex items-center justify-center gap-2.5 pt-1.5">
+            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent via-amber-400/70 to-amber-400" />
+            <div className="w-2 h-2 rotate-45 bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
+            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400/70 to-amber-400" />
           </div>
         </div>
 
         {/* ===================================================================
-            FLUID LAYOUT GLIDE STAGE (ALL 5 FRAMES SWAP POSITIONS IN 16:9)
+            MOBILE VIEW (< sm): 3D RISING STACKED CARD DECK (BOTTOM-UP ANIMATION)
+        =================================================================== */}
+        <div className="sm:hidden w-full flex flex-col items-center py-2 select-none">
+          <div className="relative w-[90vw] max-w-[345px] h-[265px] mx-auto flex items-center justify-center">
+            {photoOrder.slice(0, 3).reverse().map((photo, reverseIndex) => {
+              // reverseIndex 0 = deepest (bottom), 1 = middle, 2 = top active
+              const stackPosition = 2 - reverseIndex;
+              const isActive = stackPosition === 0;
+
+              return (
+                <motion.div
+                  key={photo.id}
+                  layout
+                  initial={false}
+                  animate={{
+                    y: stackPosition === 0 ? 0 : stackPosition === 1 ? 24 : 46,
+                    scale: stackPosition === 0 ? 1 : stackPosition === 1 ? 0.94 : 0.88,
+                    opacity: stackPosition === 0 ? 1 : stackPosition === 1 ? 0.6 : 0.28,
+                    zIndex: 30 - stackPosition * 10,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.25, 1, 0.5, 1],
+                  }}
+                  drag={isActive ? true : false}
+                  dragElastic={0.2}
+                  dragSnapToOrigin={true}
+                  onDragEnd={(_e, info) => {
+                    if (info.offset.y < -30 || info.offset.x < -30) {
+                      handleCycleNext();
+                    } else if (info.offset.y > 30 || info.offset.x > 30) {
+                      handleCyclePrev();
+                    }
+                  }}
+                  onClick={() => {
+                    if (isActive) setActivePhoto(photo);
+                    else handleCycleNext();
+                  }}
+                  className={`absolute inset-x-0 top-0 h-[215px] rounded-2xl overflow-hidden cursor-pointer bg-black transition-shadow duration-300 ${
+                    isActive
+                      ? 'border border-amber-400/90 shadow-[0_8px_32px_rgba(245,158,11,0.35)]'
+                      : 'border border-white/10 shadow-lg pointer-events-auto'
+                  }`}
+                >
+                  <img
+                    src={photo.imageUrl}
+                    alt={photo.title || `Festival Moment ${photo.id}`}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Interactive Golden Dots for Mobile */}
+          <div className="flex items-center gap-1.5 pt-4">
+            {GALLERY_PHOTOS.map((photo) => (
+              <button
+                key={photo.id}
+                onClick={() => {
+                  const targetIdx = photoOrder.findIndex((p) => p.id === photo.id);
+                  if (targetIdx > 0) {
+                    setPhotoOrder((prev) => {
+                      const next = [...prev];
+                      const moved = next.splice(targetIdx, 1)[0];
+                      next.unshift(moved);
+                      return next;
+                    });
+                  }
+                }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  photoOrder[0].id === photo.id
+                    ? 'w-6 bg-amber-400 shadow-[0_0_8px_#F59E0B]'
+                    : 'w-1.5 bg-white/25 hover:bg-white/50'
+                }`}
+                aria-label={`View photo ${photo.id}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* ===================================================================
+            DESKTOP VIEW (>= sm): FLUID 5-FRAME MOSAIC GLIDE STAGE
         =================================================================== */}
         <LayoutGroup id="festival-gallery-glide-group">
-          <div className="flex flex-col gap-2 sm:gap-3 w-full">
+          <div className="hidden sm:flex flex-col gap-2 sm:gap-3 w-full">
             {/* Top Tier: 2 Large 16:9 Spotlight Frames */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
               {photoOrder.slice(0, 2).map((photo) => (
@@ -269,8 +356,8 @@ export const FestivalGallerySection: React.FC = () => {
           </div>
         </LayoutGroup>
 
-        {/* Minimal Navigation & Live Animation Heartbeat Indicator */}
-        <div className="flex items-center justify-between w-full max-w-xs pt-1">
+        {/* Minimal Navigation & Live Animation Heartbeat Indicator (Desktop View) */}
+        <div className="hidden sm:flex items-center justify-between w-full max-w-xs pt-1">
           <button
             onClick={handleCyclePrev}
             className="w-7 h-7 rounded-full bg-white/5 border border-white/10 hover:border-amber-400 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"

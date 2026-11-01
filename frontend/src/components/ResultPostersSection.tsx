@@ -128,24 +128,31 @@ export const ResultPostersSection: React.FC = () => {
       ref={sectionRef}
       id="results"
       data-alias="result-posters"
-      className="relative w-full py-12 sm:py-16 px-4 sm:px-8 bg-[#070503] overflow-hidden select-none"
+      className="relative w-full h-[100dvh] max-h-[100dvh] min-h-[560px] flex flex-col justify-center items-center py-4 md:py-16 px-4 sm:px-8 pb-20 md:pb-16 bg-[#070503] overflow-hidden select-none snap-start"
       aria-label="Official Competition Posters"
     >
+      {/* Top Seamless Dark Gradient Blend (Connecting Flush with Standings - Behind Content) */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-12 md:h-48 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
+
+      {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Gallery - Behind Content) */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-12 md:h-48 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
+
       {/* Background Volumetric Ambience */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/3 to-transparent blur-[140px] z-0" />
 
-      <div className="relative z-10 max-w-6xl mx-auto space-y-6 sm:space-y-8">
+      <div className="relative z-10 max-w-6xl mx-auto w-full my-auto space-y-4 md:space-y-8 flex flex-col items-center justify-center">
         {/* ===================================================================
             SECTION TITLE: "RESULT POSTERS"
         =================================================================== */}
-        <div className="flex flex-col items-center justify-center text-center space-y-2">
-          <h2 className="font-display font-black text-xl sm:text-2xl md:text-3xl tracking-[0.22em] uppercase text-white">
-            RESULT <span className="text-amber-400">POSTERS</span>
+        <div className="flex flex-col items-center justify-center text-center">
+          <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.24em] uppercase text-white">
+            <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">RESULT </span>
+            <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">POSTERS</span>
           </h2>
-          <div className="flex items-center justify-center gap-2.5 pt-0.5">
-            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400" />
-            <div className="w-1.5 h-1.5 rotate-45 bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
-            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400/60 to-amber-400" />
+          <div className="flex items-center justify-center gap-2.5 pt-1.5">
+            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent via-amber-400/70 to-amber-400" />
+            <div className="w-2 h-2 rotate-45 bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
+            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400/70 to-amber-400" />
           </div>
         </div>
 

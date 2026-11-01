@@ -400,19 +400,19 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       className={
         isLiveScreen
           ? "relative w-full h-full flex flex-col justify-between items-center pt-2 pb-0 px-2 select-none"
-          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-between items-center pt-3 sm:pt-7 pb-2 sm:pb-3 px-2 sm:px-6 overflow-hidden bg-[#070503] select-none"
+          : "relative h-[100dvh] max-h-[100dvh] min-h-[560px] w-full flex flex-col justify-center md:justify-between items-center pt-4 sm:pt-6 md:pt-7 pb-20 md:pb-3 px-2 sm:px-6 overflow-hidden bg-[#070503] select-none snap-start"
       }
       aria-label="Official Team Standings"
     >
       {/* ===================================================================
           1. CONTINUOUS COLOR FLOW & CINEMATIC GRADIENT LIGHTING
       =================================================================== */}
-      {/* Seamless Top Bleed Blending 100% Flush with About Section (Only on Homepage) */}
+      {/* Seamless Top Bleed Blending 100% Flush with About Section (Only on Homepage - Behind Content) */}
       {!isLiveScreen && (
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-28 sm:h-40 bg-gradient-to-b from-[#070503] via-[#070503]/80 to-transparent z-10" />
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-40 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
       )}
       {!isLiveScreen && (
-        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-24 sm:h-36 bg-gradient-to-t from-[#070503] via-[#070503]/80 to-transparent z-10" />
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-20 sm:h-36 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
       )}
 
       {/* Center Stage Spotlight Illuminating the Podium Dais */}
@@ -451,38 +451,39 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       <StageMotes />
 
       {/* ===================================================================
-          2. HEADING: "T E A M   S T A N D I N G S" WITH GOLD DIVIDER & DIAMOND
+          2 & 3. UNIFIED BALANCED CORE: HEADING + PODIUM CLUSTER
+          Mobile: Grouped into one centered, balanced unit (~405px total)
+          Desktop: Anchored heading at top, dais grounded at bottom
       =================================================================== */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative z-10 flex flex-col items-center pt-1 sm:pt-2 text-center"
-      >
-        <h2 className="font-display font-black text-sm sm:text-base md:text-xl tracking-[0.28em] sm:tracking-[0.38em] uppercase">
-          <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">TEAM </span>
-          <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">
-            STANDINGS
-          </span>
-        </h2>
+      <div className="relative z-10 w-full max-w-2xl sm:max-w-3xl mx-auto flex flex-col items-center justify-center my-auto md:my-0 md:h-full md:justify-between">
+        {/* HEADING: "T E A M   S T A N D I N G S" WITH GOLD DIVIDER & DIAMOND */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="relative z-10 flex flex-col items-center pt-1 sm:pt-2 text-center mb-11 sm:mb-14 md:mb-0"
+        >
+          <h2 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.24em] uppercase text-white">
+            <span className="text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">TEAM </span>
+            <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">
+              STANDINGS
+            </span>
+          </h2>
 
-        {/* Thin Gold Divider with Centered Solid Gold Diamond */}
-        <div className="flex items-center justify-center gap-2.5 pt-2">
-          <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent via-amber-400/70 to-amber-400" />
-          <div className="w-2 h-2 rotate-45 bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
-          <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400/70 to-amber-400" />
-        </div>
-      </motion.div>
+          {/* Thin Gold Divider with Centered Solid Gold Diamond */}
+          <div className="flex items-center justify-center gap-2.5 pt-1.5">
+            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent via-amber-400/70 to-amber-400" />
+            <div className="w-2 h-2 rotate-45 bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
+            <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400/70 to-amber-400" />
+          </div>
+        </motion.div>
 
-      {/* ===================================================================
-          3. CENTER STAGE: THE TWO STEPPED PODIUM BLOCKS ON THE RAISED DAIS
-          (Unified Eye-Level Straight-On Perspective • Seamlessly Joined)
-      =================================================================== */}
-      <div
-        ref={podiumRef}
-        className="relative z-10 w-full max-w-2xl sm:max-w-3xl mx-auto flex flex-col items-center justify-end mt-auto mb-0"
-      >
+        {/* CENTER STAGE: THE TWO STEPPED PODIUM BLOCKS ON THE RAISED DAIS */}
+        <div
+          ref={podiumRef}
+          className="relative z-10 w-full flex flex-col items-center justify-center md:justify-end md:mt-auto md:mb-0"
+        >
         
         {/* The Two Stepped Podium Blocks Side-by-Side (Sitting Flush on the Dais Base) */}
         <div className="flex items-end justify-center gap-2 sm:gap-5 md:gap-6 w-full z-10">
@@ -493,7 +494,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => cheerTeam('RIVAYA')}
-            className="flex flex-col items-center w-[44vw] max-w-[155px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
+            className="flex flex-col items-center w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
           >
             {/* 3D Gold Crown (Descends on Crowning Stage only if single winner; hidden if tied) */}
             <div className="flex flex-col items-center -mb-1 relative z-20">
@@ -514,16 +515,16 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
 
             {/* Main Lower Rectangular Block Body */}
             <div
-              className={`w-full bg-gradient-to-b from-[#2b050b] via-[#1a0307] to-[#0d0103] border-t-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/20 flex flex-col items-center justify-between p-3.5 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(244,63,94,0.25)] overflow-hidden ${
+              className={`w-full bg-gradient-to-b from-[#2b050b] via-[#1a0307] to-[#0d0103] border-t-2 border-b-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/20 rounded-b-xs flex flex-col items-center justify-between p-2 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(244,63,94,0.25)] overflow-hidden ${
                 isTied
                   ? isLockstepOrMore
-                    ? 'h-[195px] sm:h-[245px] md:h-[280px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
-                    : 'h-[150px] sm:h-[180px] transition-all duration-[800ms] ease-out'
+                    ? 'h-[25vh] max-h-[250px] min-h-[200px] sm:h-[245px] md:h-[280px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
+                    : 'h-[160px] sm:h-[180px] transition-all duration-[800ms] ease-out'
                   : isRivayaLeader && isSurgingOrDone
-                  ? 'h-[230px] sm:h-[285px] md:h-[320px] transition-all duration-[2000ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
+                  ? 'h-[29vh] max-h-[290px] min-h-[235px] sm:h-[285px] md:h-[320px] transition-all duration-[2000ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
                   : isLockstepOrMore
-                  ? 'h-[185px] sm:h-[230px] md:h-[260px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
-                  : 'h-[150px] sm:h-[180px] transition-all duration-[800ms] ease-out'
+                  ? 'h-[23vh] max-h-[235px] min-h-[185px] sm:h-[230px] md:h-[260px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
+                  : 'h-[160px] sm:h-[180px] transition-all duration-[800ms] ease-out'
               }`}
             >
               {/* Subtle Specular Light Sweep on Hover / Idle */}
@@ -536,7 +537,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
 
               {/* Team Name: Bold Crimson/Magenta Typography */}
               <div className="relative z-10 text-center pt-1 sm:pt-2">
-                <h3 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.16em] sm:tracking-[0.2em] text-[#FF2A6D] drop-shadow-[0_2px_10px_rgba(255,42,109,0.7)] uppercase transition-colors duration-300 group-hover:text-[#ff528e]">
+                <h3 className="font-display font-black text-sm sm:text-2xl md:text-2xl tracking-[0.14em] sm:tracking-[0.2em] text-[#FF2A6D] drop-shadow-[0_2px_10px_rgba(255,42,109,0.7)] uppercase transition-colors duration-300 group-hover:text-[#ff528e]">
                   RIVAYA
                 </h3>
               </div>
@@ -544,7 +545,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
               {/* Center: Numerals (In Lockstep with Diraya, Frozen, then Surges to 148) */}
               <div className="relative z-10 flex flex-col items-center my-auto">
                 <span
-                  className={`font-mono font-black text-4xl sm:text-5xl md:text-5xl tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)] transition-all duration-300 ${
+                  className={`font-mono font-black text-3xl sm:text-5xl md:text-5xl tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)] transition-all duration-300 ${
                     isFrozen ? 'text-amber-200 scale-105 drop-shadow-[0_0_18px_rgba(245,158,11,0.7)]' : 'text-white'
                   }`}
                 >
@@ -568,7 +569,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => cheerTeam('DIRAYA')}
-            className="flex flex-col items-center w-[44vw] max-w-[155px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
+            className="flex flex-col items-center w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
           >
             {/* 3D Gold Crown (Descends on Crowning Stage only if single winner; hidden if tied) */}
             <div className="flex flex-col items-center -mb-1 relative z-20">
@@ -589,16 +590,16 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
 
             {/* Main Lower Rectangular Block Body */}
             <div
-              className={`w-full bg-gradient-to-b from-[#082212] via-[#04140a] to-[#020a05] border-t-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/20 flex flex-col items-center justify-between p-3.5 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(0,230,118,0.25)] overflow-hidden ${
+              className={`w-full bg-gradient-to-b from-[#082212] via-[#04140a] to-[#020a05] border-t-2 border-b-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/20 rounded-b-xs flex flex-col items-center justify-between p-2 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(0,230,118,0.25)] overflow-hidden ${
                 isTied
                   ? isLockstepOrMore
-                    ? 'h-[195px] sm:h-[245px] md:h-[280px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
-                    : 'h-[150px] sm:h-[180px] transition-all duration-[800ms] ease-out'
+                    ? 'h-[25vh] max-h-[250px] min-h-[200px] sm:h-[245px] md:h-[280px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
+                    : 'h-[160px] sm:h-[180px] transition-all duration-[800ms] ease-out'
                   : isDirayaLeader && isSurgingOrDone
-                  ? 'h-[230px] sm:h-[285px] md:h-[320px] transition-all duration-[2000ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
+                  ? 'h-[29vh] max-h-[290px] min-h-[235px] sm:h-[285px] md:h-[320px] transition-all duration-[2000ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
                   : isLockstepOrMore
-                  ? 'h-[185px] sm:h-[230px] md:h-[260px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
-                  : 'h-[150px] sm:h-[180px] transition-all duration-[800ms] ease-out'
+                  ? 'h-[23vh] max-h-[235px] min-h-[185px] sm:h-[230px] md:h-[260px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
+                  : 'h-[160px] sm:h-[180px] transition-all duration-[800ms] ease-out'
               }`}
             >
               {/* Subtle Specular Light Sweep on Hover / Idle */}
@@ -611,7 +612,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
 
               {/* Team Name: Bold Emerald Typography */}
               <div className="relative z-10 text-center pt-1 sm:pt-2">
-                <h3 className="font-display font-black text-lg sm:text-2xl md:text-2xl tracking-[0.16em] sm:tracking-[0.2em] text-[#00E676] drop-shadow-[0_2px_10px_rgba(0,230,118,0.7)] uppercase transition-colors duration-300 group-hover:text-[#2eff99]">
+                <h3 className="font-display font-black text-sm sm:text-2xl md:text-2xl tracking-[0.14em] sm:tracking-[0.2em] text-[#00E676] drop-shadow-[0_2px_10px_rgba(0,230,118,0.7)] uppercase transition-colors duration-300 group-hover:text-[#2eff99]">
                   DIRAYA
                 </h3>
               </div>
@@ -619,7 +620,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
               {/* Center: Numerals (In Lockstep with Rivaya to 115, then Stays at 115) */}
               <div className="relative z-10 flex flex-col items-center my-auto">
                 <span
-                  className={`font-mono font-black text-4xl sm:text-5xl md:text-5xl tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)] transition-all duration-300 ${
+                  className={`font-mono font-black text-3xl sm:text-5xl md:text-5xl tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)] transition-all duration-300 ${
                     isFrozen ? 'text-amber-200 scale-105 drop-shadow-[0_0_18px_rgba(245,158,11,0.7)]' : 'text-white'
                   }`}
                 >
@@ -642,7 +643,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
             4. THE RAISED CIRCULAR GOLDEN STAGE DAIS / BASE
             (Straight-On Front Eye-Level Perspective • Seamlessly Joined to Blocks)
         =================================================================== */}
-        <div className="relative w-full max-w-xl sm:max-w-2xl -mt-4 sm:-mt-6 flex flex-col items-center pointer-events-none z-0">
+        <div className="relative w-[88vw] max-w-[316px] sm:w-full sm:max-w-xl md:max-w-2xl -mt-2 sm:-mt-6 flex flex-col items-center pointer-events-none z-0">
           
           {/* Top Surface of the Circular Raised Dais (Matching Eye-Level Horizon) */}
           <div className="w-full h-11 sm:h-14 rounded-[100%] border-2 border-amber-500/70 bg-gradient-to-b from-[#181105] via-[#0d0903] to-[#040301] shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_0_12px_rgba(245,158,11,0.18)] relative flex items-center justify-center overflow-hidden">
@@ -650,24 +651,25 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
             <div className="w-[96%] h-[82%] rounded-[100%] border border-amber-300/40 bg-gradient-to-b from-amber-500/10 to-transparent" />
 
             {/* Subtle Vertical Reflections Across the Dais Platform */}
-            <div className="absolute inset-0 flex items-center justify-center gap-10 opacity-35 blur-[2px]">
-              <div className="w-32 sm:w-44 h-10 bg-gradient-to-b from-rose-500/40 to-transparent rounded-[100%]" />
-              <div className="w-32 sm:w-44 h-10 bg-gradient-to-b from-emerald-500/40 to-transparent rounded-[100%]" />
+            <div className="absolute inset-0 flex items-center justify-center gap-6 sm:gap-10 opacity-35 blur-[2px]">
+              <div className="w-24 sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-rose-500/40 to-transparent rounded-[100%]" />
+              <div className="w-24 sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-emerald-500/40 to-transparent rounded-[100%]" />
             </div>
           </div>
 
-          {/* 3D Vertical Golden Plinth Edge / Step (Solid Physical Presence) */}
-          <div className="w-full h-5 sm:h-7 -mt-5.5 sm:-mt-7 rounded-b-[100%] bg-gradient-to-r from-amber-800 via-amber-500 via-30% via-yellow-300 via-50% via-amber-500 via-70% to-amber-800 border-b-2 border-amber-300 shadow-[0_12px_24px_rgba(0,0,0,0.95)]" />
-
-          {/* Glossy Floor Mirror Reflections Falling Downward Directly Beneath Plinth */}
-          <div className="w-full flex items-start justify-center gap-5 sm:gap-8 opacity-30 transform scale-y-[-1] blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_80%)] overflow-hidden h-12 sm:h-16 -mt-1 sm:-mt-2">
-            <div className="w-32 sm:w-48 h-20 bg-gradient-to-t from-transparent via-[#2b050b]/60 to-[#FF2A6D]/30" />
-            <div className="w-32 sm:w-48 h-16 bg-gradient-to-t from-transparent via-[#082212]/60 to-[#00E676]/30" />
-          </div>
+          {/* 3D Vertical Golden Plinth Edge / Step (Solid Physical Presence with Valid Negative Margin) */}
+          <div className="w-full h-5 sm:h-7 -mt-5 sm:-mt-7 rounded-b-[100%] bg-gradient-to-r from-amber-800 via-amber-500 via-30% via-yellow-300 via-50% via-amber-500 via-70% to-amber-800 border-b-2 border-amber-300 shadow-[0_12px_24px_rgba(0,0,0,0.95)]" />
 
           {/* Deep Ground Contact Shadow Directly Underneath the Physical Base */}
-          <div className="w-[92%] h-5 sm:h-6 rounded-[100%] bg-black/98 blur-md -mt-8 sm:-mt-10" />
+          <div className="w-[94%] h-4 sm:h-6 rounded-[100%] bg-black/98 blur-sm sm:blur-md -mt-2 sm:-mt-3" />
+
+          {/* Glossy Floor Mirror Reflections Falling Downward Directly Beneath Plinth */}
+          <div className="w-full flex items-start justify-center gap-4 sm:gap-8 opacity-25 sm:opacity-30 transform scale-y-[-1] blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_80%)] overflow-hidden h-10 sm:h-16 mt-0.5">
+            <div className="w-24 sm:w-48 h-16 sm:h-20 bg-gradient-to-t from-transparent via-[#2b050b]/60 to-[#FF2A6D]/30" />
+            <div className="w-24 sm:w-48 h-12 sm:h-16 bg-gradient-to-t from-transparent via-[#082212]/60 to-[#00E676]/30" />
+          </div>
         </div>
+      </div>
       </div>
     </section>
   );

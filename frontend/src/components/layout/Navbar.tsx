@@ -301,62 +301,54 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
                   <span className="hidden sm:inline">Portal Login</span>
                   <span className="sm:hidden">Login</span>
                 </Link>
-
-                {/* Mobile Menu Toggle Button */}
-                {isDarkHome && (
-                  <button
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 md:hidden transition-colors"
-                    aria-label="Toggle navigation menu"
-                  >
-                    {mobileMenuOpen ? <X className="w-5 h-5 text-amber-400" /> : <Menu className="w-5 h-5" />}
-                  </button>
-                )}
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* Mobile Slide-down Navigation Panel for Public Homepage */}
-      {isDarkHome && mobileMenuOpen && !user && (
-        <div className="md:hidden w-full bg-[#070503]/95 backdrop-blur-2xl border-b border-amber-500/20 px-5 py-4 flex flex-col gap-1.5 transition-all shadow-2xl">
+      {/* Mobile Floating Bottom Navigation Island (Ergonomic Thumb Reach) */}
+      {isDarkHome && !user && (
+        <nav
+          aria-label="Mobile Bottom Navigation"
+          className="fixed bottom-4 inset-x-3 z-50 md:hidden flex items-center justify-around py-2 px-1.5 rounded-full bg-[#0d0905]/92 backdrop-blur-2xl border border-amber-500/35 shadow-[0_8px_32px_rgba(0,0,0,0.85),0_0_16px_rgba(245,158,11,0.2)] max-w-sm mx-auto select-none"
+        >
           <button
             onClick={() => scrollToSection('home')}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[9px] font-bold text-slate-300 hover:text-amber-400 active:scale-90 transition-all cursor-pointer"
           >
             <Home className="w-4 h-4 text-amber-400" />
-            <span>[00] HOME</span>
+            <span>Home</span>
           </button>
           <button
             onClick={() => scrollToSection('about')}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[9px] font-bold text-slate-300 hover:text-amber-400 active:scale-90 transition-all cursor-pointer"
           >
             <BookOpen className="w-4 h-4 text-amber-400" />
-            <span>[01] MANIFESTO</span>
+            <span>Manifesto</span>
           </button>
           <button
             onClick={() => scrollToSection('standings')}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[9px] font-bold text-slate-300 hover:text-amber-400 active:scale-90 transition-all cursor-pointer"
           >
             <Trophy className="w-4 h-4 text-amber-400" />
-            <span>[02] TEAM STANDINGS</span>
+            <span>Standings</span>
           </button>
           <button
             onClick={() => scrollToSection('results')}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[9px] font-bold text-slate-300 hover:text-amber-400 active:scale-90 transition-all cursor-pointer"
           >
             <Award className="w-4 h-4 text-amber-400" />
-            <span>[03] RESULT POSTERS</span>
+            <span>Results</span>
           </button>
           <button
             onClick={() => scrollToSection('gallery')}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all text-left"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[9px] font-bold text-slate-300 hover:text-amber-400 active:scale-90 transition-all cursor-pointer"
           >
             <Camera className="w-4 h-4 text-amber-400" />
-            <span>[04] FESTIVAL GALLERY</span>
+            <span>Gallery</span>
           </button>
-        </div>
+        </nav>
       )}
     </header>
   );
