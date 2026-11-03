@@ -136,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
   return (
     <>
       <header
-        className={`w-full transition-all ${
+        className={`w-full transition-all pt-safe ${
           isDarkHome
             ? 'absolute top-0 inset-x-0 z-30 bg-gradient-to-b from-[#040404]/90 via-[#040404]/40 to-transparent border-b border-white/[0.08]'
             : 'sticky top-0 z-30 bg-[#0A0A0A]/95 border-b border-white/[0.08] backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.8)]'
@@ -321,7 +321,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isPublic = fals
         {isDarkHome && !user && (
           <nav
             aria-label="Mobile Bottom Navigation"
-            className="fixed bottom-4 inset-x-3 z-50 md:hidden flex items-center justify-around py-2 px-1.5 rounded-full bg-[#121212]/92 backdrop-blur-2xl border border-amber-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.85),0_0_16px_rgba(245,158,11,0.2)] max-w-sm mx-auto select-none"
+            className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] inset-x-3 z-50 md:hidden flex items-center justify-around py-2 px-1.5 rounded-full bg-[#121212]/92 backdrop-blur-2xl border border-amber-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.85),0_0_16px_rgba(245,158,11,0.2)] max-w-sm mx-auto select-none"
           >
             <button
               onClick={() => scrollToSection('home')}

@@ -57,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:sticky top-0 lg:top-3 xl:top-4 z-50 lg:z-20 h-screen lg:h-[calc(100vh-1.5rem)] xl:h-[calc(100vh-2rem)] w-60 xl:w-64 lg:rounded-[24px] p-4 flex flex-col justify-between shrink-0 shadow-2xl transition-transform duration-300 bg-[#0A0A0A] border border-white/[0.08] text-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.8)] ${
+        className={`fixed lg:sticky top-0 lg:top-3 xl:top-4 z-50 lg:z-20 h-screen lg:h-[calc(100vh-1.5rem)] xl:h-[calc(100vh-2rem)] w-60 xl:w-64 lg:rounded-[24px] p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] flex flex-col justify-between shrink-0 shadow-2xl transition-transform duration-300 bg-[#0A0A0A] border border-white/[0.08] text-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.8)] ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

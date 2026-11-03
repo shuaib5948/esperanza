@@ -193,7 +193,7 @@ export const HomePage: React.FC = () => {
       =================================================================== */}
       <section
         id="home"
-        className="relative h-[100dvh] min-h-[560px] w-full flex flex-col justify-center items-center text-center overflow-hidden px-4 sm:px-8 pt-16 md:pt-20 pb-16 md:pb-6 bg-transparent snap-start"
+        className="relative h-[100dvh] min-h-[560px] w-full flex flex-col justify-center items-center text-center overflow-hidden px-4 sm:px-8 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] md:pt-20 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-6 bg-transparent snap-start"
       >
         {/* Official Festival Bokeh & Cyber Atmosphere Backdrop */}
         <div

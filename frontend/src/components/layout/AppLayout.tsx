@@ -60,7 +60,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ requireAuth = false, allow
 
   // 3. All Authenticated Portals (Admin, Team, Judge, Participant) -> Unified Dark Luxury Bento Grid System
   return (
-    <div className={`w-full flex gap-3 xl:gap-4 font-bento antialiased items-start bento-portal bg-[#040404] text-slate-100 p-2 sm:p-3 xl:p-4 ${
+    <div className={`w-full flex gap-3 xl:gap-4 font-bento antialiased items-start bento-portal bg-[#040404] text-slate-100 p-2 sm:p-3 xl:p-4 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] pl-[calc(0.5rem+env(safe-area-inset-left,0px))] pr-[calc(0.5rem+env(safe-area-inset-right,0px))] ${
       isJudge ? 'min-h-screen md:h-screen md:overflow-hidden select-none' : 'min-h-screen'
     }`}>
       {showSidebar && <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />}
