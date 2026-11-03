@@ -100,7 +100,7 @@ export class JudgeRepository {
              MAX(s.end_at) as end_at, 
              MAX(v.name) as venue_name,
              MAX(s.status) as schedule_status,
-             COUNT(DISTINCT r.id) as participant_count,
+             COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END) as participant_count,
              COUNT(DISTINCT CASE WHEN ss.status = 'SUBMITTED' OR ss.status = 'LOCKED' THEN ss.id END) as evaluated_count
       FROM competitions c
       JOIN competition_judges cj ON cj.competition_id = c.id AND cj.judge_id = ? AND cj.status = 'ASSIGNED'
@@ -109,6 +109,7 @@ export class JudgeRepository {
       LEFT JOIN schedules s ON s.competition_id = c.id
       LEFT JOIN venues v ON v.id = s.venue_id
       LEFT JOIN registrations r ON r.competition_id = c.id AND r.status = 'ASSIGNED'
+      LEFT JOIN participants p ON p.id = r.participant_id
       LEFT JOIN score_sheets ss ON ss.competition_id = c.id AND ss.judge_id = ?
       GROUP BY c.id, pg.name, ct.name
       ORDER BY 

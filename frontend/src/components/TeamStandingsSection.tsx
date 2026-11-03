@@ -410,10 +410,10 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
       =================================================================== */}
       {/* Seamless Top Bleed Blending 100% Flush with About Section (Only on Homepage - Behind Content) */}
       {!isLiveScreen && (
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-40 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-16 sm:h-40 bg-gradient-to-b from-[#040404] via-[#040404]/85 to-transparent z-0" />
       )}
       {!isLiveScreen && (
-        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-20 sm:h-36 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-20 sm:h-36 bg-gradient-to-t from-[#040404] via-[#040404]/85 to-transparent z-0" />
       )}
 
       {/* Center Stage Spotlight Illuminating the Podium Dais */}
@@ -510,7 +510,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
 
             {/* Main Lower Rectangular Block Body */}
             <div
-              className={`w-full bg-gradient-to-b from-[#2b050b] via-[#1a0307] to-[#0d0103] border-t-2 border-b-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/20 rounded-b-xs flex flex-col items-center justify-between p-2 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(244,63,94,0.25)] overflow-hidden ${
+              className={`w-full bg-gradient-to-b from-[#2b050b] via-[#1a0307] to-[#0d0103] border-t-2 border-b-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/30 rounded-b-xs flex flex-col items-center justify-between p-2 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(244,63,94,0.25)] overflow-hidden ${
                 isTied
                   ? isLockstepOrMore
                     ? 'h-[25vh] max-h-[250px] min-h-[200px] sm:h-[245px] md:h-[280px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
@@ -585,7 +585,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
 
             {/* Main Lower Rectangular Block Body */}
             <div
-              className={`w-full bg-gradient-to-b from-[#082212] via-[#04140a] to-[#020a05] border-t-2 border-b-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/20 rounded-b-xs flex flex-col items-center justify-between p-2 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(0,230,118,0.25)] overflow-hidden ${
+              className={`w-full bg-gradient-to-b from-[#082212] via-[#04140a] to-[#020a05] border-t-2 border-b-2 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] border-x border-amber-500/30 rounded-b-xs flex flex-col items-center justify-between p-2 sm:p-5 relative z-10 group-hover:border-amber-400/80 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.35),0_0_24px_rgba(0,230,118,0.25)] overflow-hidden ${
                 isTied
                   ? isLockstepOrMore
                     ? 'h-[25vh] max-h-[250px] min-h-[200px] sm:h-[245px] md:h-[280px] transition-all duration-[2200ms] ease-[cubic-bezier(0.25,1,0.5,1)]'
@@ -643,7 +643,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           {/* Top Surface of the Circular Raised Dais (Matching Eye-Level Horizon) */}
           <div className="w-full h-11 sm:h-14 rounded-[100%] border-2 border-amber-500/70 bg-gradient-to-b from-[#181105] via-[#0d0903] to-[#040301] shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_0_12px_rgba(245,158,11,0.18)] relative flex items-center justify-center overflow-hidden">
             {/* Concentric Golden Inlay Ring */}
-            <div className="w-[96%] h-[82%] rounded-[100%] border border-amber-300/40 bg-gradient-to-b from-amber-500/10 to-transparent" />
+            <div className="w-[96%] h-[82%] rounded-[100%] border border-amber-500/30 bg-gradient-to-b from-amber-500/10 to-transparent" />
 
             {/* Subtle Vertical Reflections Across the Dais Platform */}
             <div className="absolute inset-0 flex items-center justify-center gap-2 sm:gap-5 md:gap-6 opacity-35 blur-[2px]">
@@ -653,7 +653,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           </div>
 
           {/* 3D Vertical Golden Plinth Edge / Step (Solid Physical Presence with Valid Negative Margin) */}
-          <div className="w-full h-5 sm:h-7 -mt-5 sm:-mt-7 rounded-b-[100%] bg-gradient-to-r from-amber-800 via-amber-500 via-30% via-yellow-300 via-50% via-amber-500 via-70% to-amber-800 border-b-2 border-amber-300 shadow-[0_12px_24px_rgba(0,0,0,0.95)]" />
+          <div className="w-full h-5 sm:h-7 -mt-5 sm:-mt-7 rounded-b-[100%] bg-gradient-to-r from-amber-800 via-amber-500 via-30% via-yellow-300 via-50% via-amber-500 via-70% to-amber-800 border-b-2 border-amber-500/30 shadow-[0_12px_24px_rgba(0,0,0,0.95)]" />
 
           {/* Deep Ground Contact Shadow Directly Underneath the Physical Base */}
           <div className="w-[94%] h-4 sm:h-6 rounded-[100%] bg-black/98 blur-sm sm:blur-md -mt-2 sm:-mt-3" />

@@ -189,10 +189,10 @@ export const FestivalGallerySection: React.FC = () => {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Top Seamless Dark Gradient Blend (Connecting Flush with Posters - Behind Content) */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-10 md:h-48 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-10 md:h-48 bg-gradient-to-b from-[#040404] via-[#040404]/85 to-transparent z-0" />
 
       {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Footer - Behind Content) */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 md:h-48 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 md:h-48 bg-gradient-to-t from-[#040404] via-[#040404]/85 to-transparent z-0" />
 
       {/* Background Volumetric Gold Glow */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/5 to-transparent blur-[150px] z-0" />
@@ -236,7 +236,7 @@ export const FestivalGallerySection: React.FC = () => {
                 alt="Previous festival moment"
                 className="w-full h-full object-cover object-center filter brightness-75 select-none pointer-events-none"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#070503]/60 via-transparent to-[#070503]/60 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#040404]/60 via-transparent to-[#040404]/60 pointer-events-none" />
             </motion.div>
 
             {/* 2. CENTER ACTIVE SPOTLIGHT FRAME (Expanded Large Frame • 100% Opacity • Gold Aura) */}
@@ -282,7 +282,7 @@ export const FestivalGallerySection: React.FC = () => {
                 alt="Next festival moment"
                 className="w-full h-full object-cover object-center filter brightness-90 select-none pointer-events-none"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#070503]/60 via-transparent to-[#070503]/60 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#040404]/60 via-transparent to-[#040404]/60 pointer-events-none" />
             </motion.div>
 
           </div>
@@ -332,7 +332,7 @@ export const FestivalGallerySection: React.FC = () => {
                   whileHover={{ scale: 1.015 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setActivePhoto(photo)}
-                  className="relative w-full aspect-[16/9] rounded-xl sm:rounded-2xl overflow-hidden border border-amber-500/25 hover:border-amber-400 shadow-[0_4px_20px_rgba(0,0,0,0.6)] hover:shadow-[0_0_25px_rgba(245,158,11,0.35)] transition-colors duration-300 group cursor-pointer bg-black select-none"
+                  className="relative w-full aspect-[16/9] rounded-xl sm:rounded-2xl overflow-hidden border border-amber-500/30 hover:border-amber-400 shadow-[0_4px_20px_rgba(0,0,0,0.6)] hover:shadow-[0_0_25px_rgba(245,158,11,0.35)] transition-colors duration-300 group cursor-pointer bg-black select-none"
                 >
                   <img
                     src={photo.imageUrl}
@@ -360,7 +360,7 @@ export const FestivalGallerySection: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setActivePhoto(photo)}
-                  className="relative w-full aspect-[16/9] rounded-xl sm:rounded-2xl overflow-hidden border border-amber-500/25 hover:border-amber-400 shadow-[0_4px_20px_rgba(0,0,0,0.6)] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-colors duration-300 group cursor-pointer bg-black select-none"
+                  className="relative w-full aspect-[16/9] rounded-xl sm:rounded-2xl overflow-hidden border border-amber-500/30 hover:border-amber-400 shadow-[0_4px_20px_rgba(0,0,0,0.6)] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-colors duration-300 group cursor-pointer bg-black select-none"
                 >
                   <img
                     src={photo.imageUrl}
@@ -381,7 +381,7 @@ export const FestivalGallerySection: React.FC = () => {
         <div className="hidden sm:flex items-center justify-between w-full max-w-xs pt-1">
           <button
             onClick={handleCyclePrev}
-            className="w-7 h-7 rounded-full bg-white/5 border border-white/10 hover:border-amber-400 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-full bg-white/5 border border-white/[0.08] hover:border-amber-400 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
             title="Previous swap"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
@@ -402,7 +402,7 @@ export const FestivalGallerySection: React.FC = () => {
 
           <button
             onClick={handleCycleNext}
-            className="w-7 h-7 rounded-full bg-white/5 border border-white/10 hover:border-amber-400 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-full bg-white/5 border border-white/[0.08] hover:border-amber-400 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
             title="Next swap"
           >
             <ChevronRight className="w-3.5 h-3.5" />

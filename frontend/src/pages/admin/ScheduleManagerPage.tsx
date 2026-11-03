@@ -101,6 +101,15 @@ export const ScheduleManagerPage: React.FC = () => {
   const [formEndTime, setFormEndTime] = useState<string>('10:30');
   const [formStageOrder, setFormStageOrder] = useState<string>('');
 
+  // View Full Lineup Modal State
+  const [viewLineupItem, setViewLineupItem] = useState<{
+    comp: Competition;
+    sched?: Schedule | null;
+    diraya: Registration[];
+    rivaya: Registration[];
+    fullTitle: string;
+  } | null>(null);
+
   // Delete Confirmation Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<{ id: number; name: string; progNum: number } | null>(null);
@@ -482,14 +491,18 @@ export const ScheduleManagerPage: React.FC = () => {
     <div className="space-y-5">
       {/* Header and Top Action Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-1">
-        <div>
-          <h1 className="text-2xl xl:text-3xl font-bento-title text-slate-900 tracking-[-0.035em] leading-none flex items-center gap-2.5">
-            <Calendar className="w-6 h-6 text-amber-700" />
-            Schedule & Lineup
-          </h1>
-          <p className="text-xs text-slate-400 font-medium mt-1">
-            Festival timetable scheduling and contestant lineup for all 60 competitions.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-slate-950 font-black shadow-xs shrink-0">
+            <Calendar className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bento-title font-bold text-white tracking-tight leading-none">
+              Schedule
+            </h1>
+            <p className="text-xs text-amber-200/60 font-medium mt-1">
+              Timetable & contestant lineups
+            </p>
+          </div>
         </div>
 
         {/* Dashboard-style rounded-full pill button */}
@@ -516,14 +529,14 @@ export const ScheduleManagerPage: React.FC = () => {
 
 
       {/* Unified Filters Toolbar — Category & Status Dropdowns with Reset & Search */}
-      <div className="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs">
+      <div className="bg-[#0A0A0A] rounded-2xl p-3.5 border border-white/[0.08] shadow-xs">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Left: Dropdowns & Reset Button */}
           <div className="flex items-center gap-2.5 flex-wrap">
             {/* 1. Category Dropdown */}
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                <Layers className={`w-3.5 h-3.5 ${activeCategory !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-amber-200/60">
+                <Layers className={`w-3.5 h-3.5 ${activeCategory !== 'ALL' ? 'text-slate-950' : 'text-amber-200/60'}`} />
               </div>
               <select
                 value={activeCategory}
@@ -531,28 +544,28 @@ export const ScheduleManagerPage: React.FC = () => {
                 className={`appearance-none rounded-full pl-9 pr-9 py-2 text-xs font-semibold border transition-all cursor-pointer focus:outline-hidden ${
                   activeCategory !== 'ALL'
                     ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300'
+                    : 'bg-[#121212] hover:bg-[#121212] text-amber-200 border-amber-500/30 hover:border-amber-500/30'
                 }`}
               >
                 {categoryOptions.map((cat) => (
                   <option
                     key={cat.id}
                     value={cat.id}
-                    className="bg-white text-slate-800 py-1 font-medium"
+                    className="bg-[#0A0A0A] text-amber-100 py-1 font-medium"
                   >
                     {cat.label} {categoryCounts[cat.id] !== undefined ? `(${categoryCounts[cat.id]})` : ''}
                   </option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <ChevronDown className={`w-3.5 h-3.5 ${activeCategory !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 ${activeCategory !== 'ALL' ? 'text-slate-950' : 'text-amber-200/60'}`} />
               </div>
             </div>
 
             {/* 2. Status Dropdown */}
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                <Filter className={`w-3.5 h-3.5 ${statusFilter !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-amber-200/60">
+                <Filter className={`w-3.5 h-3.5 ${statusFilter !== 'ALL' ? 'text-slate-950' : 'text-amber-200/60'}`} />
               </div>
               <select
                 value={statusFilter}
@@ -560,21 +573,21 @@ export const ScheduleManagerPage: React.FC = () => {
                 className={`appearance-none rounded-full pl-9 pr-9 py-2 text-xs font-semibold border transition-all cursor-pointer focus:outline-hidden ${
                   statusFilter !== 'ALL'
                     ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300'
+                    : 'bg-[#121212] hover:bg-[#121212] text-amber-200 border-amber-500/30 hover:border-amber-500/30'
                 }`}
               >
                 {statusOptions.map((st) => (
                   <option
                     key={st.id}
                     value={st.id}
-                    className="bg-white text-slate-800 py-1 font-medium"
+                    className="bg-[#0A0A0A] text-amber-100 py-1 font-medium"
                   >
                     {st.label} {statusCounts[st.id] !== undefined ? `(${statusCounts[st.id]})` : ''}
                   </option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <ChevronDown className={`w-3.5 h-3.5 ${statusFilter !== 'ALL' ? 'text-slate-950' : 'text-slate-400'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 ${statusFilter !== 'ALL' ? 'text-slate-950' : 'text-amber-200/60'}`} />
               </div>
             </div>
 
@@ -584,8 +597,8 @@ export const ScheduleManagerPage: React.FC = () => {
               disabled={!isFiltered}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 isFiltered
-                  ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 shadow-2xs hover:scale-[1.02]'
-                  : 'bg-slate-100 text-slate-400 border border-slate-200 opacity-60 cursor-not-allowed'
+                  ? 'bg-rose-500/15 text-rose-300 hover:bg-rose-500/15 border border-rose-500/30 shadow-2xs hover:scale-[1.02]'
+                  : 'bg-[#121212] text-amber-200/60 border border-white/[0.08] opacity-60 cursor-not-allowed'
               }`}
               title={isFiltered ? 'Reset all filters and search' : 'No filters applied'}
             >
@@ -596,18 +609,18 @@ export const ScheduleManagerPage: React.FC = () => {
 
           {/* Right: Search Bar with Instant Clear Button */}
           <div className="relative w-full sm:w-72 shrink-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-amber-200/60 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search programme, contestant, reg number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-amber-500 focus:bg-white transition-colors"
+              className="w-full bg-[#121212] border border-white/[0.08] rounded-full pl-9 pr-8 py-2 text-xs font-medium text-amber-100 placeholder-slate-400 focus:outline-hidden focus:border-amber-500 focus:bg-[#0A0A0A] transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-200/60 hover:text-amber-200/60 cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -619,14 +632,14 @@ export const ScheduleManagerPage: React.FC = () => {
 
       {/* Programme Cards */}
       {isLoading ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xs">
-          <div className="text-center text-slate-400 font-medium">Loading festival competitions and schedules...</div>
+        <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-8 shadow-xs">
+          <div className="text-center text-amber-200/60 font-medium">Loading schedules...</div>
         </div>
       ) : processedData.items.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xs">
+        <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-8 shadow-xs">
           <div className="flex flex-col items-center justify-center space-y-3">
             <Calendar className="w-12 h-12 text-slate-300" />
-            <p className="text-slate-500 font-medium text-sm">No programmes found matching the selected criteria.</p>
+            <p className="text-amber-200/60 font-medium text-sm">No programmes match your filter.</p>
           </div>
         </div>
       ) : (
@@ -646,174 +659,235 @@ export const ScheduleManagerPage: React.FC = () => {
             return (
               <div
                 key={comp.id}
-                className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
+                onClick={() => setViewLineupItem({ comp, sched, diraya, rivaya, fullTitle })}
+                className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl p-4 sm:p-5 shadow-xl hover:border-amber-500/40 hover:bg-[#121212]/30 transition-all duration-200 flex flex-col justify-between gap-3 cursor-pointer group"
               >
-                {/* Card Header — Category - Programme Name & Status Badge */}
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-50/90 border-b border-slate-200 gap-3">
-                  <h3 className="font-bento-title font-bold text-sm text-slate-900 truncate" title={fullTitle}>
+                {/* 1. Header: Programme Name & Single Unified Status / Action Space */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+                  <h3 className="font-bento-title font-bold text-sm sm:text-base text-white truncate w-full sm:w-auto" title={fullTitle}>
                     {fullTitle}
                   </h3>
-                  <div className="shrink-0">
-                    <ProgrammeStatusBadge competition={comp} schedule={sched} />
-                  </div>
-                </div>
-
-                {/* Card Body — Date, Time & Action Button */}
-                <div className="p-3.5 sm:px-4 sm:py-3 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200">
-                  {hasSchedule && sched ? (
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                      {/* Date Badge */}
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs font-semibold">
-                        <Calendar className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                        <span>{formatDisplayDate(sched.start_at)}</span>
-                      </div>
-
-                      {/* Time Badge */}
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-xs font-mono font-medium">
-                        <Clock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                        <span>{formatDisplayTime(sched.start_at)} – {formatDisplayTime(sched.end_at)}</span>
-                      </div>
-
-                      {/* Stage Order */}
-                      {sched.stage_order !== null && sched.stage_order !== undefined && (
-                        <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold">
-                          <span className="text-[10px] uppercase font-bold text-amber-700 tracking-wider">Order</span>
-                          <span className="font-mono">{sched.stage_order}</span>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 text-xs font-medium">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="italic">Not scheduled yet</span>
-                    </div>
-                  )}
-
-                  {/* Actions — Dashboard style rounded-full buttons */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="shrink-0 flex items-center gap-2">
                     {isPublished ? (
-                      <span className="px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center gap-1.5 cursor-not-allowed" title="Published programme">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
-                        <span>Published</span>
-                      </span>
+                      <ProgrammeStatusBadge status="PUBLISHED" />
                     ) : isCompleted ? (
-                      <span className="px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold flex items-center gap-1.5 cursor-not-allowed" title="Completed programme cannot be edited or rescheduled">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Completed</span>
-                      </span>
+                      <ProgrammeStatusBadge status="COMPLETED" />
                     ) : hasSchedule && sched ? (
-                      <button
-                        onClick={() => handleOpenEdit(comp, sched)}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-300 hover:border-slate-800 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer"
-                        title="Change Date & Time"
-                      >
-                        <Pencil className="w-3 h-3 text-amber-700" />
-                        <span>Change</span>
-                      </button>
+                      <>
+                        <ProgrammeStatusBadge competition={comp} schedule={sched} />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEdit(comp, sched);
+                          }}
+                          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-[#121212] hover:bg-white/[0.08] text-amber-200 border border-white/[0.08] cursor-pointer transition-colors"
+                          title="Change Date & Time"
+                        >
+                          <Pencil className="w-3 h-3 text-amber-400" />
+                          <span>Change</span>
+                        </button>
+                      </>
                     ) : (
                       <button
                         disabled={totalAssigned === 0}
-                        title={
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenAdd(comp);
+                        }}
+                        className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full cursor-pointer transition-all ${
                           totalAssigned === 0
-                            ? 'Cannot schedule: At least 1 participant must be registered and assigned first'
-                            : undefined
-                        }
-                        onClick={() => handleOpenAdd(comp)}
-                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black shadow-xs transition-all cursor-pointer ${
-                          totalAssigned === 0
-                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            ? 'bg-[#121212] text-amber-200/60 border border-white/[0.08] cursor-not-allowed'
                             : `${THEME.classes.primaryBtn} hover:scale-[1.02]`
                         }`}
                       >
-                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <Plus className="w-3 h-3 stroke-[2.5]" />
                         <span>Schedule</span>
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* Contestant Lineup: Team Diraya vs Team Rivaya Standard High-Contrast Boxes */}
-                <div className="p-3.5 bg-slate-50/70 border-t border-slate-100">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Team Diraya Box */}
-                    <div className="bg-white rounded-xl border border-amber-200/90 shadow-2xs p-3 flex flex-col justify-between">
-                      <div className="flex items-center justify-between pb-2 border-b border-amber-100/80 mb-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-amber-500" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-amber-900">
-                            Team Diraya
+                {/* 2. Schedule Timing: Simple clean text strip */}
+                <div className="text-xs text-amber-200/60 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {hasSchedule && sched ? (
+                    <>
+                      <span className="inline-flex items-center gap-1.5 text-white font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                        {formatDisplayDate(sched.start_at)}
+                      </span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1.5 font-mono text-amber-200">
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        {formatDisplayTime(sched.start_at)} – {formatDisplayTime(sched.end_at)}
+                      </span>
+                      {sched.stage_order !== null && sched.stage_order !== undefined && (
+                        <>
+                          <span>•</span>
+                          <span className="font-semibold text-amber-300">
+                            Order {sched.stage_order}
                           </span>
-                        </div>
-                        <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">
-                          {diraya.length} {diraya.length === 1 ? 'entry' : 'entries'}
-                        </span>
-                      </div>
-
-                      {diraya.length > 0 ? (
-                        <div className="flex flex-col gap-1.5">
-                          {diraya.map((p, idx) => (
-                            <div
-                              key={p.id || idx}
-                              className="flex items-center gap-2 bg-slate-50/80 hover:bg-amber-50/40 border border-slate-200 rounded-lg px-2.5 py-1.5 transition-colors"
-                            >
-                              <span className="font-mono text-xs bg-amber-100 text-amber-950 border border-amber-200 px-1.5 py-0.5 rounded font-bold shrink-0">
-                                {p.participant_code}
-                              </span>
-                              <span className="text-xs font-semibold text-slate-800 truncate" title={p.participant_name}>
-                                {p.participant_name}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center py-3 text-xs text-slate-400 font-medium italic bg-slate-50/50 rounded-lg border border-dashed border-slate-200">
-                          No Diraya contestant assigned
-                        </div>
+                        </>
                       )}
-                    </div>
+                    </>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 italic text-amber-200/60">
+                      <Clock className="w-3.5 h-3.5 text-amber-200/60" />
+                      Not scheduled yet
+                    </span>
+                  )}
+                </div>
 
-                    {/* Team Rivaya Box */}
-                    <div className="bg-white rounded-xl border border-emerald-200/90 shadow-2xs p-3 flex flex-col justify-between">
-                      <div className="flex items-center justify-between pb-2 border-b border-emerald-100/80 mb-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-                            Team Rivaya
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-semibold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
-                          {rivaya.length} {rivaya.length === 1 ? 'entry' : 'entries'}
-                        </span>
-                      </div>
-
-                      {rivaya.length > 0 ? (
-                        <div className="flex flex-col gap-1.5">
-                          {rivaya.map((p, idx) => (
-                            <div
-                              key={p.id || idx}
-                              className="flex items-center gap-2 bg-slate-50/80 hover:bg-emerald-50/40 border border-slate-200 rounded-lg px-2.5 py-1.5 transition-colors"
-                            >
-                              <span className="font-mono text-xs bg-emerald-100 text-emerald-900 border border-emerald-200 px-1.5 py-0.5 rounded font-bold shrink-0">
-                                {p.participant_code}
-                              </span>
-                              <span className="text-xs font-semibold text-slate-800 truncate" title={p.participant_name}>
-                                {p.participant_name}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center py-3 text-xs text-slate-400 font-medium italic bg-slate-50/50 rounded-lg border border-dashed border-slate-200">
-                          No Rivaya contestant assigned
-                        </div>
-                      )}
-                    </div>
+                {/* 3. Footer: Simple Team Lineup Bar (Clickable Box) */}
+                <div className="flex items-center justify-between text-xs pt-2.5 border-t border-white/[0.04]">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center gap-1.5 font-bold text-emerald-300">
+                      <span className="w-2 h-2 rounded-full bg-[#00E676] shadow-[0_0_6px_rgba(0,230,118,0.5)]" />
+                      Diraya: {diraya.length}
+                    </span>
+                    <span className="text-white/20">•</span>
+                    <span className="inline-flex items-center gap-1.5 font-bold text-rose-300">
+                      <span className="w-2 h-2 rounded-full bg-[#FF2A6D] shadow-[0_0_6px_rgba(255,42,109,0.5)]" />
+                      Rivaya: {rivaya.length}
+                    </span>
                   </div>
+                  <span className="text-[11px] text-amber-200/40 group-hover:text-amber-300 transition-colors flex items-center gap-1">
+                    <span>Lineup</span>
+                    <span>→</span>
+                  </span>
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* Full Programme Details & Lineup Modal */}
+      {viewLineupItem && (
+        <Modal
+          isOpen={!!viewLineupItem}
+          onClose={() => setViewLineupItem(null)}
+          title={viewLineupItem.fullTitle}
+          maxWidth="2xl"
+        >
+          <div className="space-y-4">
+            {/* Unified Info Strip */}
+            <div className="p-3 bg-[#121212] rounded-xl border border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 flex-wrap">
+                {viewLineupItem.sched ? (
+                  <>
+                    <span className="text-white font-medium">
+                      {formatDisplayDate(viewLineupItem.sched.start_at)} ({formatDisplayTime(viewLineupItem.sched.start_at)} – {formatDisplayTime(viewLineupItem.sched.end_at)})
+                    </span>
+                    {viewLineupItem.sched.stage_order !== null && viewLineupItem.sched.stage_order !== undefined && (
+                      <>
+                        <span className="text-white/30">•</span>
+                        <span className="font-bold text-amber-300">
+                          Order {viewLineupItem.sched.stage_order}
+                        </span>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-amber-200/60 italic">Not scheduled yet</span>
+                )}
+              </div>
+              <ProgrammeStatusBadge competition={viewLineupItem.comp} schedule={viewLineupItem.sched} />
+            </div>
+
+            {/* 2-Column Team Lineup Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              {/* House Diraya Column */}
+              <div className="bg-[#121212] rounded-xl border border-emerald-500/30 p-3.5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between pb-2.5 border-b border-emerald-500/30 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#00E676] shadow-[0_0_8px_rgba(0,230,118,0.6)]" />
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
+                        House Diraya
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                      {viewLineupItem.diraya.length} {viewLineupItem.diraya.length === 1 ? 'Contestant' : 'Contestants'}
+                    </span>
+                  </div>
+
+                  {viewLineupItem.diraya.length > 0 ? (
+                    <div className="space-y-0.5 max-h-64 overflow-y-auto pr-1">
+                      {viewLineupItem.diraya.map((p, idx) => (
+                        <div
+                          key={p.id || idx}
+                          className="flex items-center gap-2.5 py-1.5 px-2 hover:bg-white/[0.04] rounded-lg transition-colors"
+                        >
+                          <span className="font-mono text-xs font-bold text-emerald-400 shrink-0">
+                            {p.participant_code}
+                          </span>
+                          <span className="text-xs text-white truncate" title={p.participant_name}>
+                            {p.participant_name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
+                      No Diraya participants registered
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* House Rivaya Column */}
+              <div className="bg-[#121212] rounded-xl border border-rose-500/30 p-3.5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between pb-2.5 border-b border-rose-500/30 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#FF2A6D] shadow-[0_0_8px_rgba(255,42,109,0.6)]" />
+                      <span className="text-xs font-black uppercase tracking-wider text-rose-300">
+                        House Rivaya
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-rose-300 bg-rose-500/15 px-2 py-0.5 rounded-full border border-rose-500/30">
+                      {viewLineupItem.rivaya.length} {viewLineupItem.rivaya.length === 1 ? 'Contestant' : 'Contestants'}
+                    </span>
+                  </div>
+
+                  {viewLineupItem.rivaya.length > 0 ? (
+                    <div className="space-y-0.5 max-h-64 overflow-y-auto pr-1">
+                      {viewLineupItem.rivaya.map((p, idx) => (
+                        <div
+                          key={p.id || idx}
+                          className="flex items-center gap-2.5 py-1.5 px-2 hover:bg-white/[0.04] rounded-lg transition-colors"
+                        >
+                          <span className="font-mono text-xs font-bold text-rose-400 shrink-0">
+                            {p.participant_code}
+                          </span>
+                          <span className="text-xs text-white truncate" title={p.participant_name}>
+                            {p.participant_name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
+                      No Rivaya participants registered
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.08]">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setViewLineupItem(null)}
+                className="rounded-xl text-xs font-bold"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </Modal>
       )}
 
       {/* Schedule / Edit Modal */}
@@ -826,42 +900,42 @@ export const ScheduleManagerPage: React.FC = () => {
         >
           <form onSubmit={handleFormSubmit} className="space-y-4">
             {/* Programme Info Header */}
-            <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl">
+            <div className="p-3 bg-[#121212] border border-white/[0.08]/80 rounded-xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-amber-700 text-sm">
+                  <span className="font-mono font-bold text-amber-400 text-sm">
                     {selectedComp.programme_number}
                   </span>
-                  <span className="font-bold text-slate-900 text-sm">{selectedComp.name}</span>
+                  <span className="font-bold text-white text-sm">{selectedComp.name}</span>
                 </div>
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                     Number(selectedComp.registered_count ?? 0) === 0
-                      ? 'bg-rose-50 border-rose-200 text-rose-600'
-                      : 'bg-slate-100 border-slate-200 text-slate-700'
+                      ? 'bg-rose-500/15 border-rose-500/30 text-rose-300'
+                      : 'bg-[#121212] border-amber-500/30 text-amber-200'
                   }`}
                 >
                   {selectedComp.registered_count ?? 0} {Number(selectedComp.registered_count ?? 0) === 1 ? 'Contestant' : 'Contestants'}
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-amber-200/60 mt-1">
                 {selectedComp.programme_group_name || selectedComp.group_name} •{' '}
                 {selectedComp.competition_type_name || selectedComp.competition_type}
               </div>
             </div>
 
             {modalMode === 'CREATE' && Number(selectedComp?.registered_count ?? 0) === 0 && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="p-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-rose-300 text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-300" />
                 <span>
-                  This programme has 0 registered participants. At least 1 participant must be registered and assigned before scheduling.
+                  At least 1 participant must be registered before scheduling.
                 </span>
               </div>
             )}
 
             {/* Date Input */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Festival Date *
               </label>
               <input
@@ -869,14 +943,14 @@ export const ScheduleManagerPage: React.FC = () => {
                 required
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                className="w-full px-3 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
               />
             </div>
 
             {/* Timing Inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Start Time *
                 </label>
                 <input
@@ -884,12 +958,12 @@ export const ScheduleManagerPage: React.FC = () => {
                   required
                   value={formStartTime}
                   onChange={(e) => setFormStartTime(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                  className="w-full px-3 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   End Time *
                 </label>
                 <input
@@ -897,14 +971,14 @@ export const ScheduleManagerPage: React.FC = () => {
                   required
                   value={formEndTime}
                   onChange={(e) => setFormEndTime(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                  className="w-full px-3 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 />
               </div>
             </div>
 
             {/* Sequence / Running Order */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Running Order / Sequence Number (Optional)
               </label>
               <input
@@ -913,15 +987,15 @@ export const ScheduleManagerPage: React.FC = () => {
                 placeholder="e.g. 1 (for 1st event), 2, 3..."
                 value={formStageOrder}
                 onChange={(e) => setFormStageOrder(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                className="w-full px-3 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-white font-mono focus:outline-hidden focus:border-amber-500"
               />
-              <span className="text-[11px] text-slate-500 mt-1 block">
-                Helps rearrange events that share the same time slot or day into strict sequence.
+              <span className="text-[11px] text-amber-200/60 mt-1 block">
+                Order events sharing the same time slot.
               </span>
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2.5">
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between gap-2.5">
               {modalMode === 'EDIT' && editingScheduleId ? (
                 <button
                   type="button"
@@ -935,7 +1009,7 @@ export const ScheduleManagerPage: React.FC = () => {
                     });
                     setIsDeleteModalOpen(true);
                   }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 hover:border-rose-300 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-rose-300 hover:bg-rose-500/15 border border-rose-500/30 hover:border-rose-500/30 transition-colors cursor-pointer"
                   title="Remove this schedule slot"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -949,7 +1023,7 @@ export const ScheduleManagerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:bg-[#121212] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -982,29 +1056,29 @@ export const ScheduleManagerPage: React.FC = () => {
           maxWidth="md"
         >
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700">
-              <AlertTriangle className="w-5 h-5 flex-shrink-0 text-rose-600" />
+            <div className="flex items-center gap-3 p-3.5 bg-rose-500/15 border border-rose-500/30 rounded-xl text-rose-300">
+              <AlertTriangle className="w-5 h-5 flex-shrink-0 text-rose-300" />
               <p className="text-xs leading-relaxed font-semibold">
-                This will remove the assigned date and time for this competition. The programme will return to unscheduled status.
+                This removes the assigned schedule. The programme will return to unscheduled.
               </p>
             </div>
 
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-amber-200">
               Are you sure you want to clear the schedule for{' '}
-              <span className="font-bold text-slate-900">
+              <span className="font-bold text-white">
                 {scheduleToDelete.progNum} - {scheduleToDelete.name}
               </span>
               ?
             </p>
 
-            <div className="pt-4 border-t border-slate-100 flex justify-end gap-2.5">
+            <div className="pt-4 border-t border-white/[0.08] flex justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => {
                   setIsDeleteModalOpen(false);
                   setScheduleToDelete(null);
                 }}
-                className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:bg-[#121212] transition-colors cursor-pointer"
               >
                 Cancel
               </button>

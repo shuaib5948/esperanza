@@ -111,19 +111,22 @@ export class ScheduleService {
       };
     }
 
-    const venueId = data.venue_id !== undefined ? data.venue_id : existing.venue_id;
-    const startAt = data.start_at || existing.start_at;
-    const endAt = data.end_at || existing.end_at;
+    const isRescheduling = data.venue_id !== undefined || data.start_at !== undefined || data.end_at !== undefined;
+    if (isRescheduling) {
+      const venueId = data.venue_id !== undefined ? data.venue_id : existing.venue_id;
+      const startAt = data.start_at || existing.start_at;
+      const endAt = data.end_at || existing.end_at;
 
-    if (venueId) {
-      const conflicts = await ScheduleRepository.checkVenueConflict(venueId, startAt, endAt, id);
-      if (conflicts.length > 0) {
-        throw {
-          statusCode: 409,
-          code: 'VENUE_SCHEDULE_CONFLICT',
-          message: `Venue conflict: "${conflicts[0].competition_name}" overlaps with the rescheduled time.`,
-          details: conflicts[0],
-        };
+      if (venueId) {
+        const conflicts = await ScheduleRepository.checkVenueConflict(venueId, startAt, endAt, id);
+        if (conflicts.length > 0) {
+          throw {
+            statusCode: 409,
+            code: 'VENUE_SCHEDULE_CONFLICT',
+            message: `Venue conflict: "${conflicts[0].competition_name}" overlaps with the rescheduled time.`,
+            details: conflicts[0],
+          };
+        }
       }
     }
 
@@ -219,7 +222,8 @@ export class ScheduleService {
             call_count = 0,
             called_at = NULL,
             stage_started_at = NULL,
-            stage_ended_at = NULL
+            stage_ended_at = NULL,
+            notes = NULL
         WHERE competition_id = ?
       `, [existing.competition_id]);
 
@@ -230,10 +234,10 @@ export class ScheduleService {
         WHERE r.competition_id = ?
       `, [existing.competition_id]);
 
-      // 3. Ensure competition is back to SCHEDULED
+      // 3. Ensure competition is back to ACTIVE
       await query(`
         UPDATE competitions 
-        SET status = 'SCHEDULED' 
+        SET status = 'ACTIVE' 
         WHERE id = ?
       `, [existing.competition_id]);
     }

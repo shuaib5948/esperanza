@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.js';
-import { CheckCircle2, XCircle, Clock, FileCheck2, Search, CheckCheck } from 'lucide-react';
-import { Card } from '../../components/ui/Card.js';
-import { Badge } from '../../components/ui/Badge.js';
-import { Button } from '../../components/ui/Button.js';
+import {
+  FileCheck2,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Search,
+  CheckCheck,
+  Users,
+} from 'lucide-react';
+import { THEME } from '../../theme/theme.js';
 
 interface AttendanceRecord {
   id: number;
@@ -70,7 +76,7 @@ export const AttendanceManagerPage: React.FC = () => {
       return api.post('/attendance/bulk', { attendance: updates });
     },
     onSuccess: () => {
-      success('All participants marked present');
+      success('All marked present');
       queryClient.invalidateQueries({ queryKey: ['attendance', selectedCompId] });
     },
     onError: (err: any) => {
@@ -89,146 +95,253 @@ export const AttendanceManagerPage: React.FC = () => {
   const presentCount = attendanceList.filter((a) => a.status === 'PRESENT').length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-white">Attendance Roll Call</h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Participant verification, check-in timestamps, and presence audit.
-          </p>
+    <div className="space-y-4">
+      {/* 1. Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-slate-950 font-black shadow-xs">
+            <FileCheck2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bento-title font-bold text-white tracking-tight leading-none">
+              Stage Attendance
+            </h1>
+            <p className="text-xs text-amber-200/60 font-medium mt-1">
+              Participant check-in & verification
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Programme Selector & Quick Actions */}
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <select
             value={selectedCompId}
             onChange={(e) => setSelectedCompId(parseInt(e.target.value, 10))}
-            className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto bg-[#0A0A0A] border border-white/[0.08] rounded-xl px-3 py-1.5 text-xs font-semibold text-amber-100 focus:outline-hidden focus:border-amber-400 cursor-pointer"
           >
             {competitions.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.programme_number} - {c.name} ({c.group_name})
+                {c.programme_number} - {c.name}
               </option>
             ))}
           </select>
 
-          <Button
-            variant="secondary"
-            size="md"
-            isLoading={bulkPresentMutation.isPending}
-            onClick={() => bulkPresentMutation.mutate()}
-          >
-            <CheckCheck className="w-4 h-4 mr-1.5" />
-            <span>Mark All Present</span>
-          </Button>
+          {attendanceList.length > 0 && (
+            <button
+              disabled={bulkPresentMutation.isPending}
+              onClick={() => bulkPresentMutation.mutate()}
+              className="px-3 py-1.5 rounded-full bg-[#121212] hover:bg-white/10 text-amber-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <CheckCheck className="w-3.5 h-3.5" />
+              <span>Mark All Present</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Roster & Stats */}
-      <Card className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-white">
-              Roll Summary: {presentCount} / {attendanceList.length} Present
-            </span>
-            <Badge variant={presentCount === attendanceList.length && attendanceList.length > 0 ? 'success' : 'neutral'} size="sm">
-              {attendanceList.length > 0 ? `${Math.round((presentCount / attendanceList.length) * 100)}%` : '0%'}
-            </Badge>
-          </div>
-
+      {/* 2. Main Attendance Table Container */}
+      <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl shadow-xs overflow-hidden">
+        {/* Table Toolbar */}
+        <div className="p-3 border-b border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#121212]">
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-amber-200/60" />
             <input
               type="text"
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
-              placeholder="Search roster..."
-              className="w-full pl-9 pr-4 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Filter by name or code..."
+              className="w-full pl-7 pr-3 py-1 bg-[#0A0A0A] border border-white/[0.08] rounded-xl text-xs text-amber-100 placeholder-slate-400 focus:outline-hidden focus:border-amber-400 font-medium"
             />
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] font-bold text-amber-200/60 shrink-0">
+            <span>
+              Checked In: <strong className="text-emerald-300">{presentCount}</strong> / {attendanceList.length}
+            </span>
           </div>
         </div>
 
-        {attendanceList.length === 0 ? (
-          <div className="py-12 text-center text-slate-500 text-sm">
-            No approved registrations found for this competition.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-800 text-xs font-bold uppercase text-slate-400">
-                  <th className="py-3 px-4">Participant</th>
-                  <th className="py-3 px-4">Team</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Quick Mark</th>
+        {/* Mobile View: Attendance Cards (<md) */}
+        <div className="md:hidden divide-y divide-white/[0.04]">
+          {isLoading ? (
+            <div className="py-8 text-center text-amber-200/60 text-xs">
+              Loading attendance list...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-8 text-center text-amber-200/60 space-y-1">
+              <Users className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+              <p className="text-xs font-semibold">No contestants registered</p>
+            </div>
+          ) : (
+            filtered.map((record) => {
+              const isPresent = record.status === 'PRESENT';
+              const isDiraya = record.team_name?.toUpperCase().includes('DIRAYA');
+
+              return (
+                <div key={record.id} className="p-3.5 space-y-2 hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-amber-400 text-xs bg-amber-500/10 px-2 py-0.5 rounded-md border border-white/[0.08]">
+                      Chest {record.participant_code}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        isPresent
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-[#121212] text-amber-200/60 border border-white/[0.08]'
+                      }`}
+                    >
+                      {record.status}
+                    </span>
+                  </div>
+
+                  <h3 className="font-bold text-white text-sm">
+                    {record.participant_name}
+                  </h3>
+
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        isDiraya
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                      }`}
+                    >
+                      {record.team_name}
+                    </span>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => markMutation.mutate({ registrationId: record.registration_id, status: 'PRESENT' })}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          isPresent
+                            ? 'bg-emerald-500 text-slate-950 shadow-xs'
+                            : 'bg-[#121212] text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/15'
+                        }`}
+                      >
+                        Present
+                      </button>
+                      <button
+                        onClick={() => markMutation.mutate({ registrationId: record.registration_id, status: 'ABSENT' })}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          !isPresent && record.status === 'ABSENT'
+                            ? 'bg-rose-500 text-white shadow-xs'
+                            : 'bg-[#121212] text-rose-400 border border-rose-500/30 hover:bg-rose-500/15'
+                        }`}
+                      >
+                        Absent
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop View: Full Table (>=md) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left text-xs min-w-[560px]">
+            <thead>
+              <tr className="border-b border-white/[0.08] text-[10px] font-bento-title uppercase tracking-wider text-amber-200/60 bg-[#121212]">
+                <th className="py-2.5 px-4 font-bold">Chest No</th>
+                <th className="py-2.5 px-4 font-bold">Participant</th>
+                <th className="py-2.5 px-4 font-bold">House Team</th>
+                <th className="py-2.5 px-4 font-bold">Status</th>
+                <th className="py-2.5 px-4 font-bold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.04]">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-amber-200/60">
+                    Loading attendance list...
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filtered.map((record) => (
-                  <tr key={record.registration_id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4">
-                      <span className="font-bold text-white block">{record.participant_name}</span>
-                      <span className="text-xs text-slate-400 font-mono">{record.participant_code}</span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-semibold text-slate-200">{record.team_name}</span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge
-                        variant={
-                          record.status === 'PRESENT'
-                            ? 'success'
-                            : record.status === 'LATE'
-                            ? 'warning'
-                            : record.status === 'EXCUSED'
-                            ? 'info'
-                            : 'danger'
-                        }
-                        size="sm"
-                      >
-                        {record.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-right space-x-2">
-                      <button
-                        onClick={() =>
-                          markMutation.mutate({
-                            registrationId: record.registration_id,
-                            status: 'PRESENT',
-                          })
-                        }
-                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                          record.status === 'PRESENT'
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-emerald-400'
-                        }`}
-                        title="Mark Present"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          markMutation.mutate({
-                            registrationId: record.registration_id,
-                            status: 'ABSENT',
-                          })
-                        }
-                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                          record.status === 'ABSENT'
-                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-rose-400'
-                        }`}
-                        title="Mark Absent"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-amber-200/60">
+                    <Users className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+                    <span className="text-xs font-semibold text-amber-200/60">No contestants registered</span>
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((record) => {
+                  const isPresent = record.status === 'PRESENT';
+                  const isDiraya = record.team_name?.toUpperCase().includes('DIRAYA');
+
+                  return (
+                    <tr key={record.id} className="hover:bg-white/[0.03] transition-colors">
+                      <td className="py-2.5 px-4 font-mono font-bold text-white">
+                        {record.participant_code}
+                      </td>
+                      <td className="py-2.5 px-4 font-bold text-white">
+                        {record.participant_name}
+                      </td>
+                      <td className="py-2.5 px-4">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isDiraya
+                              ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                              : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                          }`}
+                        >
+                          {record.team_name}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-4">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isPresent
+                              ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                              : 'bg-[#121212] text-amber-200/60 border border-white/[0.08]'
+                          }`}
+                        >
+                          {isPresent && <CheckCircle2 className="w-3 h-3 text-emerald-300" />}
+                          <span>{record.status}</span>
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() =>
+                              markMutation.mutate({
+                                registrationId: record.registration_id,
+                                status: 'PRESENT',
+                              })
+                            }
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                              isPresent
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-[#121212] text-amber-200 hover:bg-emerald-500/15 hover:text-emerald-300'
+                            }`}
+                          >
+                            Present
+                          </button>
+                          <button
+                            onClick={() =>
+                              markMutation.mutate({
+                                registrationId: record.registration_id,
+                                status: 'ABSENT',
+                              })
+                            }
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                              record.status === 'ABSENT'
+                                ? 'bg-rose-600 text-white'
+                                : 'bg-[#121212] text-amber-200 hover:bg-rose-500/15 hover:text-rose-300'
+                            }`}
+                          >
+                            Absent
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

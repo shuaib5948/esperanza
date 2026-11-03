@@ -616,17 +616,24 @@ export const StageQueueControlPage: React.FC = () => {
     <div className="space-y-6">
       {/* Top Banner & Refresh */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
-            </span>
-            <h1 className="text-3xl font-black text-slate-900">Live Stage Queue Control</h1>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-slate-950 font-black shadow-xs shrink-0">
+            <Radio className="w-5 h-5" />
           </div>
-          <p className="text-sm text-slate-500 mt-1">
-            Backstage check-in, judge sync, blind lot drawing (A, B, C...), and live stage calling console.
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bento-title font-bold text-white tracking-tight leading-none">
+                Stage Queue
+              </h1>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+            </div>
+            <p className="text-xs text-amber-200/60 font-medium mt-1">
+              Backstage call & stage dispatch
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -637,7 +644,7 @@ export const StageQueueControlPage: React.FC = () => {
             }}
             disabled={schedulesFetching || liveQueueFetching}
             title="Refresh Live Data"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 hover:border-slate-800 shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 text-xs font-semibold border border-white/[0.08] hover:border-amber-400 shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${schedulesFetching || liveQueueFetching ? 'animate-spin' : ''}`} />
             <span>Live Feed</span>
@@ -662,7 +669,7 @@ export const StageQueueControlPage: React.FC = () => {
 
           <div className="space-y-6 relative z-10">
             {/* Header Info */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amber-500/20 pb-5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
               <div className="space-y-2">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
                   {liveSchedule.programme_group ? `${liveSchedule.programme_group} - ` : ''}{liveSchedule.competition_name}
@@ -688,7 +695,7 @@ export const StageQueueControlPage: React.FC = () => {
               </div>
 
               {/* Right Side: Live Badge & Actions (Discard & Finish) */}
-              <div className="shrink-0 flex items-center gap-3">
+              <div className="shrink-0 flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 animate-pulse">
                   <Radio className="w-3.5 h-3.5 text-emerald-400" />
                   {isLiveCompOffStage ? 'OFF-STAGE ACTIVE' : 'LIVE'}
@@ -743,39 +750,39 @@ export const StageQueueControlPage: React.FC = () => {
 
             {/* If Off-Stage: Showcase Off-Stage Programme In Progress */}
             {isLiveCompOffStage ? (
-              <div className="bg-white text-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-xs space-y-4">
+              <div className="bg-[#0A0A0A] text-slate-100 border border-white/[0.08] rounded-2xl shadow-xl p-6 shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-900 font-black text-2xl flex items-center justify-center shrink-0 border border-amber-200">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-300 font-black text-2xl flex items-center justify-center shrink-0 border border-white/[0.08]">
                       <Layers className="w-7 h-7" />
                     </div>
                     <div>
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 block">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 block">
                         OFF-STAGE PROGRAMME IN PROGRESS
                       </span>
-                      <h3 className="text-xl font-black text-slate-900">
+                      <h3 className="text-xl font-black text-white">
                         Contestants Participating Off-Stage
                       </h3>
-                      <p className="text-xs text-slate-600 mt-0.5">
-                        {sortedLiveQueue.length} contestants checked in with code letters (Code A, Code B, Code C...).
+                      <p className="text-xs text-amber-200/60 mt-0.5">
+                        {sortedLiveQueue.length} contestants checked in with secret codes.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                    <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-white/[0.08]">
                       Programme Active
                     </span>
                   </div>
                 </div>
 
                 {/* Code Letters Display */}
-                <div className="pt-3 border-t border-slate-100 space-y-2">
+                <div className="pt-3 border-t border-white/[0.08] space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700">
+                    <span className="text-xs font-bold text-amber-200">
                       Assigned Code Letters:
                     </span>
-                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold text-amber-200/60 bg-[#121212] px-2 py-0.5 rounded-full">
                       {sortedLiveQueue.length} Present Contestants
                     </span>
                   </div>
@@ -783,7 +790,7 @@ export const StageQueueControlPage: React.FC = () => {
                     {sortedLiveQueue.map((item) => (
                       <div
                         key={item.id}
-                        className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-center shrink-0 font-bold text-xs"
+                        className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] bg-[#121212] text-amber-100 text-center shrink-0 font-bold text-xs"
                       >
                         Code {item.code_letter}
                       </div>
@@ -794,42 +801,42 @@ export const StageQueueControlPage: React.FC = () => {
             ) : (
               /* For Stage Items: Active Performer Showcase (Unchanged) */
               <>
-                <div className="bg-white text-slate-900 border border-amber-500/30 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-xs">
+                <div className="bg-[#0A0A0A] text-slate-100 border border-white/[0.08] rounded-2xl shadow-xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-xs">
                   <div className="flex items-center gap-4 sm:gap-5">
                     {/* Big Code Letter Badge */}
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#241407] to-[#070908] text-amber-400 border border-amber-500/30 font-black text-3xl sm:text-4xl flex items-center justify-center shadow-md shrink-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0A0A0A] to-[#040404] text-amber-400 border border-white/[0.08] font-black text-3xl sm:text-4xl flex items-center justify-center shadow-md shrink-0">
                       {activePerformer?.code_letter ? activePerformer.code_letter : 'A'}
                     </div>
 
                     <div className="space-y-1 min-w-0">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5" />
                         {activePerformer?.is_group ? 'GROUP PERFORMING NOW ON STAGE' : 'PERFORMING NOW ON STAGE'}
                       </span>
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 truncate">
+                      <h3 className="text-xl sm:text-2xl font-black text-white truncate">
                         {activePerformer
                           ? (activePerformer.is_group ? activePerformer.team_name : activePerformer.participant_name)
                           : 'Waiting for Performer'}
                       </h3>
                       {activePerformer && (
-                        <div className="text-xs font-semibold text-slate-600 flex items-center gap-2 flex-wrap">
+                        <div className="text-xs font-semibold text-amber-200/60 flex items-center gap-2 flex-wrap">
                           {activePerformer.is_group ? (
                             <>
-                              <span className="font-mono text-amber-950 font-bold bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 shrink-0">
+                              <span className="font-mono text-amber-300 font-bold bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-white/[0.08] shrink-0">
                                 {activePerformer.member_count} Members
                               </span>
                               <span>•</span>
-                              <span className="text-slate-600 font-medium truncate max-w-xl">
+                              <span className="text-amber-200/60 font-medium truncate max-w-xl">
                                 {activePerformer.member_names}
                               </span>
                             </>
                           ) : (
                             <>
-                              <span className="font-mono text-amber-950 font-bold bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                              <span className="font-mono text-amber-300 font-bold bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-white/[0.08]">
                                 {activePerformer.participant_code}
                               </span>
                               <span>•</span>
-                              <span className="text-slate-700 font-bold">{activePerformer.team_name}</span>
+                              <span className="text-amber-200 font-bold">{activePerformer.team_name}</span>
                             </>
                           )}
                         </div>
@@ -841,10 +848,10 @@ export const StageQueueControlPage: React.FC = () => {
                     <span
                       className={`px-3.5 py-1.5 rounded-full text-xs font-bold border ${
                         activePerformer?.stage_status === 'ON_STAGE'
-                          ? 'bg-amber-50 text-amber-900 border-amber-200'
+                          ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                           : activePerformer?.stage_status === 'COMPLETED'
-                          ? 'bg-slate-100 text-slate-700 border-slate-200'
-                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                          ? 'bg-[#121212] text-amber-200 border-amber-500/30'
+                          : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                       }`}
                     >
                       {activePerformer?.stage_status === 'ON_STAGE'
@@ -855,13 +862,13 @@ export const StageQueueControlPage: React.FC = () => {
                 </div>
 
                 {/* Queue Progression Box — Present Participants with Lots (Code A, Code B, Code C) */}
-                <div className="bg-white/95 backdrop-blur-xs text-slate-900 rounded-2xl p-4 border border-white/20 shadow-xs space-y-3">
+                <div className="bg-[#121212] rounded-2xl p-4 border border-white/[0.08] shadow-xs space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-xs tracking-wide">
+                      <span className="font-bold text-white text-xs tracking-wide">
                         Queue Progression
                       </span>
-                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-amber-200/60 bg-[#121212] px-2 py-0.5 rounded-full">
                         {sortedLiveQueue.length} Present Performers
                       </span>
                     </div>
@@ -870,21 +877,21 @@ export const StageQueueControlPage: React.FC = () => {
                     <button
                       disabled={isLiveMarksReceived}
                       onClick={() => setIsLateModalOpen(true)}
-                      className="flex items-center gap-1 px-3 py-1 rounded-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200 hover:border-slate-800 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+                      className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-200 text-xs font-semibold border border-white/[0.08] hover:border-amber-500/30 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
                       title={
                         isLiveMarksReceived
                           ? 'Official marks already submitted; late additions are strictly locked.'
                           : 'Add an arriving contestant to the end of the line'
                       }
                     >
-                      <Plus className="w-3.5 h-3.5 text-amber-700" />
+                      <Plus className="w-3.5 h-3.5 text-amber-400" />
                       <span>Late Performer</span>
                     </button>
                   </div>
 
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
                     {sortedLiveQueue.length === 0 ? (
-                      <span className="text-xs text-slate-500 py-1">No present performers with assigned lots.</span>
+                      <span className="text-xs text-amber-200/60 py-1">No present performers with assigned lots.</span>
                     ) : (
                       sortedLiveQueue.map((item) => {
                         const isActive = item.stage_status === 'ON_STAGE' || item.id === activePerformer?.id;
@@ -898,10 +905,10 @@ export const StageQueueControlPage: React.FC = () => {
                               isActive
                                 ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-sm ring-2 ring-amber-400'
                                 : isScored
-                                ? 'bg-amber-50 text-amber-900 border-amber-300'
+                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                                 : isDraft
-                                ? 'bg-amber-50 text-amber-900 border-amber-300'
-                                : 'bg-white text-slate-800 border-slate-200'
+                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                                : 'bg-[#0A0A0A] text-amber-100 border-amber-500/30'
                             }`}
                           >
                             Code {item.code_letter}
@@ -916,15 +923,15 @@ export const StageQueueControlPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-center justify-between gap-5">
+        <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-              <Clock className="w-6 h-6 text-slate-600" />
+            <div className="w-12 h-12 rounded-2xl bg-[#121212] border border-white/[0.08] flex items-center justify-center text-amber-200/60 shrink-0">
+              <Clock className="w-6 h-6 text-amber-200/60" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Stage is currently idle</h3>
-              <p className="text-xs text-slate-500 mt-0.5 max-w-lg">
-                No competition is currently LIVE. Complete backstage preparation for the upcoming programme below and click &quot;Go Live&quot; to begin.
+              <h3 className="text-base font-bold text-white">Stage Idle</h3>
+              <p className="text-xs text-amber-200/60 mt-0.5">
+                No active live event. Complete backstage setup below to call next programme.
               </p>
             </div>
           </div>
@@ -936,12 +943,12 @@ export const StageQueueControlPage: React.FC = () => {
       {/* ============================================================== */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-slate-900">Upcoming Programmes</h3>
+          <h3 className="text-base font-bold text-white">Upcoming Programmes</h3>
         </div>
 
         {upcomingSchedules.length === 0 ? (
-          <div className="bg-white border border-slate-200 p-6 rounded-2xl text-center text-xs text-slate-500 shadow-xs">
-            No further scheduled programmes found for this stage.
+          <div className="bg-[#0A0A0A] border border-white/[0.08] p-6 rounded-2xl text-center text-xs text-amber-200/60 shadow-xs">
+            No upcoming scheduled programmes.
           </div>
         ) : (
           <div className="space-y-3">
@@ -953,16 +960,16 @@ export const StageQueueControlPage: React.FC = () => {
               return (
                 <div
                   key={sched.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:border-slate-300 transition-all"
+                  className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-4 sm:p-5 shadow-xs hover:border-amber-500/30 transition-all"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     {/* Left: Info */}
                     <div className="space-y-1">
-                      <h4 className="text-lg font-bold text-slate-900">
+                      <h4 className="text-lg font-bold text-white">
                         {sched.programme_group ? `${sched.programme_group} - ` : ''}{sched.competition_name}
                       </h4>
 
-                      <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
+                      <div className="flex items-center gap-3 text-xs text-amber-200/60 font-mono">
                         <span>
                           {formatDisplayTime(sched.start_at)} – {formatDisplayTime(sched.end_at)}
                         </span>
@@ -986,9 +993,9 @@ export const StageQueueControlPage: React.FC = () => {
                         <>
                           <button
                             onClick={() => handleOpenCheckIn(sched)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-800 text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 border border-white/[0.08] hover:border-amber-500/30 text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
                           >
-                            <UserCheck className="w-4 h-4 text-amber-700" />
+                            <UserCheck className="w-4 h-4 text-amber-400" />
                             <span>Edit Check-In</span>
                           </button>
 
@@ -1025,14 +1032,14 @@ export const StageQueueControlPage: React.FC = () => {
       >
         <div className="space-y-5">
           {/* Top Sub-tabs (2-Step Fast Flow) */}
-          <div className="flex flex-wrap items-center justify-between border-b border-slate-200 pb-3 gap-2">
+          <div className="flex flex-wrap items-center justify-between border-b border-white/[0.08] pb-3 gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setActiveModalTab('ROLL_CALL')}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeModalTab === 'ROLL_CALL'
                     ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border border-amber-400 shadow-xs font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    : 'bg-[#121212] hover:bg-[#121212] text-amber-200 border border-white/[0.08]'
                 }`}
               >
                 <UserCheck className="w-4 h-4" />
@@ -1050,10 +1057,10 @@ export const StageQueueControlPage: React.FC = () => {
                 disabled={reportedCount === 0}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   reportedCount === 0
-                    ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                    ? 'bg-[#121212] text-amber-200/60 border border-white/[0.08] cursor-not-allowed'
                     : activeModalTab === 'LOTS_DRAW'
                     ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border border-amber-400 shadow-xs font-bold cursor-pointer'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer'
+                    : 'bg-[#121212] hover:bg-[#121212] text-amber-200 border border-white/[0.08] cursor-pointer'
                 }`}
                 title={
                   reportedCount === 0
@@ -1067,11 +1074,11 @@ export const StageQueueControlPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 text-xs font-semibold">
-              <span className={reportedCount > 0 ? 'text-amber-900 font-bold' : 'text-slate-500'}>
+              <span className={reportedCount > 0 ? 'text-amber-300 font-bold' : 'text-amber-200/60'}>
                 {reportedCount} Present
               </span>
               <span className="text-slate-300">•</span>
-              <span className="text-amber-700">{pendingCount} Pending</span>
+              <span className="text-amber-400">{pendingCount} Pending</span>
             </div>
           </div>
 
@@ -1080,12 +1087,12 @@ export const StageQueueControlPage: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 {reportedCount === 0 ? (
-                  <span className="text-xs font-semibold text-amber-700 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                     <span>Mark at least 1 participant Present to draw lots.</span>
                   </span>
                 ) : (
-                  <span className="text-xs font-semibold text-slate-600">
+                  <span className="text-xs font-semibold text-amber-200/60">
                     {reportedCount} participant{reportedCount > 1 ? 's' : ''} reported backstage
                   </span>
                 )}
@@ -1094,7 +1101,7 @@ export const StageQueueControlPage: React.FC = () => {
                   disabled={reportedCount === 0}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black shadow-xs shrink-0 ml-auto transition-all ${
                     reportedCount === 0
-                      ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                      ? 'bg-[#121212] text-amber-200/60 border border-white/[0.08] cursor-not-allowed'
                       : `${THEME.classes.primaryBtn} hover:scale-[1.02] cursor-pointer`
                   }`}
                   onClick={handleDrawLots}
@@ -1105,11 +1112,11 @@ export const StageQueueControlPage: React.FC = () => {
               </div>
 
               {modalQueue.length === 0 ? (
-                <div className="text-center py-10 text-slate-400 text-xs font-medium">
+                <div className="text-center py-10 text-amber-200/60 text-xs font-medium">
                   No participants loaded yet.{' '}
                   <button
                     onClick={() => activeCheckInSched && initQueueMutation.mutate(activeCheckInSched.competition_id)}
-                    className="text-amber-800 underline font-bold cursor-pointer"
+                    className="text-amber-300 underline font-bold cursor-pointer"
                   >
                     Populate from Registrations
                   </button>
@@ -1125,10 +1132,10 @@ export const StageQueueControlPage: React.FC = () => {
                         key={item.id}
                         className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                           isReported
-                            ? 'bg-amber-50/60 border-amber-200 shadow-2xs'
+                            ? 'bg-amber-500/15 border-amber-500/30 shadow-2xs'
                             : isAbsent
-                            ? 'bg-rose-50/60 border-rose-200 opacity-75'
-                            : 'bg-white border-slate-200 shadow-2xs'
+                            ? 'bg-rose-500/15 border-rose-500/30 opacity-75'
+                            : 'bg-[#0A0A0A] border-amber-500/30 shadow-2xs'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -1142,7 +1149,7 @@ export const StageQueueControlPage: React.FC = () => {
                             className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
                               isReported
                                 ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 shadow-xs'
-                                : 'border border-slate-300 bg-slate-50 hover:border-slate-500 text-slate-400'
+                                : 'border border-white/[0.08] bg-[#121212] hover:border-slate-500 text-amber-200/60'
                             }`}
                             title={isReported ? 'Mark as Pending' : 'Mark as Present'}
                           >
@@ -1153,25 +1160,25 @@ export const StageQueueControlPage: React.FC = () => {
                             {item.is_group ? (
                               <div>
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <h5 className="font-bold text-slate-900 text-sm">{item.team_name}</h5>
-                                  <span className="font-mono text-xs text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shrink-0">
+                                  <h5 className="font-bold text-white text-sm">{item.team_name}</h5>
+                                  <span className="font-mono text-xs text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08] shrink-0">
                                     {item.member_count} Members
                                   </span>
                                 </div>
-                                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                                <p className="text-xs text-amber-200/60 font-medium mt-0.5">
                                   {item.member_names}
                                 </p>
                               </div>
                             ) : (
                               <div>
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <h5 className="font-bold text-slate-900 text-sm">{item.participant_name}</h5>
-                                  <span className="font-mono text-xs text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shrink-0">
+                                  <h5 className="font-bold text-white text-sm">{item.participant_name}</h5>
+                                  <span className="font-mono text-xs text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08] shrink-0">
                                     {item.participant_code}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 mt-0.5">
-                                  <span className="text-xs font-semibold text-slate-500">{item.team_name}</span>
+                                  <span className="text-xs font-semibold text-amber-200/60">{item.team_name}</span>
                                 </div>
                               </div>
                             )}
@@ -1181,7 +1188,7 @@ export const StageQueueControlPage: React.FC = () => {
                         <div className="flex items-center gap-2 shrink-0">
                           {!isReported && (
                             <button
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold cursor-pointer"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-500/15 hover:bg-white/[0.03] text-amber-300 border border-white/[0.08] text-xs font-semibold cursor-pointer"
                               onClick={() => notifyTeamLeaderMutation.mutate(item.id)}
                               disabled={notifyTeamLeaderMutation.isPending}
                               title="Send urgent notification to Team Leader"
@@ -1193,7 +1200,7 @@ export const StageQueueControlPage: React.FC = () => {
 
                           {!isAbsent ? (
                             <button
-                              className="px-3 py-1.5 rounded-full text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 cursor-pointer"
+                              className="px-3 py-1.5 rounded-full text-xs font-semibold text-rose-300 bg-rose-500/15 hover:bg-rose-500/15 border border-rose-500/30 cursor-pointer"
                               onClick={() =>
                                 updateCheckInStatusMutation.mutate({
                                   queueId: item.id,
@@ -1205,7 +1212,7 @@ export const StageQueueControlPage: React.FC = () => {
                             </button>
                           ) : (
                             <button
-                              className="px-3 py-1.5 rounded-full text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer"
+                              className="px-3 py-1.5 rounded-full text-xs font-semibold text-amber-200/60 bg-[#121212] hover:bg-white/10 border border-white/[0.08] cursor-pointer"
                               onClick={() =>
                                 updateCheckInStatusMutation.mutate({
                                   queueId: item.id,
@@ -1228,13 +1235,13 @@ export const StageQueueControlPage: React.FC = () => {
           {/* TAB 2: RANDOM & MANUAL LOTS DRAW */}
           {activeModalTab === 'LOTS_DRAW' && (
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#121212] border border-white/[0.08]">
                 <div>
-                  <h5 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                    <Shuffle className="w-4 h-4 text-amber-700" />
+                  <h5 className="font-bold text-white text-sm flex items-center gap-2">
+                    <Shuffle className="w-4 h-4 text-amber-400" />
                     <span>Performer Lot Order (A, B, C...)</span>
                   </h5>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-amber-200/60 mt-0.5">
                     Draw random lots or manually adjust order using the arrows or position selectors.
                   </p>
                 </div>
@@ -1242,7 +1249,7 @@ export const StageQueueControlPage: React.FC = () => {
                 <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 shadow-2xs cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-200 text-xs font-semibold border border-white/[0.08] shadow-2xs cursor-pointer transition-colors"
                     onClick={handleInitializeManualLots}
                     title="Reset to attendance/roll-call order"
                   >
@@ -1261,13 +1268,13 @@ export const StageQueueControlPage: React.FC = () => {
               </div>
 
               {drawnLots.length === 0 ? (
-                <div className="text-center py-10 text-slate-400 text-xs space-y-3 font-medium">
+                <div className="text-center py-10 text-amber-200/60 text-xs space-y-3 font-medium">
                   {reportedCount === 0 ? (
-                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 max-w-md mx-auto space-y-2">
+                    <div className="p-4 rounded-2xl bg-amber-500/15 border border-white/[0.08] text-amber-300 max-w-md mx-auto space-y-2">
                       <AlertTriangle className="w-5 h-5 mx-auto text-amber-600" />
                       <p className="font-bold">No participants marked Present yet.</p>
                       <button
-                        className="px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-semibold text-xs shadow-2xs"
+                        className="px-3.5 py-1.5 rounded-full bg-[#0A0A0A] hover:bg-[#121212] border border-white/[0.08] text-amber-100 font-semibold text-xs shadow-2xs"
                         onClick={() => setActiveModalTab('ROLL_CALL')}
                       >
                         ← Return to Attendance
@@ -1275,7 +1282,7 @@ export const StageQueueControlPage: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-3">
-                      <p className="text-slate-600 font-medium">Choose how to assign lots for {reportedCount} present contestants:</p>
+                      <p className="text-amber-200/60 font-medium">Assign lots for {reportedCount} present contestants:</p>
                       <div className="flex flex-wrap items-center justify-center gap-3">
                         <button
                           type="button"
@@ -1287,7 +1294,7 @@ export const StageQueueControlPage: React.FC = () => {
                         </button>
                         <button
                           type="button"
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 text-xs font-semibold shadow-xs cursor-pointer"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 border border-white/[0.08] text-xs font-semibold shadow-xs cursor-pointer"
                           onClick={handleInitializeManualLots}
                         >
                           <span>Manual / Roll-Call Order</span>
@@ -1301,11 +1308,11 @@ export const StageQueueControlPage: React.FC = () => {
                   {drawnLots.map((lot, idx) => (
                     <div
                       key={lot.queue_id}
-                      className="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
+                      className="p-3 rounded-2xl bg-[#0A0A0A] border border-white/[0.08] shadow-2xs flex items-center justify-between gap-3 hover:border-amber-500/30 transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Order & Lot Code Badge */}
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#241407] to-[#070908] text-amber-400 border border-amber-500/30 font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0A0A0A] to-[#040404] text-amber-400 border border-white/[0.08] font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
                           {lot.code_letter}
                         </div>
 
@@ -1313,22 +1320,22 @@ export const StageQueueControlPage: React.FC = () => {
                           {lot.is_group ? (
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h5 className="font-bold text-slate-900 text-sm truncate">{lot.team_name}</h5>
-                                <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shrink-0">
+                                <h5 className="font-bold text-white text-sm truncate">{lot.team_name}</h5>
+                                <span className="font-mono text-[11px] text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08] shrink-0">
                                   {lot.member_count} Members
                                 </span>
                               </div>
-                              <span className="text-xs text-slate-500 font-medium truncate block">{lot.member_names}</span>
+                              <span className="text-xs text-amber-200/60 font-medium truncate block">{lot.member_names}</span>
                             </div>
                           ) : (
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h5 className="font-bold text-slate-900 text-sm truncate">{lot.participant_name}</h5>
-                                <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shrink-0">
+                                <h5 className="font-bold text-white text-sm truncate">{lot.participant_name}</h5>
+                                <span className="font-mono text-[11px] text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08] shrink-0">
                                   {lot.participant_code}
                                 </span>
                               </div>
-                              <span className="text-xs text-slate-500 font-semibold truncate block">{lot.team_name}</span>
+                              <span className="text-xs text-amber-200/60 font-semibold truncate block">{lot.team_name}</span>
                             </div>
                           )}
                         </div>
@@ -1338,29 +1345,29 @@ export const StageQueueControlPage: React.FC = () => {
                       <div className="flex items-center gap-2 shrink-0">
                         {/* Position select */}
                         <div className="flex items-center gap-1">
-                          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Pos:</span>
+                          <span className="text-[11px] text-amber-200/60 font-medium hidden sm:inline">Pos:</span>
                           <select
                             value={lot.queue_order}
                             onChange={(e) => handleSetPosition(idx, Number(e.target.value))}
-                            className="text-xs font-mono font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:ring-1 focus:ring-amber-500 focus:outline-hidden cursor-pointer"
+                            className="text-xs font-mono font-bold text-amber-100 bg-[#121212] border border-white/[0.08] rounded-lg px-2 py-1 focus:ring-1 focus:ring-amber-500 focus:outline-hidden cursor-pointer"
                             title="Directly jump to position"
                           >
                             {drawnLots.map((_, pIdx) => (
                               <option key={pIdx + 1} value={pIdx + 1}>
-                                #{pIdx + 1}
+                                {pIdx + 1}
                               </option>
                             ))}
                           </select>
                         </div>
 
                         {/* Up / Down Swap Buttons */}
-                        <div className="flex items-center gap-0.5 bg-slate-50 p-0.5 rounded-lg border border-slate-200">
+                        <div className="flex items-center gap-0.5 bg-[#121212] p-0.5 rounded-lg border border-white/[0.08]">
                           <button
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMoveLot(idx, 'UP')}
                             title="Move Up"
-                            className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-white disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors"
+                            className="p-1 rounded text-amber-200/60 hover:text-white hover:bg-[#0A0A0A] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors"
                           >
                             <ChevronUp className="w-3.5 h-3.5" />
                           </button>
@@ -1369,7 +1376,7 @@ export const StageQueueControlPage: React.FC = () => {
                             disabled={idx === drawnLots.length - 1}
                             onClick={() => handleMoveLot(idx, 'DOWN')}
                             title="Move Down"
-                            className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-white disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors"
+                            className="p-1 rounded text-amber-200/60 hover:text-white hover:bg-[#0A0A0A] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors"
                           >
                             <ChevronDown className="w-3.5 h-3.5" />
                           </button>
@@ -1381,9 +1388,9 @@ export const StageQueueControlPage: React.FC = () => {
               )}
 
               {/* Bottom Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-between pt-4 border-t border-white/[0.08]">
                 <button
-                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-amber-200/60 hover:text-white hover:bg-[#121212] transition-colors cursor-pointer"
                   onClick={() => setActiveModalTab('ROLL_CALL')}
                 >
                   ← Back to Attendance
@@ -1416,20 +1423,20 @@ export const StageQueueControlPage: React.FC = () => {
         maxWidth="lg"
       >
         <div className="space-y-4 text-xs">
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium">
-            <span className="text-slate-600">Appends contestant as the last lot:</span>
-            <span className="font-mono font-bold text-amber-950 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#121212] border border-white/[0.08] text-xs font-medium">
+            <span className="text-amber-200/60">Appends contestant as the last lot:</span>
+            <span className="font-mono font-bold text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-white/[0.08]">
               Code {nextAssignedLetter} (Order {nextAssignedOrder})
             </span>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+            <label className="text-xs font-bold uppercase tracking-wider text-amber-200 block">
               Select Arriving Contestant
             </label>
 
             {lateCheckInCandidates.length === 0 ? (
-              <p className="text-xs text-slate-400 font-medium py-6 text-center">
+              <p className="text-xs text-amber-200/60 font-medium py-6 text-center">
                 All registered contestants for this programme are already marked present with active lots.
               </p>
             ) : (
@@ -1443,29 +1450,29 @@ export const StageQueueControlPage: React.FC = () => {
                       onClick={() => setSelectedLateParticipantId(c.participant_id)}
                       className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
                         isSelected
-                          ? 'border-amber-500 bg-amber-50 ring-2 ring-amber-500/30'
-                          : 'border-slate-200 bg-white hover:bg-slate-50'
+                          ? 'border-amber-500 bg-amber-500/15 ring-2 ring-amber-500/30'
+                          : 'border-amber-500/30 bg-[#0A0A0A] hover:bg-[#121212]'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs ${
-                            isSelected ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-bold' : 'bg-slate-100 text-slate-700'
+                            isSelected ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-bold' : 'bg-[#121212] text-amber-200'
                           }`}
                         >
                           {c.participant_code}
                         </div>
                         <div>
-                          <h5 className="font-bold text-slate-900 text-sm">{c.participant_name}</h5>
-                          <span className="text-xs text-slate-500 font-semibold">{c.team_name}</span>
+                          <h5 className="font-bold text-white text-sm">{c.participant_name}</h5>
+                          <span className="text-xs text-amber-200/60 font-semibold">{c.team_name}</span>
                         </div>
                       </div>
 
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
                           c.check_in_status === 'ABSENT'
-                            ? 'bg-rose-50 text-rose-700 border-rose-200'
-                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                            ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                            : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                         }`}
                       >
                         Status: {c.check_in_status || 'Pending'}
@@ -1477,9 +1484,9 @@ export const StageQueueControlPage: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-between pt-4 border-t border-white/[0.08]">
             <button
-              className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:text-white hover:bg-[#121212] transition-colors cursor-pointer"
               onClick={() => {
                 setIsLateModalOpen(false);
                 setSelectedLateParticipantId(null);
@@ -1514,16 +1521,16 @@ export const StageQueueControlPage: React.FC = () => {
         title="Discard Live Programme"
         maxWidth="md"
       >
-        <div className="p-6 space-y-5 text-slate-900">
+        <div className="p-6 space-y-5 text-white">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-300 flex items-center justify-center shrink-0 border border-rose-500/30">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-slate-900 text-base">Revert back to Scheduled?</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-bold text-white text-base">Revert back to Scheduled?</h4>
+              <p className="text-xs text-amber-200/60 leading-relaxed">
                 Are you sure you want to discard this live session for{' '}
-                <span className="font-bold text-slate-900">
+                <span className="font-bold text-white">
                   {liveSchedule?.programme_group ? `${liveSchedule.programme_group} - ` : ''}
                   {liveSchedule?.competition_name}
                 </span>
@@ -1532,20 +1539,20 @@ export const StageQueueControlPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs space-y-2">
-            <p className="font-semibold text-amber-950">This action will automatically:</p>
-            <ul className="list-disc list-inside space-y-1 text-slate-700">
+          <div className="p-4 rounded-xl bg-amber-500/15 border border-white/[0.08] text-amber-300 text-xs space-y-2">
+            <p className="font-semibold text-amber-300">This action will automatically:</p>
+            <ul className="list-disc list-inside space-y-1 text-amber-200">
               <li>Free the stage immediately for other programmes.</li>
-              <li>Revert the status directly back to <span className="font-mono font-bold text-slate-900">SCHEDULED</span>.</li>
+              <li>Revert the status directly back to <span className="font-mono font-bold text-white">SCHEDULED</span>.</li>
               <li>Completely wipe out all lot codes (<span className="font-mono">A, B, C...</span>) and check-in attendance.</li>
               <li>Reset performer queues to waiting status.</li>
             </ul>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
             <button
               type="button"
-              className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:text-white hover:bg-[#121212] transition-colors cursor-pointer"
               onClick={() => setIsDiscardModalOpen(false)}
             >
               Cancel

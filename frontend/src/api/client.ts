@@ -50,7 +50,7 @@ class ApiClient {
         if (response.status === 401 && !endpoint.includes('/auth/login')) {
           localStorage.removeItem('esperanza_access_token');
           localStorage.removeItem('esperanza_user');
-          const publicPages = ['/', '/schedule', '/leaderboard', '/verify'];
+          const publicPages = ['/', '/login'];
           const isPublic = publicPages.includes(window.location.pathname);
           if (!isPublic && window.location.pathname !== '/login') {
             window.location.href = '/login';
@@ -72,6 +72,14 @@ class ApiClient {
   post<T>(endpoint: string, body?: any, options?: RequestInit) {
     return this.request<T>(endpoint, {
       method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
+      ...options,
+    });
+  }
+
+  put<T>(endpoint: string, body?: any, options?: RequestInit) {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
       body: body ? JSON.stringify(body) : undefined,
       ...options,
     });

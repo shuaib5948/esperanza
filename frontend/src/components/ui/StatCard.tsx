@@ -25,15 +25,15 @@ export const StatCard: React.FC<StatCardProps> = ({
       badge: 'text-indigo-400',
     },
     emerald: {
-      bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
       badge: 'text-emerald-400',
     },
     amber: {
-      bg: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      bg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
       badge: 'text-amber-400',
     },
     rose: {
-      bg: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+      bg: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
       badge: 'text-rose-400',
     },
     purple: {
@@ -45,12 +45,12 @@ export const StatCard: React.FC<StatCardProps> = ({
   const scheme = colorMap[color];
 
   return (
-    <Card className="hover:border-slate-700/80 transition-all duration-200">
+    <Card className="hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-950/20 transition-all duration-200">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-200/60">{title}</p>
           <h4 className="text-3xl font-extrabold text-white mt-1.5">{value}</h4>
-          {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-amber-200/60 mt-1">{subtitle}</p>}
           {trend && <p className="text-xs font-medium text-emerald-400 mt-2">{trend}</p>}
         </div>
         <div className={`p-3 rounded-xl border ${scheme.bg}`}>

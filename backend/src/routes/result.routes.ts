@@ -10,6 +10,7 @@ const router = Router();
 // Admin-only Competition-specific Results & Complete Judge Marks
 router.get('/competition/:competitionId', authenticate, authorizeRoles('ADMIN'), ResultController.getByCompetition);
 router.get('/competition/:competitionId/judge-scores', authenticate, authorizeRoles('ADMIN'), ResultController.getCompetitionJudgeScores);
+router.put('/competition/:competitionId/scores', authenticate, authorizeRoles('ADMIN'), ResultController.adminUpdateScores);
 
 // Public / Authenticated published results
 router.get('/', ResultController.getAll);

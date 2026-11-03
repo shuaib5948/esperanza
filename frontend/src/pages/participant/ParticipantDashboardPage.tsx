@@ -2,10 +2,17 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import { User, Calendar, MapPin, Sparkles, Trophy, Award, UploadCloud } from 'lucide-react';
-import { Card } from '../../components/ui/Card.js';
-import { Badge } from '../../components/ui/Badge.js';
-import { Button } from '../../components/ui/Button.js';
+import {
+  Calendar,
+  Sparkles,
+  Trophy,
+  Award,
+  UploadCloud,
+  CheckCircle2,
+  Clock,
+  Radio,
+} from 'lucide-react';
+import { THEME } from '../../theme/theme.js';
 
 export const ParticipantDashboardPage: React.FC = () => {
   const { data, isLoading } = useQuery({
@@ -21,174 +28,116 @@ export const ParticipantDashboardPage: React.FC = () => {
   const registrations = data?.registrations || [];
   const certificates = data?.certificates || [];
 
-  return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Mobile-First Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 glass-panel border border-slate-800">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black text-white shadow-xl"
-              style={{ backgroundColor: participant?.team_color || '#4f46e5' }}
-            >
-              {participant?.participant_code?.substring(0, 3) || 'ESP'}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-indigo-400">
-                  {participant?.participant_code}
-                </span>
-                <Badge variant="primary" size="sm">
-                  {participant?.category_name}
-                </Badge>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white mt-0.5">
-                {participant?.user_name}
-              </h1>
-              <p className="text-xs text-slate-400 font-semibold">{participant?.team_name}</p>
-            </div>
-          </div>
+  const isDiraya = (participant?.team_name || '').toUpperCase().includes('DIRAYA');
 
-          <div className="flex items-center gap-2">
-            <Link to="/participant/submissions">
-              <Button variant="secondary" size="sm">
-                <UploadCloud className="w-4 h-4 mr-1.5" />
-                <span>Upload Work</span>
-              </Button>
-            </Link>
+  return (
+    <div className="space-y-4 max-w-4xl mx-auto">
+      {/* 1. Contestant Hero Profile Card */}
+      <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white shadow-xs ${
+              isDiraya ? 'bg-[#0D472D]' : 'bg-[#881337]'
+            }`}
+          >
+            {participant?.participant_code?.substring(0, 3) || 'ESP'}
           </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-amber-300">
+                {participant?.participant_code}
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#121212] text-amber-200">
+                {participant?.category_name}
+              </span>
+            </div>
+            <h1 className="text-lg sm:text-2xl font-bento-title font-bold text-white mt-0.5">
+              {participant?.user_name}
+            </h1>
+            <span
+              className={`inline-block text-[11px] font-bold ${
+                isDiraya ? 'text-emerald-300' : 'text-[#881337]'
+              }`}
+            >
+              {participant?.team_name}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <Link to="/participant/submissions">
+            <button className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full ${THEME.classes.primaryBtn} text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shadow-2xs`}>
+              <UploadCloud className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Submit Work</span>
+            </button>
+          </Link>
         </div>
       </div>
 
-      {/* Events Timeline */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-indigo-400" />
-          <span>My Registered Events ({registrations.length})</span>
-        </h3>
+      {/* 2. Registered Events Bento List */}
+      <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-4 shadow-xs space-y-3">
+        <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.08]">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-amber-700" />
+            <h3 className="text-xs font-bento-title uppercase tracking-wider text-amber-100 font-bold">
+              My Registered Programmes ({registrations.length})
+            </h3>
+          </div>
+        </div>
 
         {registrations.length === 0 ? (
-          <Card className="text-center py-12 text-slate-500 text-sm">
-            You are not currently registered for any festival competitions.
-          </Card>
+          <div className="p-8 text-center text-xs text-amber-200/60">
+            You are not enrolled in any competitions yet.
+          </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {registrations.map((reg: any) => {
               const isOnStage = reg.stage_status === 'ON_STAGE';
               const isCalled = reg.stage_status === 'CALLED';
 
               return (
-                <Card
-                  key={reg.registration_id}
-                  className={`border transition-all ${
-                    isOnStage
-                      ? 'border-indigo-500 bg-indigo-950/30'
-                      : isCalled
-                      ? 'border-amber-500 bg-amber-950/20'
-                      : 'border-slate-800'
-                  }`}
+                <div
+                  key={reg.id || reg.competition_id}
+                  className="p-3 rounded-xl border border-amber-500/15 bg-[#121212] hover:bg-[#121212] flex items-center justify-between gap-3 transition-colors"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono font-bold text-indigo-400">
-                          PROG {reg.programme_number}
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono font-bold text-amber-300">
+                        {reg.programme_number}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#121212] text-amber-200">
+                        {reg.competition_type || 'STAGE'}
+                      </span>
+                      {isOnStage && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 animate-pulse">
+                          <Radio className="w-2.5 h-2.5" />
+                          <span>NOW ON STAGE</span>
                         </span>
-                        <Badge variant="neutral" size="sm">
-                          {reg.group_name}
-                        </Badge>
-                        <Badge
-                          variant={reg.competition_type === 'STAGE' ? 'primary' : 'info'}
-                          size="sm"
-                        >
-                          {reg.competition_type}
-                        </Badge>
-                      </div>
-                      <h4 className="text-lg font-bold text-white">{reg.competition_name}</h4>
-                      {reg.venue_name && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                          <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Venue: {reg.venue_name}</span>
-                        </div>
                       )}
-                    </div>
-
-                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-800">
-                      {reg.position ? (
-                        <Badge variant="warning" size="md">
-                          <Trophy className="w-3.5 h-3.5 mr-1 text-amber-400" />
-                          <span>Position {reg.position}</span>
-                        </Badge>
-                      ) : reg.stage_status ? (
-                        <Badge
-                          variant={
-                            isOnStage
-                              ? 'primary'
-                              : isCalled
-                              ? 'warning'
-                              : reg.stage_status === 'COMPLETED'
-                              ? 'success'
-                              : 'neutral'
-                          }
-                          size="md"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 mr-1" />
-                          <span>Queue: {reg.stage_status}</span>
-                        </Badge>
-                      ) : (
-                        <Badge variant="neutral" size="md">
-                          {reg.registration_status}
-                        </Badge>
-                      )}
-
-                      {reg.attendance_status && (
-                        <span className="text-[11px] text-slate-400 font-medium">
-                          Attendance: {reg.attendance_status}
+                      {isCalled && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/15 text-amber-300 border border-white/[0.08] animate-pulse">
+                          <span>STAGE CALL</span>
                         </span>
                       )}
                     </div>
+                    <h4 className="text-sm font-bento-title font-bold text-white">
+                      {reg.competition_name}
+                    </h4>
                   </div>
-                </Card>
+
+                  <div className="text-right text-[11px] text-amber-200/60 font-medium">
+                    {reg.stage_name ? (
+                      <span className="font-bold text-amber-200 block">{reg.stage_name}</span>
+                    ) : (
+                      <span>Time TBD</span>
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
         )}
       </div>
-
-      {/* Issued Certificates */}
-      {certificates.length > 0 && (
-        <div className="space-y-4 pt-4">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <Award className="w-5 h-5 text-amber-400" />
-            <span>My Issued Certificates ({certificates.length})</span>
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {certificates.map((cert: any) => (
-              <Card key={cert.id} className="border-emerald-500/30 bg-emerald-950/10 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge variant="success" size="sm">
-                    Verified Award
-                  </Badge>
-                  <span className="text-xs font-mono text-slate-400">{cert.verification_code}</span>
-                </div>
-                <h4 className="text-base font-bold text-white">{cert.competition_name}</h4>
-                <p className="text-xs text-amber-300 font-bold">
-                  {cert.position ? `Position ${cert.position} Place` : 'Certificate of Participation'}
-                </p>
-                <div className="pt-2 border-t border-slate-800">
-                  <Link
-                    to={`/verify?code=${cert.verification_code}`}
-                    className="text-xs font-semibold text-indigo-400 hover:text-indigo-300"
-                  >
-                    View Authentic Credential →
-                  </Link>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

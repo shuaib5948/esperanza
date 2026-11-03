@@ -88,23 +88,23 @@ export const ProgrammeStatusBadge: React.FC<ProgrammeStatusBadgeProps> = ({
   > = {
     PUBLISHED: {
       label: 'Published',
-      bg: 'bg-emerald-50',
-      text: 'text-emerald-700',
-      border: 'border-emerald-200/80',
-      icon: <CheckCircle2 className="w-3 h-3 text-emerald-600" />,
+      bg: 'bg-emerald-500/15',
+      text: 'text-emerald-300',
+      border: 'border-emerald-500/30',
+      icon: <CheckCircle2 className="w-3 h-3 text-emerald-400" />,
     },
     COMPLETED: {
       label: 'Completed',
-      bg: 'bg-sky-50',
-      text: 'text-sky-700',
-      border: 'border-sky-200/80',
-      icon: <Check className="w-3 h-3 text-sky-600" />,
+      bg: 'bg-sky-500/15',
+      text: 'text-sky-300',
+      border: 'border-sky-500/30',
+      icon: <Check className="w-3 h-3 text-sky-400" />,
     },
     LIVE: {
       label: 'Live',
-      bg: 'bg-rose-50',
-      text: 'text-rose-700',
-      border: 'border-rose-200/80',
+      bg: 'bg-rose-500/15',
+      text: 'text-rose-300',
+      border: 'border-rose-500/30',
       icon: (
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
@@ -114,24 +114,24 @@ export const ProgrammeStatusBadge: React.FC<ProgrammeStatusBadgeProps> = ({
     },
     CHECK_IN: {
       label: 'Check-In',
-      bg: 'bg-amber-50',
-      text: 'text-amber-800',
-      border: 'border-amber-200/80',
-      icon: <UserCheck className="w-3 h-3 text-amber-600" />,
+      bg: 'bg-amber-500/15',
+      text: 'text-amber-300',
+      border: 'border-amber-500/30',
+      icon: <UserCheck className="w-3 h-3 text-amber-400" />,
     },
     SCHEDULED: {
       label: 'Scheduled',
-      bg: 'bg-indigo-50',
-      text: 'text-indigo-700',
-      border: 'border-indigo-200/80',
-      icon: <Calendar className="w-3 h-3 text-indigo-600" />,
+      bg: 'bg-indigo-500/15',
+      text: 'text-indigo-300',
+      border: 'border-indigo-500/30',
+      icon: <Calendar className="w-3 h-3 text-indigo-400" />,
     },
     DRAFT: {
       label: 'Draft',
-      bg: 'bg-slate-100',
-      text: 'text-slate-600',
-      border: 'border-slate-200/80',
-      icon: <FileText className="w-3 h-3 text-slate-500" />,
+      bg: 'bg-[#121212]',
+      text: 'text-amber-200/60',
+      border: 'border-amber-500/30',
+      icon: <FileText className="w-3 h-3 text-amber-400/60" />,
     },
   };
 

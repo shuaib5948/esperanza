@@ -21,13 +21,13 @@ export const PublicComingSoon: React.FC<PublicComingSoonProps> = ({
   const tickerItems = Array.from({ length: 14 }, () => 'COMING SOON');
 
   return (
-    <div className="h-screen max-h-[100dvh] w-screen max-w-full bg-[#070908] text-white flex flex-col justify-between overflow-hidden relative font-bento select-none">
+    <div className="h-screen max-h-[100dvh] w-screen max-w-full bg-[#040404] text-white flex flex-col justify-between overflow-hidden relative font-bento select-none">
       {/* Ambient Background Gold Bokeh Glows */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute inset-0 bg-radial from-amber-500/5 via-transparent to-black/80 pointer-events-none" />
 
       {/* 1. TOP BAR */}
-      <header className="w-full z-20 px-4 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between border-b border-white/10 bg-black/50 backdrop-blur-md shrink-0">
+      <header className="w-full z-20 px-4 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between border-b border-white/[0.08] bg-black/50 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-yellow-500 flex items-center justify-center shadow-md shadow-amber-500/20">
             <Sparkles className="w-3.5 h-3.5 text-slate-950 font-bold" />
@@ -47,7 +47,7 @@ export const PublicComingSoon: React.FC<PublicComingSoonProps> = ({
           {showBackButton && !isHomePage && (
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-sm border border-white/10 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-sm border border-white/[0.08] transition-all cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Home</span>
@@ -55,7 +55,7 @@ export const PublicComingSoon: React.FC<PublicComingSoonProps> = ({
           )}
 
           <Link
-            to="/login"
+            to="/?login=true"
             className="flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 shadow-md shadow-amber-500/20 transition-all transform hover:scale-[1.02] cursor-pointer"
           >
             <Lock className="w-3.5 h-3.5" />
@@ -82,8 +82,8 @@ export const PublicComingSoon: React.FC<PublicComingSoonProps> = ({
         {/* Full-Width Ticker (Seamless Borderless Ribbon with Edge Gradients) */}
         <div className="w-full relative overflow-hidden rounded-2xl py-1.5 sm:py-2 shrink-0">
           {/* Edge Fade Gradients matching Homescreen */}
-          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20 bg-gradient-to-r from-[#070908] to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20 bg-gradient-to-l from-[#070908] to-transparent" />
+          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20 bg-gradient-to-r from-[#040404] to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20 bg-gradient-to-l from-[#040404] to-transparent" />
 
           <div className="animate-ticker flex items-center">
             {[...tickerItems, ...tickerItems].map((text, idx) => (
@@ -101,7 +101,7 @@ export const PublicComingSoon: React.FC<PublicComingSoonProps> = ({
       </main>
 
       {/* 3. FOOTER (Matching Container Spacing) */}
-      <footer className="w-full z-20 px-4 sm:px-8 py-2 border-t border-white/10 bg-black/60 backdrop-blur-md flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 shrink-0">
+      <footer className="w-full z-20 px-4 sm:px-8 py-2 border-t border-white/[0.08] bg-black/60 backdrop-blur-md flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 shrink-0">
         <div className="flex items-center gap-1.5 font-semibold">
           <span className="text-amber-400 font-bold">Project Council.</span>
           <span>ESPERANZA 9.0</span>

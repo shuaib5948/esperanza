@@ -20,16 +20,16 @@ export const THEME = {
     champagneCanvas: '#FFFFC5', // Festival Poster Pale Yellow
     warmWhite: '#FCFBF7',       // Soft off-white
     
-    // Contingent / Battle Colors (Antique Forest Leather vs Oxblood Burgundy Leather)
-    diraya: '#059669',          // Team 1 (Antique Forest Leather Green)
-    rivaya: '#BE123C',          // Team 2 (Oxblood Burgundy Leather)
+    // Contingent / Battle Colors (Diraya Emerald vs Rivaya Crimson)
+    diraya: '#00E676',          // Team 1 (Glowing Emerald Green)
+    rivaya: '#FF2A6D',          // Team 2 (Glowing Crimson Burgundy)
     
     // Real-Time Telemetry
     telemetryPulse: '#10B981',  // Emerald Green for Live Radar Signals
     // Dark Luxury Bronze & Poster Tones
-    darkBronze: '#241407',      // Deep roasted coffee bronze
-    darkBronzeMid: '#170d04',   // Espresso bronze
-    posterDark: '#070908',      // Festival noir background
+    darkBronze: '#0A0A0A',      // Deep roasted coffee bronze
+    darkBronzeMid: '#0A0A0A',   // Espresso bronze
+    posterDark: '#040404',      // Festival noir background
   },
 
   // Ready-to-use Tailwind class presets across platform UI components
@@ -38,7 +38,7 @@ export const THEME = {
     primaryBtn:
       'bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-bold shadow-md shadow-amber-500/20 focus:ring-amber-400',
     secondaryBtn:
-      'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200/80 focus:ring-slate-400',
+      'bg-[#121212] hover:bg-[#1a1a1a] text-slate-200 border border-white/[0.08] hover:border-white/20 focus:ring-amber-500/40 shadow-xs',
 
     // Global Header & Navbar Avatars
     avatarCircle:
@@ -50,15 +50,15 @@ export const THEME = {
     activeIndicator:
       'bg-amber-500',
     inactiveTab:
-      'text-slate-600 hover:text-slate-950 hover:bg-amber-50/60',
+      'text-slate-400 hover:text-white hover:bg-white/5',
     
     // Badges & Status Chips
     badgeInactive:
-      'bg-amber-50 text-amber-900 border border-amber-200/80 font-bold',
+      'bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold',
     badgeActive:
       'bg-black/10 text-slate-950 font-bold',
     lotBadge:
-      'bg-gradient-to-br from-[#241407] via-[#170d04] to-[#070908] text-amber-300 border border-amber-500/35 font-black shadow-xs',
+      'bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#040404] text-amber-300 border border-amber-500/30 font-black shadow-xs',
 
     // Shimmering Golden Title & Numbers
     goldTextGradient:
@@ -66,9 +66,9 @@ export const THEME = {
 
     // Bento Hero KPI Tiles (Dark Luxury Bronze Brown & Poster Gold Gradient)
     heroCard:
-      'bg-gradient-to-br from-[#241407] via-[#170d04] to-[#070908] text-white border border-amber-500/35 shadow-lg shadow-amber-950/20',
+      'bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#040404] text-white border border-amber-500/30 shadow-lg shadow-amber-950/20',
     heroCardSubtle:
-      'bg-gradient-to-br from-[#241407] via-[#170d04] to-[#070908] text-white border border-amber-500/30 shadow-md shadow-amber-950/15',
+      'bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#040404] text-white border border-amber-500/30 shadow-md shadow-amber-950/15',
 
     // Form inputs & borders
     inputFocusRing:

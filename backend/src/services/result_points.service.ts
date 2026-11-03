@@ -3,6 +3,9 @@ import { query, withTransaction } from '../database/connection.js';
 
 export class ResultService {
   static async getAll(filters: any) {
+    if (filters?.competitionId) {
+      return this.getByCompetition(filters.competitionId);
+    }
     return ResultRepository.findAll(filters);
   }
 
@@ -19,11 +22,53 @@ export class ResultService {
   }
 
   static async getByCompetition(competitionId: number) {
-    return ResultRepository.findByCompetition(competitionId);
+    const results = await ResultRepository.findByCompetition(competitionId);
+    if (results && results.length > 1) {
+      const seen = new Set<string>();
+      let hasDuplicates = false;
+      for (const r of results) {
+        const key = `${r.participant_id || ''}_${r.team_id || ''}`;
+        if (seen.has(key)) {
+          hasDuplicates = true;
+          break;
+        }
+        seen.add(key);
+      }
+      if (hasDuplicates) {
+        return this.generateResults(competitionId);
+      }
+    }
+    return results;
   }
 
   static async getJudgeScoresByCompetition(competitionId: number) {
     return ResultRepository.getJudgeScoresByCompetition(competitionId);
+  }
+
+  static async adminUpdateScores(
+    competitionId: number,
+    adminUserId: number,
+    updates: { score_sheet_id: number; total_marks: number; remarks?: string }[]
+  ) {
+    await withTransaction(async (conn) => {
+      for (const item of updates) {
+        await conn.query(
+          `
+          UPDATE score_sheets 
+          SET total_marks = ?, 
+              remarks = COALESCE(?, remarks),
+              unlocked_by = ?,
+              unlocked_at = NOW(),
+              status = CASE WHEN status = 'DRAFT' THEN 'SUBMITTED' ELSE status END
+          WHERE id = ? AND competition_id = ?
+        `,
+          [item.total_marks, item.remarks !== undefined ? item.remarks : null, adminUserId, item.score_sheet_id, competitionId]
+        );
+      }
+    });
+
+    // Automatically recalculate competition results using updated marks
+    return this.generateResults(competitionId, 'AVERAGE', adminUserId);
   }
 
   /**
@@ -35,7 +80,11 @@ export class ResultService {
    * 4. Dense ranking determines Position & Position Points (5, 3, 1, 0)
    * 5. Final Programme Score = Grade Marks + Position Points
    */
-  static async generateResults(competitionId: number, calculationMethod: 'AVERAGE' | 'WEIGHTED_AVERAGE' | 'HIGHEST' = 'AVERAGE') {
+  static async generateResults(
+    competitionId: number,
+    calculationMethod: 'AVERAGE' | 'WEIGHTED_AVERAGE' | 'HIGHEST' = 'AVERAGE',
+    adminUserId?: number
+  ) {
     await withTransaction(async (conn) => {
       // 1. Fetch submitted/locked score sheets grouped by evaluated participant
       const [sheets] = await conn.query<any[]>(`
@@ -57,6 +106,20 @@ export class ResultService {
           message: 'Cannot generate results: No submitted score sheets exist for this competition yet.',
         };
       }
+
+      // Check existing results to preserve publication/verification status & publishers
+      const [existingResults] = await conn.query<any[]>(
+        'SELECT id, status, published_by, published_at, verified_by, verified_at FROM results WHERE competition_id = ?',
+        [competitionId]
+      );
+      const wasPublished = existingResults.some((r) => r.status === 'PUBLISHED');
+      const existingPublisher = existingResults.find((r) => r.status === 'PUBLISHED')?.published_by;
+      const publisherId = existingPublisher || adminUserId || null;
+      const publishedAt = existingResults.find((r) => r.status === 'PUBLISHED')?.published_at || new Date();
+
+      const existingVerifier = existingResults.find((r) => r.verified_by)?.verified_by;
+      const verifierId = existingVerifier || adminUserId || null;
+      const verifiedAt = existingResults.find((r) => r.verified_at)?.verified_at || new Date();
 
       // 2. Fetch competition details to determine programme participant scale (N)
       const [compRows] = await conn.query<any[]>(`
@@ -128,14 +191,15 @@ export class ResultService {
         computed[i].final_score = Math.round((computed[i].grade_marks + computed[i].position_points) * 100) / 100;
       }
 
-      // Delete existing DRAFT or VERIFIED results for this competition
-      await conn.query('DELETE FROM results WHERE competition_id = ? AND status IN ("DRAFT", "VERIFIED")', [competitionId]);
+      // 5. Clean up existing team points and all old results for this competition (prevents duplicate rows)
+      await conn.query('DELETE FROM team_points WHERE competition_id = ?', [competitionId]);
+      await conn.query('DELETE FROM results WHERE competition_id = ?', [competitionId]);
 
-      const createdResultIds: number[] = [];
+      // 6. Insert fresh single result rows for each participant
+      const targetStatus = wasPublished ? 'PUBLISHED' : 'VERIFIED';
 
       for (let i = 0; i < computed.length; i++) {
         const item = computed[i];
-        // Team points awarded = Final Programme Score (Grade Marks + Position Points)
         const points = item.final_score;
 
         const [insertRes] = await conn.query<any>(`
@@ -143,8 +207,9 @@ export class ResultService {
             competition_id, participant_id, team_id,
             raw_marks, grade, grade_marks,
             position, position_points,
-            final_score, points_awarded, status, verified_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'VERIFIED', NOW())
+            final_score, points_awarded, status,
+            verified_by, verified_at, published_by, published_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
           competitionId,
           item.participant_id,
@@ -156,12 +221,38 @@ export class ResultService {
           item.position_points,
           item.final_score,
           points,
+          targetStatus,
+          verifierId,
+          verifiedAt,
+          wasPublished ? publisherId : null,
+          wasPublished ? publishedAt : null,
         ]);
-        createdResultIds.push(insertRes.insertId);
+
+        // If results were previously published, automatically sync updated points into team_points
+        if (wasPublished && item.team_id && points > 0) {
+          await conn.query(`
+            INSERT INTO team_points (team_id, competition_id, result_id, points)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE points = VALUES(points)
+          `, [item.team_id, competitionId, insertRes.insertId, points]);
+        }
       }
 
       // Ensure competition status is CLOSED
       await conn.query('UPDATE competitions SET status = "CLOSED" WHERE id = ?', [competitionId]);
+
+      // Audit log if admin user is present
+      if (adminUserId) {
+        await conn.query(`
+          INSERT INTO audit_logs (user_id, action, entity_type, entity_id, new_data)
+          VALUES (?, ?, 'results', ?, ?)
+        `, [
+          adminUserId,
+          wasPublished ? 'RESULTS_UPDATED_AND_PUBLISHED' : 'RESULTS_GENERATED',
+          competitionId,
+          JSON.stringify({ calculationMethod, count: computed.length, wasPublished }),
+        ]);
+      }
     });
 
     return ResultRepository.findByCompetition(competitionId);

@@ -62,41 +62,11 @@ export const App: React.FC = () => {
             <Routes>
               {/* Public Routes */}
               <Route element={<AppLayout requireAuth={false} />}>
-                <Route
-                  path="/"
-                  element={<HomePage />}
-                />
-                <Route
-                  path="/schedule"
-                  element={
-                    isProduction ? (
-                      <PublicComingSoon showBackButton />
-                    ) : (
-                      <PublicSchedulePage />
-                    )
-                  }
-                />
-                <Route
-                  path="/leaderboard"
-                  element={
-                    isProduction ? (
-                      <PublicComingSoon showBackButton />
-                    ) : (
-                      <LiveLeaderboardPage />
-                    )
-                  }
-                />
-                <Route
-                  path="/verify"
-                  element={
-                    isProduction ? (
-                      <PublicComingSoon showBackButton />
-                    ) : (
-                      <CertificateVerifyPage />
-                    )
-                  }
-                />
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/schedule" element={<PublicSchedulePage />} />
+                <Route path="/leaderboard" element={<LiveLeaderboardPage />} />
+                <Route path="/verify" element={<CertificateVerifyPage />} />
+                <Route path="/login" element={<Navigate to="/?login=true" replace />} />
               </Route>
 
               {/* Admin Routes */}
@@ -110,60 +80,12 @@ export const App: React.FC = () => {
                 <Route path="/admin/attendance" element={<Navigate to="/admin/stage-queue" replace />} />
                 <Route path="/admin/judging" element={<Navigate to="/admin" replace />} />
                 <Route path="/admin/results" element={<ResultsVerificationPage />} />
-                <Route
-                  path="/admin/leaderboard"
-                  element={
-                    isProduction ? (
-                      <ComingSoon
-                        title="Admin Live Standings"
-                        subtitle="Live points calculation and house ranking engine is undergoing final tuning."
-                      />
-                    ) : (
-                      <AdminLeaderboardPage />
-                    )
-                  }
-                />
+                <Route path="/admin/leaderboard" element={<AdminLeaderboardPage />} />
                 <Route path="/admin/point-rules" element={<Navigate to="/admin" replace />} />
                 <Route path="/admin/certificates" element={<CertificatesManagerPage />} />
-                <Route
-                  path="/admin/announcements"
-                  element={
-                    isProduction ? (
-                      <ComingSoon
-                        title="Broadcast Announcements"
-                        subtitle="Festival notification dispatch center is scheduled for the upcoming release."
-                      />
-                    ) : (
-                      <AnnouncementsManagerPage />
-                    )
-                  }
-                />
-                <Route
-                  path="/admin/reports"
-                  element={
-                    isProduction ? (
-                      <ComingSoon
-                        title="Reports & CSV Export"
-                        subtitle="One-click CSV exports for participant rosters, judging rubrics, and standings are scheduled for the next release."
-                      />
-                    ) : (
-                      <ReportsExportPage />
-                    )
-                  }
-                />
-                <Route
-                  path="/admin/audit-logs"
-                  element={
-                    isProduction ? (
-                      <ComingSoon
-                        title="System Audit Logs"
-                        subtitle="Immutable operational audit trails and administrative change logs will be accessible in the next release."
-                      />
-                    ) : (
-                      <AuditLogsPage />
-                    )
-                  }
-                />
+                <Route path="/admin/announcements" element={<AnnouncementsManagerPage />} />
+                <Route path="/admin/reports" element={<ReportsExportPage />} />
+                <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
               </Route>
 
               {/* Team Leader Routes */}
@@ -171,19 +93,7 @@ export const App: React.FC = () => {
                 <Route path="/team" element={<TeamDashboardPage />} />
                 <Route path="/team/roster" element={<TeamRosterPage />} />
                 <Route path="/team/registrations" element={<TeamRegistrationsPage />} />
-                <Route
-                  path="/team/announcements"
-                  element={
-                    isProduction ? (
-                      <ComingSoon
-                        title="Team Announcements"
-                        subtitle="Team broadcast notices will be enabled in the upcoming release."
-                      />
-                    ) : (
-                      <AnnouncementsManagerPage />
-                    )
-                  }
-                />
+                <Route path="/team/announcements" element={<AnnouncementsManagerPage />} />
               </Route>
 
               {/* Judge Routes (Single Tablet Kiosk) */}

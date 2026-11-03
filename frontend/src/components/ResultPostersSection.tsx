@@ -134,10 +134,10 @@ export const ResultPostersSection: React.FC = () => {
       aria-label="Official Competition Posters"
     >
       {/* Top Seamless Dark Gradient Blend (Connecting Flush with Standings - Behind Content) */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-10 md:h-24 bg-gradient-to-b from-[#070503] via-[#070503]/85 to-transparent z-0" />
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-10 md:h-24 bg-gradient-to-b from-[#040404] via-[#040404]/85 to-transparent z-0" />
 
       {/* Bottom Seamless Dark Gradient Blend (Connecting Flush with Gallery - Behind Content) */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 md:h-28 bg-gradient-to-t from-[#070503] via-[#070503]/85 to-transparent z-0" />
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 md:h-28 bg-gradient-to-t from-[#040404] via-[#040404]/85 to-transparent z-0" />
 
       {/* Background Volumetric Ambience */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-amber-500/10 via-yellow-600/3 to-transparent blur-[140px] z-0" />
@@ -166,8 +166,8 @@ export const ResultPostersSection: React.FC = () => {
         =================================================================== */}
         <div className="relative w-full py-2 overflow-hidden">
           {/* Side Vignette Fades */}
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-28 bg-gradient-to-r from-[#070503] via-[#070503]/80 to-transparent z-40" />
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-28 bg-gradient-to-l from-[#070503] via-[#070503]/80 to-transparent z-40" />
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-28 bg-gradient-to-r from-[#040404] via-[#040404]/80 to-transparent z-40" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-28 bg-gradient-to-l from-[#040404] via-[#040404]/80 to-transparent z-40" />
 
           {/* Sliding Track Stage with 2200x2600 Proportional Clearance */}
           <div className="relative h-[360px] sm:h-[380px] md:h-[410px] overflow-hidden w-full">
@@ -245,11 +245,11 @@ export const ResultPostersSection: React.FC = () => {
                       className={`relative h-full w-full aspect-[22/26] rounded-2xl overflow-hidden transition-all duration-300 p-4 sm:p-5 flex items-center justify-center ${
                         isCenter
                           ? 'border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.3),0_15px_30px_rgba(0,0,0,0.9)] bg-gradient-to-b from-[#181108] via-[#0b0804] to-[#040201]'
-                          : 'border border-amber-500/25 shadow-[0_4px_20px_rgba(0,0,0,0.7)] bg-gradient-to-b from-[#120d06] via-[#080502] to-[#030201]'
+                          : 'border border-amber-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.7)] bg-gradient-to-b from-[#120d06] via-[#080502] to-[#030201]'
                       }`}
                     >
                       {/* Clean Geometric Inner Border Inlay matching 2200x2600 Proportion */}
-                      <div className="w-full h-full rounded-xl border border-amber-500/20 flex flex-col items-center justify-center relative overflow-hidden bg-black/40">
+                      <div className="w-full h-full rounded-xl border border-amber-500/30 flex flex-col items-center justify-center relative overflow-hidden bg-black/40">
                         {/* Ambient Radial Golden Glow */}
                         <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
 
@@ -284,7 +284,7 @@ export const ResultPostersSection: React.FC = () => {
           <div className="flex items-center justify-between gap-3 pt-4 max-w-sm mx-auto">
             <button
               onClick={handlePrev}
-              className="w-9 h-9 rounded-full bg-black/60 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/10 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              className="w-9 h-9 rounded-full bg-black/60 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/200/10 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
               title="Previous poster"
             >
               <ChevronLeft className="w-4 h-4 text-amber-300" />
@@ -308,7 +308,7 @@ export const ResultPostersSection: React.FC = () => {
 
             <button
               onClick={handleNext}
-              className="w-9 h-9 rounded-full bg-black/60 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/10 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              className="w-9 h-9 rounded-full bg-black/60 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/200/10 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
               title="Next poster"
             >
               <ChevronRight className="w-4 h-4 text-amber-300" />
@@ -354,7 +354,7 @@ export const ResultPostersSection: React.FC = () => {
                   />
                 ) : (
                   /* Official Blank Poster Card (2200x2600 Frame with Centered Logo Only) */
-                  <div className="w-full h-full rounded-xl sm:rounded-2xl border border-amber-500/25 flex flex-col items-center justify-center relative overflow-hidden bg-black/50 p-6 min-w-[260px] sm:min-w-[340px]">
+                  <div className="w-full h-full rounded-xl sm:rounded-2xl border border-amber-500/30 flex flex-col items-center justify-center relative overflow-hidden bg-black/50 p-6 min-w-[260px] sm:min-w-[340px]">
                     {/* Ambient Radial Golden Glow */}
                     <div className="absolute inset-0 bg-radial from-amber-500/15 via-transparent to-transparent pointer-events-none" />
 

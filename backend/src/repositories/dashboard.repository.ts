@@ -110,8 +110,12 @@ export class DashboardRepository {
                c.participation_type, pg.name as group_name,
                v.name as venue_name, s.start_at, s.status as schedule_status,
                (
-                 SELECT COUNT(*) 
+                 SELECT CASE 
+                   WHEN c.participation_type = 'GROUP' THEN COUNT(DISTINCT p.team_id)
+                   ELSE COUNT(r.id) 
+                 END
                  FROM registrations r 
+                 JOIN participants p ON p.id = r.participant_id
                  WHERE r.competition_id = c.id AND r.status = 'ASSIGNED'
                ) as total_registered,
                (
@@ -398,18 +402,23 @@ export class DashboardRepository {
 
     const assignments = await query<any[]>(`
       SELECT c.id as competition_id, c.programme_number, c.name as competition_name, c.status as competition_status,
+             c.participation_type,
+             (c.participation_type = 'GROUP') as is_group,
+             pg.name as programme_group,
              ct.name as competition_type,
              MAX(s.status) as schedule_status,
-             COUNT(DISTINCT r.id) as total_registered,
+             COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END) as total_registered,
              COUNT(DISTINCT ss.id) as total_evaluated,
              COUNT(DISTINCT CASE WHEN ss.status = 'SUBMITTED' OR ss.status = 'LOCKED' THEN ss.id END) as total_submitted
       FROM competitions c
       JOIN competition_judges cj ON cj.competition_id = c.id AND cj.judge_id = ? AND cj.status = 'ASSIGNED'
       LEFT JOIN competition_types ct ON ct.id = c.competition_type_id
+      LEFT JOIN programme_groups pg ON pg.id = c.programme_group_id
       LEFT JOIN schedules s ON s.competition_id = c.id
       LEFT JOIN registrations r ON r.competition_id = c.id AND r.status = 'ASSIGNED'
+      LEFT JOIN participants p ON p.id = r.participant_id
       LEFT JOIN score_sheets ss ON ss.competition_id = c.id AND ss.judge_id = ?
-      GROUP BY c.id, c.programme_number, c.name, c.status, ct.name
+      GROUP BY c.id, c.programme_number, c.name, c.status, c.participation_type, pg.name, ct.name
       ORDER BY 
         CASE WHEN MAX(s.status) = 'LIVE' THEN 1 
              WHEN MAX(s.status) = 'CHECK_IN' THEN 2 

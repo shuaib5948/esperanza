@@ -3,17 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client.js';
 import {
   Trophy,
-  Radio,
   Flame,
-  Sparkles,
   Award,
   RefreshCw,
-  Medal,
   ChevronRight,
   TrendingUp,
-  Shield,
-  Layers,
-  CheckCircle2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { THEME } from '../theme/theme.js';
@@ -31,7 +25,7 @@ interface LeaderboardItem {
 }
 
 export const LiveLeaderboardPage: React.FC = () => {
-  const { data, isLoading, isFetching, refetch } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ['leaderboard'],
     queryFn: async () => {
       const res = await api.get<LeaderboardItem[]>('/points/leaderboard');
@@ -53,9 +47,9 @@ export const LiveLeaderboardPage: React.FC = () => {
   const runnerUpShare = totalCombinedPts > 0 ? 100 - leaderShare : 50;
 
   return (
-    <div className="space-y-8 py-3 max-w-6xl mx-auto">
+    <div className="space-y-8 py-3 max-w-6xl mx-auto font-bento text-slate-100">
       {/* 1. Header Banner (Festival Luxury Hero Card with Ambient Waves) */}
-      <div className={`relative overflow-hidden rounded-[2.25rem] p-8 sm:p-12 ${THEME.classes.heroCard} shadow-xl`}>
+      <div className={`relative overflow-hidden rounded-2xl sm:rounded-[2.25rem] p-5 sm:p-8 md:p-12 ${THEME.classes.heroCard} shadow-2xl`}>
         {/* Ambient Festival Waves Background */}
         <svg
           className="absolute inset-0 w-full h-full opacity-35 pointer-events-none"
@@ -73,7 +67,7 @@ export const LiveLeaderboardPage: React.FC = () => {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
                 LIVE POINT SYNC
               </span>
-              <span className="text-xs text-amber-200/70 font-medium">Auto-syncs every 10s</span>
+              <span className="text-xs text-amber-200/60 font-medium">Auto-syncs every 10s</span>
             </div>
             <h1 className="font-display text-3xl sm:text-5xl font-black text-white tracking-tight">
               Festival Championship Standings
@@ -96,7 +90,7 @@ export const LiveLeaderboardPage: React.FC = () => {
 
         {/* Lead Difference Callout */}
         {leader && runnerUp && (
-          <div className="mt-8 pt-6 border-t border-amber-500/20 flex flex-wrap items-center justify-between gap-4 relative z-10">
+          <div className="mt-8 pt-6 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-4 relative z-10">
             <div className="flex items-center gap-2.5">
               <span className="flex items-center gap-1.5 text-amber-300 font-extrabold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30 text-xs">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
@@ -105,14 +99,14 @@ export const LiveLeaderboardPage: React.FC = () => {
               <span className="text-xs sm:text-sm text-amber-100/90">
                 <strong className="text-white font-black">{leader.name}</strong> leads by{' '}
                 <strong className="text-amber-400 font-black font-mono">
-                  {pointGap > 0 ? `+${pointGap.toFixed(1)}` : '0.0'} pts
+                  {pointGap > 0 ? `+${parseFloat(pointGap.toFixed(1))}` : '0'} pts
                 </strong>{' '}
                 over {runnerUp.name}
               </span>
             </div>
 
-            <span className="text-xs font-mono font-bold text-amber-200/70">
-              Total Points Contested: {totalCombinedPts.toFixed(1)}
+            <span className="text-xs font-mono font-bold text-amber-200/60">
+              Total Points Contested: {parseFloat(totalCombinedPts.toFixed(1))}
             </span>
           </div>
         )}
@@ -123,83 +117,85 @@ export const LiveLeaderboardPage: React.FC = () => {
         {teams.map((team, idx) => {
           const isFirst = idx === 0;
           const isDiraya = team.code?.toUpperCase().includes('DIR') || team.name?.toLowerCase().includes('diraya');
+          const teamColor = isDiraya ? THEME.colors.diraya : THEME.colors.rivaya;
           const share = isFirst ? leaderShare : runnerUpShare;
 
           return (
             <div
               key={team.id}
-              className={`relative overflow-hidden p-7 sm:p-8 rounded-[2.25rem] bg-white border transition-all duration-300 hover:shadow-xl ${
+              className={`relative overflow-hidden p-7 sm:p-8 rounded-[2.25rem] bg-gradient-to-br from-[#121212] via-[#0a0a0a] to-[#040404] border transition-all duration-300 hover:shadow-2xl ${
                 isFirst
-                  ? 'border-amber-400 shadow-lg shadow-amber-500/10 ring-2 ring-amber-400/20'
-                  : 'border-slate-200 shadow-xs'
+                  ? 'border-amber-400/60 shadow-xl shadow-amber-500/10 ring-2 ring-amber-400/20'
+                  : 'border-amber-500/30 shadow-lg'
               }`}
             >
               {/* Decorative warm aura */}
               <div
-                className={`absolute -right-16 -top-16 w-52 h-52 rounded-full blur-3xl opacity-30 pointer-events-none ${
-                  isFirst ? 'bg-amber-300' : 'bg-slate-200'
+                className={`absolute -right-16 -top-16 w-52 h-52 rounded-full blur-3xl opacity-20 pointer-events-none ${
+                  isFirst ? 'bg-amber-400' : 'bg-rose-500'
                 }`}
               />
 
               <div className="flex items-start justify-between relative z-10">
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-md shrink-0"
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-slate-950 shadow-lg shrink-0 border border-white/20"
                     style={{
-                      backgroundColor: team.color || (isDiraya ? '#2563eb' : '#dc2626'),
+                      backgroundColor: teamColor,
+                      boxShadow: `0 0 20px ${teamColor}55`,
                     }}
                   >
                     {idx + 1}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="font-display text-2xl sm:text-3xl font-black text-slate-900">{team.name}</h2>
+                      <h2 className="font-display text-2xl sm:text-3xl font-black text-white">{team.name}</h2>
                       {isFirst && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border border-amber-400 shadow-2xs">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border border-amber-400 shadow-xs">
                           <Trophy className="w-3 h-3 text-slate-950" />
                           <span>Rank 1</span>
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 font-mono font-bold mt-0.5">{team.code}</p>
+                    <p className="text-xs text-amber-200/60 font-mono font-bold mt-0.5">{team.code}</p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="font-display text-5xl sm:text-6xl font-black tracking-tight text-slate-900">
-                    {Number(team.total_points).toFixed(1)}
+                  <span className="font-display text-5xl sm:text-6xl font-black tracking-tight text-white">
+                    {parseFloat(Number(team.total_points).toFixed(1))}
                   </span>
-                  <span className="text-xs font-black text-amber-700 uppercase tracking-wider block mt-0.5">
+                  <span className="text-xs font-black text-amber-400 uppercase tracking-wider block mt-0.5">
                     Total Score
                   </span>
                 </div>
               </div>
 
               {/* Placements Podium Strip */}
-              <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-3 gap-2.5 relative z-10">
-                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">
+              <div className="mt-8 pt-6 border-t border-white/[0.08] grid grid-cols-3 gap-2.5 relative z-10">
+                <div className="p-3.5 rounded-2xl bg-[#0A0A0A] border border-white/[0.08] text-center space-y-1 shadow-inner">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 block">
                     🥇 1st Place
                   </span>
-                  <span className="font-display text-2xl font-black text-amber-950">
+                  <span className="font-display text-2xl font-black text-white">
                     {team.first_places || 0}
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 block">
+                <div className="p-3.5 rounded-2xl bg-[#0A0A0A] border border-white/[0.08] text-center space-y-1 shadow-inner">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 block">
                     🥈 2nd Place
                   </span>
-                  <span className="font-display text-2xl font-black text-slate-800">
+                  <span className="font-display text-2xl font-black text-white">
                     {team.second_places || 0}
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100 text-center space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 block">
+                <div className="p-3.5 rounded-2xl bg-[#0A0A0A] border border-white/[0.08] text-center space-y-1 shadow-inner">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-400/80 block">
                     🥉 3rd Place
                   </span>
-                  <span className="font-display text-2xl font-black text-amber-900">
+                  <span className="font-display text-2xl font-black text-white">
                     {team.third_places || 0}
                   </span>
                 </div>
@@ -207,16 +203,17 @@ export const LiveLeaderboardPage: React.FC = () => {
 
               {/* Point Share Progress Bar */}
               <div className="mt-6 space-y-2 relative z-10">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                <div className="flex items-center justify-between text-xs font-semibold text-amber-200/60">
                   <span>Share of Championship Points</span>
-                  <span className="font-mono font-bold text-slate-700">{share}%</span>
+                  <span className="font-mono font-bold text-white">{share}%</span>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200/60">
+                <div className="w-full bg-[#121212] rounded-full h-3.5 overflow-hidden p-0.5 border border-white/[0.08]">
                   <div
                     className="h-full rounded-full transition-all duration-1000 ease-out"
                     style={{
                       width: `${share}%`,
-                      backgroundColor: team.color || (isDiraya ? '#2563eb' : '#dc2626'),
+                      backgroundColor: teamColor,
+                      boxShadow: `0 0 10px ${teamColor}`,
                     }}
                   />
                 </div>
@@ -229,66 +226,74 @@ export const LiveLeaderboardPage: React.FC = () => {
       {/* 3. Live Head-to-Head Ratio & Scoring Criteria */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Head to Head Ratio Donut & Bar */}
-        <div className="md:col-span-2 p-7 rounded-[2rem] bg-white border border-slate-200 shadow-xs space-y-4">
+        <div className="md:col-span-2 p-7 rounded-[2rem] bg-gradient-to-br from-[#0A0A0A] to-[#0d0906] border border-white/[0.08] shadow-xl space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-display font-black text-lg text-slate-900 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-amber-600" />
+            <h3 className="font-display font-black text-lg text-white flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-amber-400" />
               <span>Points Tug-of-War</span>
             </h3>
-            <span className="text-xs font-mono font-semibold text-slate-400">
+            <span className="text-xs font-mono font-semibold text-amber-200/60">
               {leader ? leader.name : 'House 1'} vs {runnerUp ? runnerUp.name : 'House 2'}
             </span>
           </div>
 
           {/* Tug-of-War Split Pill Bar */}
           <div className="space-y-2">
-            <div className="h-6 w-full rounded-full overflow-hidden flex bg-slate-100 p-1 border border-slate-200/80">
+            <div className="h-6 w-full rounded-full overflow-hidden flex bg-[#121212] p-1 border border-white/[0.08]">
               <div
-                className="h-full rounded-l-full bg-gradient-to-r from-blue-600 to-blue-500 transition-all duration-1000"
-                style={{ width: `${leaderShare}%` }}
+                className="h-full rounded-l-full transition-all duration-1000"
+                style={{
+                  width: `${leaderShare}%`,
+                  backgroundColor: THEME.colors.diraya,
+                  boxShadow: `0 0 12px ${THEME.colors.diraya}99`,
+                }}
               />
               <div
-                className="h-full rounded-r-full bg-gradient-to-r from-rose-500 to-rose-600 transition-all duration-1000"
-                style={{ width: `${runnerUpShare}%` }}
+                className="h-full rounded-r-full transition-all duration-1000"
+                style={{
+                  width: `${runnerUpShare}%`,
+                  backgroundColor: THEME.colors.rivaya,
+                  boxShadow: `0 0 12px ${THEME.colors.rivaya}99`,
+                }}
               />
             </div>
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-blue-700">{leader?.name || 'Diraya'} ({leaderShare}%)</span>
-              <span className="text-rose-700">{runnerUp?.name || 'Rivaya'} ({runnerUpShare}%)</span>
+              <span style={{ color: THEME.colors.diraya }}>{leader?.name || 'Diraya'} ({leaderShare}%)</span>
+              <span style={{ color: THEME.colors.rivaya }}>{runnerUp?.name || 'Rivaya'} ({runnerUpShare}%)</span>
             </div>
           </div>
 
-          <p className="text-xs text-slate-500 leading-relaxed pt-2">
+          <p className="text-xs text-amber-200/60 leading-relaxed pt-2">
             Scores are calculated immediately as judging panels submit signed criteria rubrics from stage tablets.
           </p>
         </div>
 
         {/* Official Scoring Matrix Rules Card */}
-        <div className="p-7 rounded-[2rem] bg-gradient-to-br from-amber-50/40 via-white to-slate-50 border border-slate-200 shadow-xs space-y-3">
-          <h3 className="font-display font-black text-base text-slate-900 flex items-center gap-2">
-            <Award className="w-4 h-4 text-amber-600" />
+        <div className="p-7 rounded-[2rem] bg-gradient-to-br from-[#121212] via-[#0a0a0a] to-[#040404] border border-white/[0.08] shadow-xl space-y-3">
+          <h3 className="font-display font-black text-base text-white flex items-center gap-2">
+            <Award className="w-4 h-4 text-amber-400" />
             <span>Official Scoring Rules</span>
           </h3>
 
           <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-amber-200/80 shadow-2xs">
-              <span className="font-bold text-slate-700">🥇 1st Place</span>
-              <span className="font-mono font-black text-amber-900">10 Points</span>
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#121212] border border-white/[0.08] shadow-xs">
+              <span className="font-bold text-amber-100">🥇 1st Place</span>
+              <span className="font-mono font-black text-amber-300">10 Points</span>
             </div>
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 shadow-2xs">
-              <span className="font-bold text-slate-700">🥈 2nd Place</span>
-              <span className="font-mono font-black text-slate-800">7 Points</span>
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#121212] border border-white/[0.08] shadow-xs">
+              <span className="font-bold text-slate-200">🥈 2nd Place</span>
+              <span className="font-mono font-black text-slate-300">7 Points</span>
             </div>
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-amber-100 shadow-2xs">
-              <span className="font-bold text-slate-700">🥉 3rd Place</span>
-              <span className="font-mono font-black text-amber-800">5 Points</span>
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#121212] border border-white/[0.08] shadow-xs">
+              <span className="font-bold text-amber-200/60">🥉 3rd Place</span>
+              <span className="font-mono font-black text-amber-400">5 Points</span>
             </div>
           </div>
 
           <div className="pt-2 text-center">
             <Link
               to="/schedule"
-              className="text-xs font-bold text-amber-800 hover:text-amber-950 inline-flex items-center gap-1 hover:underline"
+              className="text-xs font-bold text-amber-300 hover:text-amber-200 inline-flex items-center gap-1 hover:underline"
             >
               <span>View Upcoming Programmes</span>
               <ChevronRight className="w-3.5 h-3.5" />

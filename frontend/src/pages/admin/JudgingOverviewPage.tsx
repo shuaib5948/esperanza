@@ -79,7 +79,7 @@ export const JudgingOverviewPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-white">Judges & Scoring Overview</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-amber-200/60 mt-1">
             Assign evaluation panels and manage audited score locks.
           </p>
         </div>
@@ -106,7 +106,7 @@ export const JudgingOverviewPage: React.FC = () => {
                       {j.judge_type === 'OFF_STAGE' ? 'Off-Stage Panel' : j.judge_type === 'STAGE' ? 'Stage Panel' : 'General'}
                     </Badge>
                   </div>
-                  <span className="text-xs text-slate-400 font-mono">{j.judge_code}</span>
+                  <span className="text-xs text-amber-200/60 font-mono">{j.judge_code}</span>
                 </div>
               </div>
               <Badge variant="success" size="sm">
@@ -114,8 +114,8 @@ export const JudgingOverviewPage: React.FC = () => {
               </Badge>
             </div>
 
-            <p className="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <strong className="text-slate-400 block mb-0.5">Qualification:</strong>
+            <p className="text-xs text-slate-300 bg-[#0A0A0A] p-3 rounded-xl border border-white/[0.08]">
+              <strong className="text-amber-200/60 block mb-0.5">Qualification:</strong>
               {j.qualification || 'Certified Festival Evaluator'}
             </p>
           </Card>
@@ -142,7 +142,7 @@ export const JudgingOverviewPage: React.FC = () => {
             <select
               value={judgeId}
               onChange={(e) => setJudgeId(parseInt(e.target.value, 10))}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
             >
               {judges.map((j) => (
                 <option key={j.id} value={j.id}>
@@ -159,7 +159,7 @@ export const JudgingOverviewPage: React.FC = () => {
             <select
               value={competitionId}
               onChange={(e) => setCompetitionId(parseInt(e.target.value, 10))}
-              className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
             >
               {competitions.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -169,7 +169,7 @@ export const JudgingOverviewPage: React.FC = () => {
             </select>
           </div>
 
-          <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
+          <div className="pt-4 border-t border-white/[0.08] flex justify-end gap-3">
             <Button variant="ghost" onClick={() => setIsAssignModalOpen(false)}>
               Cancel
             </Button>

@@ -1,127 +1,133 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client.js';
 import {
   Trophy,
-  Users,
   Award,
+  Users,
   ClipboardList,
-  Sparkles,
-  Megaphone,
-  CheckCircle2,
   Clock,
+  Radio,
   ArrowUpRight,
-  ShieldCheck,
+  Sparkles,
   FileText,
   BarChart3,
-  Flame,
-  AlertCircle,
+  Megaphone,
 } from 'lucide-react';
-import { Button } from '../../components/ui/Button.js';
+import { THEME } from '../../theme/theme.js';
+
+const formatProgTitle = (name?: string, group?: string) => {
+  if (!name) return 'Live Stage Event';
+  if (!group) return name;
+  const trimmedName = name.trim();
+  const trimmedGroup = group.trim();
+  if (
+    trimmedName.toLowerCase().startsWith(trimmedGroup.toLowerCase()) ||
+    trimmedName.toLowerCase().includes(`(${trimmedGroup.toLowerCase()})`) ||
+    trimmedName.toLowerCase().endsWith(`- ${trimmedGroup.toLowerCase()}`)
+  ) {
+    return trimmedName;
+  }
+  return `${trimmedGroup} - ${trimmedName}`;
+};
 
 export const TeamDashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
+  // 1. Fetch live team dashboard summary
   const { data, isLoading } = useQuery({
     queryKey: ['team-dashboard'],
     queryFn: async () => {
       const res = await api.get<any>('/dashboard/team');
       return res.data;
     },
-    refetchInterval: 3000,
+    refetchInterval: 5000,
   });
 
   const team = data?.team;
-  const registrations = data?.registrations || {};
-  const positions = data?.positions || [];
-  const totalPoints = Number(data?.total_points || 0);
-  const teamRank = data?.rank || 1;
-  const nextDispatch = data?.next_dispatch;
-  const unreportedStudent = data?.unreported_student;
-  const unreportedStudents: any[] = data?.unreported_students || (data?.unreported_student ? [data.unreported_student] : []);
+  const isRivaya = (team?.name || team?.code || '').toUpperCase().includes('RIVAYA');
+  const officialTeamColor = isRivaya ? '#FF2A6D' : '#00E676';
+  const houseBgChip = isRivaya
+    ? 'bg-[#FF2A6D]/15 text-[#FF2A6D] border-[#FF2A6D]/30'
+    : 'bg-[#00E676]/15 text-[#00E676] border-[#00E676]/30';
+
+  const metrics = data?.metrics || {};
+  const totalPoints = Number(metrics.total_points || 0);
+  const teamRank = metrics.rank || 1;
+  const totalPodiums = metrics.podium_count || 0;
+  const firstPlaces = metrics.first_places || 0;
+  const secondPlaces = metrics.second_places || 0;
+  const thirdPlaces = metrics.third_places || 0;
+
+  // Podium calculations
+  const goldPct = totalPodiums > 0 ? (firstPlaces / totalPodiums) * 100 : 0;
+
+  // Radar items
+  const activeProgramme = data?.active_programme;
+  const nextCallProgramme = data?.next_call_programme;
+
+  // Broadcasts feed
   const broadcasts: any[] = data?.broadcasts || [];
 
-  const firstPlaces = positions.find((p: any) => Number(p.position) === 1)?.count || 0;
-  const secondPlaces = positions.find((p: any) => Number(p.position) === 2)?.count || 0;
-  const thirdPlaces = positions.find((p: any) => Number(p.position) === 3)?.count || 0;
-  const totalPodiums = firstPlaces + secondPlaces + thirdPlaces;
-
-  // Donut chart calculations
-  const totalMedalsForChart = totalPodiums || 1;
-  const goldPct = Math.round((firstPlaces / totalMedalsForChart) * 100);
-  const silverPct = Math.round((secondPlaces / totalMedalsForChart) * 100);
-  const bronzePct = Math.round((thirdPlaces / totalMedalsForChart) * 100);
-
-  const individualRegs = registrations.individual_count || 0;
-  const groupRegs = registrations.group_count || 0;
-
   return (
-    <div className="w-full min-h-full flex flex-col space-y-3 text-slate-900">
-      {/* =================================================================== */}
-      {/* 1. COMPACT TOP HEADER BAR                                           */}
-      {/* =================================================================== */}
-      <div className="flex items-center justify-between gap-3 bg-white border border-slate-200/80 px-4 py-2.5 rounded-2xl shadow-xs shrink-0">
-        <div className="flex items-center gap-3 min-w-0">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-sm shadow-2xs shrink-0 border border-white font-bento-num"
-            style={{ backgroundColor: team?.color || '#0D472D' }}
-          >
-            {team?.code?.substring(0, 2) || 'TM'}
-          </div>
-          <div className="min-w-0 flex flex-col justify-center">
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-bento-title text-slate-900 truncate leading-tight tracking-[-0.035em]">
-                {team?.name || 'Loading Team...'}
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#E6F4EA] text-[#0D472D] border border-emerald-200 shrink-0 font-bento-title">
-                {team?.code || 'HOUSE TEAM'}
-              </span>
+    <div className="w-full flex flex-col space-y-3.5 text-white">
+      {/* 1. Header Bar: Responsive, Two-Tier on Mobile, Luxury Obsidian Bento on Desktop */}
+      <div className="bg-[#0A0A0A] border border-white/[0.08] p-3 sm:px-4 sm:py-3 rounded-2xl shadow-xs shrink-0 space-y-3 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-sm shadow-2xs shrink-0 font-bento-num border border-white/[0.12]"
+              style={{ backgroundColor: officialTeamColor }}
+            >
+              {team?.code?.substring(0, 2) || (isRivaya ? 'RV' : 'DR')}
             </div>
-            <p className="text-xs font-semibold text-slate-500 truncate mt-0.5">
-              Official House Contingent Command Center
-            </p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-base sm:text-lg md:text-xl font-black text-white truncate leading-tight tracking-tight">
+                  {team?.name || (isRivaya ? 'Team Rivaya' : 'Team Diraya')}
+                </h1>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border shrink-0 ${houseBgChip}`}>
+                  {team?.code || (isRivaya ? 'RIVAYA' : 'DIRAYA')}
+                </span>
+              </div>
+              <p className="text-xs font-medium text-slate-400 truncate mt-0.5">
+                Contingent Command Center
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Action Navigation Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate('/team/roster')}
-            className="rounded-xl font-bold text-xs"
-          >
-            <Users className="w-3.5 h-3.5 mr-1" />
-            <span>Roster</span>
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => navigate('/team/registrations')}
-            className="bg-[#0D472D] hover:bg-[#07321e] text-white font-bold text-xs shadow-xs rounded-xl px-4 py-2 cursor-pointer"
-          >
-            <ClipboardList className="w-3.5 h-3.5 mr-1" />
-            <span>+ Register Entries</span>
-          </Button>
+          {/* Action Navigation Buttons */}
+          <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t border-white/[0.06] sm:border-t-0 justify-end">
+            <button
+              onClick={() => navigate('/team/roster')}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#121212] hover:bg-white/10 text-slate-200 border border-white/[0.12] text-xs font-bold transition-all cursor-pointer shadow-2xs"
+            >
+              <Users className="w-3.5 h-3.5 text-slate-400" />
+              <span>Roster</span>
+            </button>
+            <button
+              onClick={() => navigate('/team/registrations')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl ${THEME.classes.primaryBtn} text-xs font-black transition-all cursor-pointer shadow-xs`}
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              <span>Register Entries</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* =================================================================== */}
-      {/* 2. BENTO GRID MAIN CONTAINER (100% Single-Screen Non-Scrolling)     */}
-      {/* =================================================================== */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3.5">
-        {/* ----------------------------------------------------------------- */}
-        {/* LEFT COLUMN (4 Cols): Hero KPI & Podium Analytics Donut Chart     */}
-        {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-4 flex flex-col gap-3">
-          {/* Hero KPI Tile: Dark Emerald Accent */}
+      {/* 2. Main Bento Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+        {/* Left Column (4 Cols): Hero KPI & Podium Breakdown */}
+        <div className="lg:col-span-4 flex flex-col gap-3.5">
+          {/* Hero KPI Card */}
           <div
-            onClick={() => navigate('/leaderboard')}
-            className="bg-[#0D472D] text-white rounded-2xl p-4 shadow-xs flex flex-col justify-between shrink-0 cursor-pointer hover:bg-[#093923] transition-all relative overflow-hidden group"
+            onClick={() => navigate('/#standings')}
+            className={`${THEME.classes.heroCard} rounded-2xl p-5 shadow-xs flex flex-col justify-between shrink-0 cursor-pointer hover:border-amber-400/50 transition-all relative overflow-hidden group min-h-[140px]`}
           >
             <div className="flex items-center justify-between z-10">
-              <span className="text-xs font-bento-title uppercase tracking-wider text-emerald-200">
+              <span className="text-xs uppercase tracking-wider text-slate-300 font-bold">
                 Live Standings Score
               </span>
               <div className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
@@ -129,55 +135,50 @@ export const TeamDashboardPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="my-3 z-10">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-4xl xl:text-5xl font-bento-num tracking-[-0.04em] text-white">
-                  {totalPoints.toFixed(0)}
-                </span>
-                <span className="text-sm font-bento-title text-emerald-300">PTS</span>
-              </div>
+            <div className="my-2 z-10 flex items-baseline gap-2">
+              <span className={`text-4xl xl:text-5xl font-black tracking-tight ${THEME.classes.goldTextGradient}`}>
+                {totalPoints.toFixed(0)}
+              </span>
+              <span className="text-xs font-bold text-amber-400/80">PTS</span>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/15 text-xs text-emerald-100 z-10">
+            <div className="flex items-center justify-between pt-2 border-t border-white/[0.08] text-xs text-slate-300 z-10">
               <div className="flex items-center gap-1.5 font-bold">
-                <Trophy className="w-4 h-4 text-amber-300" />
-                <span>Leaderboard Standing</span>
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>House Standing</span>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-white/15 text-white font-bento-num text-xs">
+              <span className="font-black text-white tabular-nums">
                 Rank #{teamRank}
               </span>
             </div>
 
-            {/* Background Glow */}
-            <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl group-hover:bg-emerald-500/30 transition-all" />
+            <div
+              className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full blur-2xl opacity-20 transition-all"
+              style={{ backgroundColor: officialTeamColor }}
+            />
           </div>
 
-          {/* Podium Donut Analytics Chart Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          {/* Podium Breakdown Card: Clean, Uncluttered */}
+          <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-5 shadow-xs flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-[#0D472D]" />
-                <h3 className="text-xs font-bento-title uppercase tracking-wider text-slate-800">
+                <Award className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">
                   Podium Breakdown
                 </h3>
               </div>
-              <span className="text-[11px] font-bento-num text-slate-500">
-                {totalPodiums} Total Medals
-              </span>
             </div>
 
-            {/* Donut Chart Visual */}
-            <div className="flex items-center justify-center gap-6 py-2 my-auto">
-              <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
+            <div className="flex items-center justify-center gap-6 py-4 my-auto">
+              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                   <path
-                    className="text-slate-100"
+                    className="text-white/[0.08]"
                     strokeWidth="3.8"
                     stroke="currentColor"
                     fill="none"
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
-                  {/* Gold Segment */}
                   <path
                     className="text-amber-400"
                     strokeDasharray={`${goldPct}, 100`}
@@ -189,259 +190,129 @@ export const TeamDashboardPage: React.FC = () => {
                   />
                 </svg>
                 <div className="absolute flex flex-col items-center justify-center text-center">
-                  <span className="text-xl font-bento-num text-slate-900 leading-none">
+                  <span className="text-2xl font-black text-white leading-none tabular-nums">
                     {totalPodiums}
                   </span>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Medals</span>
+                  <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Podiums</span>
                 </div>
               </div>
 
-              {/* Legend List */}
               <div className="space-y-2 text-xs font-medium">
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-md bg-amber-400 shrink-0" />
-                  <span className="text-slate-600">🥇 1st Place:</span>
-                  <strong className="text-slate-900 font-bento-num">{firstPlaces}</strong>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
+                  <span className="text-slate-400">1st Place:</span>
+                  <strong className="text-white font-black tabular-nums">{firstPlaces}</strong>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-md bg-slate-300 shrink-0" />
-                  <span className="text-slate-600">🥈 2nd Place:</span>
-                  <strong className="text-slate-900 font-bento-num">{secondPlaces}</strong>
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shrink-0" />
+                  <span className="text-slate-400">2nd Place:</span>
+                  <strong className="text-white font-black tabular-nums">{secondPlaces}</strong>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-md bg-amber-600/80 shrink-0" />
-                  <span className="text-slate-600">🥉 3rd Place:</span>
-                  <strong className="text-slate-900 font-bento-num">{thirdPlaces}</strong>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#CD7F32] shrink-0" />
+                  <span className="text-slate-400">3rd Place:</span>
+                  <strong className="text-white font-black tabular-nums">{thirdPlaces}</strong>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between text-xs text-slate-600">
-              <span>Points Contribution</span>
-              <strong className="text-[#0D472D] font-bento-num">100% Calculated</strong>
-            </div>
-          </div>
-        </div>
-
-        {/* ----------------------------------------------------------------- */}
-        {/* CENTER COLUMN (5 Cols): Live Dispatch Radar & Cap Monitor        */}
-        {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-5 flex flex-col">
-          {/* Card 3: Live Stage Dispatch Radar */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                <h3 className="text-xs font-bento-title uppercase tracking-wider text-slate-800">
-                  Live Stage Radar
-                </h3>
-              </div>
-              <span className="px-2 py-0.5 rounded-md bg-[#E6F4EA] text-[#0D472D] text-[10px] font-bento-title uppercase border border-emerald-200">
-                STAGE ITEMS ONLY
-              </span>
-            </div>
-
-            {/* Main Content Area - Fully Organized Vertical Stack */}
-            <div className="flex-1 flex flex-col justify-evenly py-3 gap-3 overflow-y-auto pr-0.5">
-              {/* Point 1: Next Performer in Live Programme (Hero Card) */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bento-title uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                    Next Team Performer
-                  </span>
-                  <span className="text-xs font-bento-num font-bold text-[#0D472D] bg-white px-2 py-0.5 rounded-md border border-slate-200 uppercase">
-                    {nextDispatch?.venue_name || 'MAIN STAGE'}
-                  </span>
-                </div>
-
-                {nextDispatch ? (
-                  <div className="flex items-center gap-3 pt-1">
-                    <div className="w-11 h-11 rounded-xl bg-[#0D472D] text-white font-bento-num text-lg flex items-center justify-center shadow-xs shrink-0 font-bold">
-                      {nextDispatch.code_letter || 'A'}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bento-num font-bold text-slate-900">
-                          {nextDispatch.participant_code}
-                        </span>
-                        <span className="px-2 py-0.5 text-[10px] font-bento-title uppercase rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">
-                          LOT {nextDispatch.code_letter || 'A'}
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-bento-title text-slate-900 truncate mt-0.5">
-                        {nextDispatch.competition_name}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">
-                        {nextDispatch.participant_name || 'Team Contestant'}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-3 text-center bg-white rounded-xl border border-slate-200/60 space-y-1">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" />
-                    <h4 className="text-xs font-bento-title text-slate-900 font-bold">No Active Live Programme On Stage</h4>
-                    <p className="text-[10px] text-slate-500">
-                      Your team's live stage performer will appear here when an event is set to LIVE.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Point 2: Unreported / Absent Participant Alert (Alert Box) */}
-              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bento-title uppercase text-amber-900 tracking-wider flex items-center gap-1.5 font-bold">
-                    <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                    Unreported Check-in Alert
-                  </span>
-                  {unreportedStudents.length > 0 && (
-                    <span className="text-[10px] font-bento-title uppercase bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md font-bold border border-amber-300">
-                      {unreportedStudents.length > 1
-                        ? `${unreportedStudents.length} NOT REPORTED`
-                        : unreportedStudents[0]?.stage_status === 'ABSENT' || unreportedStudents[0]?.check_in_status === 'ABSENT'
-                        ? 'ABSENT'
-                        : 'NOT REPORTED'}
-                    </span>
-                  )}
-                </div>
-
-                {unreportedStudents.length > 0 ? (
-                  <div className="pt-0.5 space-y-1.5 max-h-28 overflow-y-auto pr-0.5">
-                    {Array.from(new Set(unreportedStudents.map((s: any) => s.competition_name))).map((compName: any) => {
-                      const studentsInComp = unreportedStudents.filter((s: any) => s.competition_name === compName);
-                      const venue = studentsInComp[0]?.venue_name;
-                      return (
-                        <div key={compName} className="space-y-0.5">
-                          <h4 className="text-xs sm:text-sm font-bento-title font-bold text-slate-900 truncate">
-                            {compName || 'Live Competition'}
-                          </h4>
-                          <p className="text-xs font-semibold text-amber-900 truncate">
-                            {studentsInComp.map((s: any) => s.participant_name).filter(Boolean).join(', ')}
-                          </p>
-                          {venue && (
-                            <p className="text-[10px] text-slate-500 font-medium truncate">
-                              Backstage: {venue}
-                            </p>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 pt-0.5 text-emerald-800 text-xs font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>All team members reported on time for check-in</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Point 3: Live Programme Participant Count Footer Grid */}
-            <div className="grid grid-cols-2 gap-2.5 text-center text-xs pt-3 border-t border-slate-100 shrink-0">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Checked In Contestants</span>
-                <strong className="text-base text-slate-900 font-bento-num mt-0.5">{registrations.approved ?? 0} Students</strong>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Live Stage Pending</span>
-                <strong className="text-base text-[#0D472D] font-bento-num mt-0.5">{registrations.pending ?? 0} Entries</strong>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ----------------------------------------------------------------- */}
-        {/* RIGHT COLUMN (3 Cols): Admin Feed & Quick Tools Hub               */}
-        {/* ----------------------------------------------------------------- */}
-        <div className="md:col-span-3 flex flex-col gap-3">
-          {/* Card 5: Live Admin Announcements Ticker */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex-1 flex flex-col justify-between">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        {/* Center Column (4 Cols): Live Stage Radar */}
+        <div className="lg:col-span-4 flex flex-col">
+          <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-5 shadow-xs flex-1 flex flex-col justify-between space-y-4">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
-                <Megaphone className="w-4 h-4 text-[#0D472D]" />
-                <h3 className="text-xs font-bento-title uppercase tracking-wider text-slate-800">
-                  Control Broadcasts
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">
+                  Stage Dispatch Radar
                 </h3>
               </div>
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
             </div>
 
-            <div className="flex-1 my-2 overflow-y-auto pr-1 space-y-1.5 scrollbar-thin">
+            <div className="flex-1 flex flex-col justify-evenly gap-3 py-1">
+              {/* Item 1: Active Stage Performer */}
+              <div className="p-4 rounded-xl bg-[#121212] border border-white/[0.06] space-y-2 shadow-2xs">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Now on Stage</span>
+                </div>
+
+                <div className="pt-0.5">
+                  <h4 className="text-sm font-black text-white leading-snug">
+                    {formatProgTitle(activeProgramme?.name, activeProgramme?.programme_group || activeProgramme?.group_name)}
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {activeProgramme?.performer_name ? (
+                      <span>Contestant: <strong className="text-white font-bold">{activeProgramme.performer_name}</strong></span>
+                    ) : (
+                      <span>In evaluation</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 2: Next Call Queue */}
+              <div className="p-4 rounded-xl bg-[#121212] border border-white/[0.06] space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                  <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Next Call Backstage</span>
+                </div>
+
+                <div className="pt-0.5">
+                  <h4 className="text-sm font-black text-white leading-snug">
+                    {formatProgTitle(nextCallProgramme?.name, nextCallProgramme?.programme_group || nextCallProgramme?.group_name)}
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Report to backstage check-in
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (4 Cols): Broadcasts */}
+        <div className="lg:col-span-4 flex flex-col">
+          <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-5 shadow-xs flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div className="flex items-center gap-2">
+                <Megaphone className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">
+                  Broadcasts
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex-1 my-3 overflow-y-auto pr-1 space-y-2.5 max-h-[300px] scrollbar-thin">
               {broadcasts.length > 0 ? (
                 broadcasts.map((log: any, idx: number) => (
-                  <div key={log.id || idx} className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                  <div key={log.id || idx} className="p-3 rounded-xl bg-[#121212] border border-white/[0.06] space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bento-title text-[#0D472D] uppercase truncate max-w-[120px] font-bold">
-                        {log.action || 'System Notice'}
+                      <span className="text-xs font-black text-white">
+                        {log.action || 'Official Announcement'}
                       </span>
-                      <span className="text-[9px] text-slate-400 font-medium shrink-0">
-                        {log.created_at ? new Date(log.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : 'Live'}
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {log.created_at ? new Date(log.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : 'Live'}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-700 leading-snug truncate">
-                      {log.details || 'Official festival broadcast'}
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {log.details || 'Broadcast notice'}
                     </p>
                   </div>
                 ))
               ) : (
-                <>
-                  <div className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bento-title text-[#0D472D] uppercase font-bold">Stage Control</span>
-                      <span className="text-[9px] text-slate-400 font-medium">Just Now</span>
-                    </div>
-                    <p className="text-xs text-slate-700 leading-snug">
-                      Stage queues & lot drawing active.
-                    </p>
-                  </div>
-                  <div className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bento-title text-amber-700 uppercase font-bold">Off-Stage Update</span>
-                      <span className="text-[9px] text-slate-400 font-medium">10m ago</span>
-                    </div>
-                    <p className="text-xs text-slate-700 leading-snug">
-                      Evaluation portal active for submissions.
-                    </p>
-                  </div>
-                </>
+                <div className="py-16 text-center text-xs text-slate-500">
+                  No active broadcasts
+                </div>
               )}
             </div>
 
-            <div className="pt-2 border-t border-slate-100 text-center shrink-0">
-              <span className="text-[10px] text-slate-400 font-medium">
+            <div className="pt-3 border-t border-white/[0.08] text-center shrink-0">
+              <span className="text-[11px] text-slate-400 font-medium">
                 Live alerts sync automatically
               </span>
             </div>
-          </div>
-
-          {/* Card 6: Quick Tools Hub */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-xs space-y-2 shrink-0">
-            <span className="text-[10px] font-bento-title uppercase tracking-wider text-slate-400 block mb-1">
-              Quick Tools Hub
-            </span>
-
-            <button
-              onClick={() => navigate('/team/roster')}
-              className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold flex items-center justify-between transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5 text-[#0D472D]" />
-                <span>Export Team Roster</span>
-              </div>
-              <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-            </button>
-
-            <button
-              onClick={() => navigate('/leaderboard')}
-              className="w-full px-3 py-2 rounded-xl bg-[#E6F4EA] hover:bg-emerald-100 border border-emerald-200 text-[#0D472D] text-xs font-bold flex items-center justify-between transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-3.5 h-3.5 text-[#0D472D]" />
-                <span>Festival Standings</span>
-              </div>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#0D472D]" />
-            </button>
           </div>
         </div>
       </div>

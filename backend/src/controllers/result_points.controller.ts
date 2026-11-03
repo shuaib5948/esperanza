@@ -59,11 +59,25 @@ export class ResultController {
     }
   }
 
+  static async adminUpdateScores(req: AuthenticatedRequest, res: Response, next: any) {
+    try {
+      const compId = parseInt(req.params.competitionId, 10);
+      const { updates } = req.body;
+      if (!Array.isArray(updates) || updates.length === 0) {
+        return ApiResponse.error(res, 'INVALID_DATA', 'Updates array is required', 400);
+      }
+      const results = await ResultService.adminUpdateScores(compId, req.user!.id, updates);
+      return ApiResponse.success(res, results, 'Scores updated and results recalculated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async generate(req: AuthenticatedRequest, res: Response, next: any) {
     try {
       const compId = parseInt(req.params.competitionId, 10);
       const method = req.body.calculation_method || 'AVERAGE';
-      const results = await ResultService.generateResults(compId, method);
+      const results = await ResultService.generateResults(compId, method, req.user?.id);
       return ApiResponse.success(res, results, 'Results generated successfully', 201);
     } catch (error) {
       next(error);

@@ -26,6 +26,7 @@ import auditLogRoutes from './routes/audit_log.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import teamLeaderRoutes from './routes/team_leader.routes.js';
+import liveScreenRoutes from './routes/live_screen.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -111,6 +112,7 @@ export function createApp(): Express {
   app.use('/api/v1/dashboard', dashboardRoutes);
   app.use('/api/v1/admin', adminRoutes);
   app.use('/api/v1/team-leader', teamLeaderRoutes);
+  app.use('/api/v1/live-screen', liveScreenRoutes);
 
   // 404 handler for undefined API routes
   app.use('/api/*', (_req, res) => {

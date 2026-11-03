@@ -20,6 +20,9 @@ import {
   CheckCircle2,
   Clock,
   Gavel,
+  Edit3,
+  Save,
+  Lock,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card.js';
 import { Badge } from '../../components/ui/Badge.js';
@@ -102,9 +105,9 @@ export const ResultsVerificationPage: React.FC = () => {
   // Search state for Programme List
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Audit modal state
-  const [auditParticipantId, setAuditParticipantId] = useState<number | null>(null);
-  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  // Admin Score Calibration modal state
+  const [isEditScoresModalOpen, setIsEditScoresModalOpen] = useState(false);
+  const [editedScores, setEditedScores] = useState<Record<number, { marks: number; remarks: string }>>({});
 
   // 1. Fetch competitions list
   const {
@@ -302,6 +305,55 @@ export const ResultsVerificationPage: React.FC = () => {
     },
   });
 
+  // 7. Admin Score update mutation (overrides locked judge scores & recalculates)
+  const adminUpdateScoresMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedCompId) return;
+      const updates = Object.entries(editedScores).map(([sheetId, data]) => ({
+        score_sheet_id: Number(sheetId),
+        total_marks: data.marks,
+        remarks: data.remarks,
+      }));
+      return api.put(`/results/competition/${selectedCompId}/scores`, { updates });
+    },
+    onSuccess: () => {
+      success('Scores updated and results recalculated successfully!');
+      setIsEditScoresModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['competition-results', selectedCompId] });
+      queryClient.invalidateQueries({ queryKey: ['competition-judge-scores', selectedCompId] });
+      queryClient.invalidateQueries({ queryKey: ['competitions-list'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    },
+    onError: (err: any) => {
+      error(err.message || 'Failed to update scores');
+    },
+  });
+
+  const getGradeBadgeClass = (grade?: string | null) => {
+    switch (grade) {
+      case 'A+':
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+      case 'A':
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+      case 'B':
+        return 'bg-sky-500/15 text-sky-300 border-sky-500/30';
+      case 'C':
+        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      default:
+        return 'bg-[#121212] text-amber-200/60 border-amber-500/30';
+    }
+  };
+
+  const getGradeFromMark = (mark: number) => {
+    if (!mark || mark <= 0) return { grade: '—', color: 'bg-[#121212] text-amber-200/60 border-amber-500/30' };
+    if (mark >= 90) return { grade: 'A+', color: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 font-black' };
+    if (mark >= 70) return { grade: 'A', color: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 font-bold' };
+    if (mark >= 60) return { grade: 'B', color: 'bg-sky-500/15 text-sky-300 border-sky-500/30 font-bold' };
+    if (mark >= 50) return { grade: 'C', color: 'bg-amber-500/15 text-amber-300 border-amber-500/30 font-bold' };
+    return { grade: 'NG', color: 'bg-[#121212] text-amber-200/60 border-amber-500/30 font-bold' };
+  };
+
   const handleRefreshDetail = () => {
     refetchResults();
     refetchJudgeScores();
@@ -313,6 +365,14 @@ export const ResultsVerificationPage: React.FC = () => {
     const val = Number(num);
     if (isNaN(val)) return '-';
     return parseFloat(val.toFixed(2)).toString();
+  };
+
+  // Helper to get house team styling accent (Rivaya burgundy, Diraya emerald)
+  const getHouseTeamClass = (teamName?: string) => {
+    const upper = (teamName || '').toUpperCase();
+    if (upper.includes('RIVAYA')) return 'text-rose-300 font-bold';
+    if (upper.includes('DIRAYA')) return 'text-emerald-300 font-bold';
+    return 'text-amber-200/60 font-bold';
   };
 
   // Helper to format relative time (e.g. Just now, 1 min ago, 2 min ago)
@@ -337,16 +397,15 @@ export const ResultsVerificationPage: React.FC = () => {
     return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   };
 
+  // Check if current programme is a group competition
+  const isGroup = useMemo(() => {
+    return (selectedComp?.participation_type || '').toUpperCase() === 'GROUP' || results.some((r) => r.is_group);
+  }, [selectedComp, results]);
+
   // Top 3 Podium Winners
   const firstPlace = results.find((r) => r.position === 1);
   const secondPlace = results.find((r) => r.position === 2);
   const thirdPlace = results.find((r) => r.position === 3);
-
-  // Filter judge scores for audit modal
-  const auditedJudgeScores = useMemo(() => {
-    if (!auditParticipantId) return judgeScores;
-    return judgeScores.filter((js) => js.participant_id === auditParticipantId);
-  }, [judgeScores, auditParticipantId]);
 
   // =========================================================================
   // VIEW 1: PROGRAMME LIST VIEW (First show list of completed programmes)
@@ -356,21 +415,25 @@ export const ResultsVerificationPage: React.FC = () => {
       <div className="space-y-6">
         {/* Top Banner & Refresh */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <Award className="w-7 h-7 text-amber-700" />
-              <h1 className="text-3xl font-black text-slate-900">Results & Points Verification</h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-slate-950 font-black shadow-xs shrink-0">
+              <Award className="w-5 h-5" />
             </div>
-            <p className="text-sm text-slate-500 mt-1">
-              Select a completed programme below to review rankings, calculate final grades, and publish points to the live festival leaderboard.
-            </p>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bento-title font-bold text-white tracking-tight leading-none">
+                Results
+              </h1>
+              <p className="text-xs text-amber-200/60 font-medium mt-1">
+                Score audit & points publish
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => refetchCompetitions()}
               title="Refresh list"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 hover:border-slate-800 shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 text-xs font-semibold border border-white/[0.08] hover:border-amber-400 shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh</span>
@@ -378,112 +441,89 @@ export const ResultsVerificationPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Status Filter Chips & Search Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white border border-slate-200 p-3 rounded-2xl shadow-xs">
+        {/* Status Filter Chips & Search Bar: Single Tone & Size */}
+        <div className="bg-[#0A0A0A] rounded-2xl p-3.5 border border-white/[0.08] flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
           {/* Status Filter Chips */}
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setStatusFilter('ALL')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
-                statusFilter === 'ALL'
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <span>All</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'ALL' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {counts.all}
-              </span>
-            </button>
+          <div className="flex flex-wrap items-center gap-1.5 w-full lg:w-auto">
+            {[
+              { id: 'ALL', label: 'All', count: counts.all, icon: Sparkles },
+              { id: 'DRAFT', label: 'Draft', count: counts.draft, icon: Clock },
+              { id: 'VERIFIED', label: 'Verified', count: counts.verified, icon: Check },
+              { id: 'PUBLISHED', label: 'Published', count: counts.published, icon: CheckCircle2 },
+            ].map((pill) => {
+              const Icon = pill.icon;
+              const isActive = statusFilter === pill.id;
 
-            <button
-              onClick={() => setStatusFilter('DRAFT')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
-                statusFilter === 'DRAFT'
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
-                  : 'bg-white text-amber-800 border-slate-200 hover:bg-amber-50/50'
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5 text-amber-600" />
-              <span>Draft</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'DRAFT' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-amber-50 text-amber-800 border border-amber-200'
-                }`}
-              >
-                {counts.draft}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setStatusFilter('VERIFIED')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
-                statusFilter === 'VERIFIED'
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
-                  : 'bg-white text-blue-800 border-slate-200 hover:bg-blue-50/50'
-              }`}
-            >
-              <Check className="w-3.5 h-3.5 text-blue-600" />
-              <span>Verified</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'VERIFIED' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-blue-50 text-blue-800 border border-blue-200'
-                }`}
-              >
-                {counts.verified}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setStatusFilter('PUBLISHED')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
-                statusFilter === 'PUBLISHED'
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-xs'
-                  : 'bg-white text-emerald-800 border-slate-200 hover:bg-emerald-50/50'
-              }`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Published</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  statusFilter === 'PUBLISHED' ? 'bg-slate-950/15 text-slate-950 font-bold' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                }`}
-              >
-                {counts.published}
-              </span>
-            </button>
+              return (
+                <button
+                  key={pill.id}
+                  onClick={() => setStatusFilter(pill.id as any)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 shadow-xs font-bold'
+                      : 'bg-[#121212] hover:bg-white/[0.04] text-amber-200/60 hover:text-white border border-white/[0.08]'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span>{pill.label}</span>
+                  <span className={`text-[10px] font-mono ${isActive ? 'text-slate-950 font-bold' : 'text-amber-200/50'}`}>
+                    ({pill.count})
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Search Input */}
-          <div className="relative w-full lg:w-72">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search programme, code, category..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-full pl-9 pr-4 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
-            />
+          {/* Right: Search Box + Quick Reset */}
+          <div className="flex items-center gap-2 w-full lg:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-amber-200/60" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search programme, code..."
+                className="w-full pl-8 pr-7 py-1.5 bg-[#121212] border border-white/[0.08] rounded-full text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-200/60 hover:text-white text-xs font-bold cursor-pointer"
+                  title="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            {(statusFilter !== 'ALL' || searchQuery) && (
+              <button
+                onClick={() => {
+                  setStatusFilter('ALL');
+                  setSearchQuery('');
+                }}
+                className="px-2.5 py-1.5 text-xs font-bold text-rose-300 bg-rose-500/15 hover:bg-rose-500/15 border border-rose-500/30 rounded-full transition-colors cursor-pointer shrink-0"
+                title="Reset filters"
+              >
+                Reset
+              </button>
+            )}
           </div>
         </div>
 
         {/* Programmes List (2 in a Row Grid) */}
         {isCompetitionsLoading ? (
-          <div className="py-20 text-center text-slate-400 text-xs font-medium">
+          <div className="py-20 text-center text-amber-200/60 text-xs font-medium">
             Loading completed festival programmes...
           </div>
         ) : filteredCompetitions.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3 shadow-xs">
-            <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+          <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-12 text-center space-y-3 shadow-xs">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-[#121212] border border-white/[0.08] flex items-center justify-center text-amber-200/60">
               <Calendar className="w-6 h-6" />
             </div>
-            <p className="font-bold text-slate-800 text-sm">No finished programmes with submitted marks found.</p>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Programmes will appear here once the judge submits score sheets from their tablet and the event is finished on stage.
+            <p className="font-bold text-amber-100 text-sm">No Completed Programmes</p>
+            <p className="text-xs text-amber-200/60 max-w-sm mx-auto">
+              Submitted judge sheets will appear here for verification.
             </p>
           </div>
         ) : (
@@ -497,7 +537,7 @@ export const ResultsVerificationPage: React.FC = () => {
                 <div
                   key={comp.id}
                   onClick={() => setSelectedCompId(comp.id)}
-                  className="bg-white border border-slate-200 hover:border-slate-800 rounded-2xl p-5 shadow-xs transition-all cursor-pointer flex flex-col justify-between gap-4 group"
+                  className="bg-[#0A0A0A] border border-white/[0.08] hover:border-amber-500/30 rounded-2xl p-5 shadow-xs transition-all cursor-pointer flex flex-col justify-between gap-4 group"
                 >
                   <div className="space-y-2">
                     {/* Header: Participation Type, Item Category & Status Badge */}
@@ -506,50 +546,50 @@ export const ResultsVerificationPage: React.FC = () => {
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
                             comp.participation_type === 'GROUP'
-                              ? 'bg-purple-50 text-purple-800 border-purple-200'
-                              : 'bg-slate-100 text-slate-700 border-slate-200'
+                              ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                              : 'bg-[#121212] text-amber-200 border-white/[0.08]'
                           }`}
                         >
                           {comp.participation_type === 'GROUP' ? 'Group' : 'Individual'}
                         </span>
-                        <span className="text-xs text-slate-500 font-medium">
+                        <span className="text-xs text-amber-200/60 font-medium">
                           {comp.competition_type_name || comp.competition_type || 'General Item'}
                         </span>
                       </div>
 
                       {hasPublished ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                           <span>Published</span>
                         </span>
                       ) : hasVerified ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1">
-                          <Check className="w-3 h-3 text-blue-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center gap-1">
+                          <Check className="w-3 h-3 text-sky-400" />
                           <span>Verified</span>
                         </span>
                       ) : isAwaitingEval ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-amber-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-amber-400" />
                           <span>Ready for Evaluation</span>
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-amber-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#121212] text-amber-200/60 border border-white/[0.08] flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-amber-400" />
                           <span>Draft</span>
                         </span>
                       )}
                     </div>
 
                     {/* Programme Name */}
-                    <h4 className="text-lg font-bold text-slate-900 group-hover:text-amber-700 transition-colors leading-snug">
+                    <h4 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors leading-snug">
                       {comp.group_name || comp.programme_group_name ? `${comp.group_name || comp.programme_group_name} - ` : ''}{comp.name}
                     </h4>
                   </div>
 
                   {/* Footer: Submitted Time (left) & Action (right) */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs text-amber-200/60 font-medium">
+                      <Clock className="w-3.5 h-3.5 text-amber-200/60" />
                       <span>{formatTimeAgo(comp.submitted_at || comp.updated_at)}</span>
                     </div>
 
@@ -568,7 +608,7 @@ export const ResultsVerificationPage: React.FC = () => {
                         <span>Evaluate (Send to Judges)</span>
                       </button>
                     ) : (
-                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 group-hover:bg-gradient-to-r group-hover:from-amber-400 group-hover:to-yellow-400 text-slate-700 group-hover:text-slate-950 border border-slate-200 group-hover:border-amber-400 text-xs font-semibold shadow-2xs transition-all">
+                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#121212] group-hover:bg-gradient-to-r group-hover:from-amber-400 group-hover:to-yellow-400 text-amber-200 group-hover:text-slate-950 border border-white/[0.08] group-hover:border-amber-400 text-xs font-semibold shadow-2xs transition-all">
                         <span>View Results</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </div>
@@ -594,29 +634,30 @@ export const ResultsVerificationPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSelectedCompId(null)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-[#121212] text-amber-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 flex items-center justify-center shadow-2xs"
+            title="Back to Programmes"
+            aria-label="Back"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back</span>
+            <ArrowLeft className="w-5 h-5" />
           </button>
 
           {selectedComp && (
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 min-w-0">
+              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight break-words truncate">
                 {selectedComp.group_name || selectedComp.programme_group_name ? `${selectedComp.group_name || selectedComp.programme_group_name} - ` : ''}{selectedComp.name}
               </h2>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                     selectedComp.participation_type === 'GROUP'
-                      ? 'bg-purple-50 text-purple-800 border-purple-200'
-                      : 'bg-slate-100 text-slate-700 border-slate-200'
+                      ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                      : 'bg-[#121212] text-amber-200 border-white/[0.08]'
                   }`}
                 >
                   {selectedComp.participation_type === 'GROUP' ? 'Group' : 'Individual'}
                 </span>
-                <span className="text-xs text-slate-400">•</span>
-                <span className="text-xs font-medium text-slate-500">
+                <span className="text-xs text-amber-200/60">•</span>
+                <span className="text-xs font-medium text-amber-200/60">
                   {selectedComp.competition_type_name || selectedComp.competition_type || 'General'}
                 </span>
               </div>
@@ -647,15 +688,15 @@ export const ResultsVerificationPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer ${
                 allPublished
-                  ? 'bg-emerald-50 hover:bg-rose-50 text-emerald-800 hover:text-rose-700 border border-emerald-300 hover:border-rose-300 group'
+                  ? 'bg-emerald-500/15 hover:bg-rose-500/15 text-emerald-300 hover:text-rose-300 border border-emerald-500/30 hover:border-rose-500/30 group'
                   : `${THEME.classes.primaryBtn} font-black`
               }`}
               title={allPublished ? 'Click to unpublish results and rollback points' : 'Publish results to live leaderboard'}
             >
               {allPublished ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-600 group-hover:hidden" />
-                  <RotateCcw className="w-4 h-4 text-rose-600 hidden group-hover:block" />
+                  <Check className="w-4 h-4 text-emerald-400 group-hover:hidden" />
+                  <RotateCcw className="w-4 h-4 text-rose-300 hidden group-hover:block" />
                   <span className="group-hover:hidden">Published</span>
                   <span className="hidden group-hover:inline">Unpublish Results</span>
                 </>
@@ -670,204 +711,227 @@ export const ResultsVerificationPage: React.FC = () => {
         </div>
       </div>
 
-      {/* WINNERS PODIUM (2nd Left | 1st Center Prominent | 3rd Right) */}
-      {results.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 items-stretch pt-2">
-          {/* 2nd Place Card (Left) */}
-          <div className="order-2 md:order-1 bg-gradient-to-b from-slate-100/70 via-slate-50/30 to-white border border-slate-300 rounded-2xl p-5 shadow-xs flex flex-col justify-between gap-4">
-            <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-slate-200/80 text-slate-700 border border-slate-300 flex items-center justify-center shadow-2xs shrink-0">
-                  <Medal className="w-5 h-5 text-slate-600" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Position</span>
-                  <span className="text-sm font-black text-slate-900">2nd Place</span>
-                </div>
+      {/* FREE-STANDING STEPPED PODIUM (LIVE BROADCAST GRAPHICS) */}
+      {results.length > 0 && (firstPlace || secondPlace || thirdPlace) && (
+        <div className="pt-4 pb-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 items-end max-w-4xl mx-auto">
+            
+            {/* 🥈 2ND PLACE COLUMN (Left) */}
+            <div className="order-2 sm:order-1 flex flex-col items-center w-full">
+              {/* Standard Position Box on Top */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#121212] text-slate-200 font-sans font-bold text-xs shadow-2xs border border-white/[0.08] -mb-3 z-20">
+                <Medal className="w-3.5 h-3.5 text-amber-200/60" />
+                <span>2nd Place</span>
               </div>
-              <Badge variant="neutral" size="sm" className="bg-slate-200/80 text-slate-800 border-slate-300 font-black">
-                Silver
-              </Badge>
-            </div>
 
-            {secondPlace ? (
-              <div className="space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-base font-black text-slate-900 truncate" title={secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}>
-                    {secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    {secondPlace.is_group ? (
-                      <>
-                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
-                          {secondPlace.member_count} Members
+              {/* Main Pillar Body */}
+              <div className="w-full bg-[#0A0A0A] border border-white/[0.08] rounded-2xl p-5 pt-6 sm:pt-7 shadow-xs flex flex-col items-center text-center space-y-3.5">
+                {secondPlace ? (
+                  <>
+                    {/* Title & Subtitle */}
+                    <div className="space-y-1 w-full min-h-[58px] flex flex-col justify-center">
+                      <h4
+                        className="text-base sm:text-lg font-black text-white truncate px-1"
+                        title={secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}
+                      >
+                        {secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}
+                      </h4>
+                      {secondPlace.is_group ? (
+                        <p
+                          className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
+                          title={secondPlace.member_names || ''}
+                        >
+                          {secondPlace.member_names || (secondPlace.member_count ? `${secondPlace.member_count} Members` : '—')}
+                        </p>
+                      ) : (
+                        <p className={`text-xs ${getHouseTeamClass(secondPlace.team_name)}`}>
+                          {secondPlace.team_name}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Dedicated Highlighted Metrics Row */}
+                    <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                          Grade
                         </span>
-                        <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]" title={secondPlace.member_names}>
-                          {secondPlace.member_names}
+                        <span
+                          className={`inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                            secondPlace.grade
+                          )}`}
+                        >
+                          {secondPlace.grade || 'NG'}
                         </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
-                          {secondPlace.participant_code}
+                      </div>
+                      <div className="border-l border-amber-500/30 pl-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                          Points
                         </span>
-                        <span className="text-xs text-slate-500 font-semibold">{secondPlace.team_name}</span>
-                      </>
-                    )}
+                        <span className="font-mono font-black text-white text-base block leading-tight mt-0.5">
+                          {Number(secondPlace.final_score).toFixed(0)}{' '}
+                          <span className="text-[10px] text-amber-200/60 font-bold">pts</span>
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
+                    No 2nd place awarded
                   </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
-                    Grade {secondPlace.grade || 'A'} ({formatMark(secondPlace.raw_marks)})
-                  </span>
-                  <span className="font-mono font-black text-amber-700 text-lg">
-                    +{secondPlace.final_score} <span className="text-xs font-bold text-slate-500">pts</span>
-                  </span>
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="py-6 text-center text-xs text-slate-400 font-medium italic">
-                No 2nd place awarded
-              </div>
-            )}
-          </div>
-
-          {/* 1st Place Card (Center - Prominent & Bigger) */}
-          <div className="order-1 md:order-2 bg-gradient-to-b from-amber-100/90 via-amber-50/40 to-white border-2 border-amber-400 rounded-3xl p-6 shadow-lg shadow-amber-500/10 flex flex-col justify-between gap-5 relative overflow-hidden transform md:-translate-y-2">
-            <div className="flex items-center justify-between border-b border-amber-200 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30 shrink-0">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-800 block">Champion</span>
-                  <span className="text-base font-black text-amber-950">1st Place</span>
-                </div>
-              </div>
-              <Badge variant="warning" size="sm" className="bg-amber-500 text-white border-amber-600 font-black px-3 py-1 text-xs shadow-2xs">
-                Gold Winner
-              </Badge>
             </div>
 
-            {firstPlace ? (
-              <div className="space-y-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xl font-black text-slate-900 truncate" title={firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}>
-                    {firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    {firstPlace.is_group ? (
-                      <>
-                        <span className="font-mono text-xs text-amber-950 font-black bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-300">
-                          {firstPlace.member_count} Members
-                        </span>
-                        <span className="text-xs text-slate-700 font-medium bg-amber-100/70 px-2.5 py-1 rounded-lg border border-amber-200 truncate max-w-xs" title={firstPlace.member_names}>
-                          {firstPlace.member_names}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="font-mono text-xs text-amber-950 font-black bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-300">
-                          {firstPlace.participant_code}
-                        </span>
-                        <span className="text-xs text-slate-700 font-bold bg-amber-100/70 px-2.5 py-1 rounded-lg border border-amber-200">
+            {/* 🥇 1ST PLACE COLUMN (Center - Elevated Champion) */}
+            <div className="order-1 sm:order-2 flex flex-col items-center w-full z-10 sm:-translate-y-3">
+              {/* Standard Position Box on Top */}
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-sans font-bold text-xs shadow-xs border border-white/[0.08] -mb-3 z-20">
+                <Trophy className="w-3.5 h-3.5 text-slate-950" />
+                <span>1st Place</span>
+              </div>
+
+              {/* Main Pillar Body */}
+              <div className="w-full bg-[#121212] border-2 border-amber-400 shadow-lg shadow-amber-500/10 rounded-2xl p-5 sm:p-6 pt-7 sm:pt-8 flex flex-col items-center text-center space-y-4">
+                {firstPlace ? (
+                  <>
+                    {/* Title & Subtitle */}
+                    <div className="space-y-1 w-full min-h-[58px] flex flex-col justify-center">
+                      <h4
+                        className="text-lg sm:text-xl font-black text-white truncate px-1"
+                        title={firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}
+                      >
+                        {firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}
+                      </h4>
+                      {firstPlace.is_group ? (
+                        <p
+                          className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
+                          title={firstPlace.member_names || ''}
+                        >
+                          {firstPlace.member_names || (firstPlace.member_count ? `${firstPlace.member_count} Members` : '—')}
+                        </p>
+                      ) : (
+                        <p className={`text-xs ${getHouseTeamClass(firstPlace.team_name)}`}>
                           {firstPlace.team_name}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Dedicated Highlighted Metrics Row */}
+                    <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                          Grade
                         </span>
-                      </>
-                    )}
+                        <span
+                          className={`inline-block mt-0.5 px-3 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                            firstPlace.grade
+                          )}`}
+                        >
+                          {firstPlace.grade || 'NG'}
+                        </span>
+                      </div>
+                      <div className="border-l border-amber-500/30 pl-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                          Points
+                        </span>
+                        <span className="font-mono font-black text-amber-300 text-lg block leading-tight mt-0.5">
+                          {Number(firstPlace.final_score).toFixed(0)}{' '}
+                          <span className="text-[10px] text-amber-300 font-bold">pts</span>
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
+                    No 1st place awarded
                   </div>
-                </div>
-
-                <div className="pt-3.5 border-t border-amber-200/60 flex items-center justify-between">
-                  <span className="text-xs font-black text-amber-900 bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-300">
-                    Grade {firstPlace.grade || 'A'} ({formatMark(firstPlace.raw_marks)})
-                  </span>
-                  <span className="font-mono font-black text-amber-700 text-2xl">
-                    +{firstPlace.final_score} <span className="text-xs font-bold text-slate-500">pts</span>
-                  </span>
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="py-8 text-center text-xs text-slate-400 font-medium italic">
-                No 1st place awarded
-              </div>
-            )}
-          </div>
-
-          {/* 3rd Place Card (Right) */}
-          <div className="order-3 md:order-3 bg-gradient-to-b from-amber-900/5 via-amber-50/10 to-white border border-amber-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between gap-4">
-            <div className="flex items-center justify-between border-b border-amber-200/60 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center shadow-2xs shrink-0">
-                  <Medal className="w-5 h-5 text-amber-700" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800/80 block">Position</span>
-                  <span className="text-sm font-black text-amber-950">3rd Place</span>
-                </div>
-              </div>
-              <Badge variant="warning" size="sm" className="bg-amber-50 text-amber-900 border-amber-300 font-black">
-                Bronze
-              </Badge>
             </div>
 
-            {thirdPlace ? (
-              <div className="space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-base font-black text-slate-900 truncate" title={thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}>
-                    {thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    {thirdPlace.is_group ? (
-                      <>
-                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
-                          {thirdPlace.member_count} Members
-                        </span>
-                        <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]" title={thirdPlace.member_names}>
-                          {thirdPlace.member_names}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="font-mono text-[11px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
-                          {thirdPlace.participant_code}
-                        </span>
-                        <span className="text-xs text-slate-500 font-semibold">{thirdPlace.team_name}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+            {/* 🥉 3RD PLACE COLUMN (Right) */}
+            <div className="order-3 sm:order-3 flex flex-col items-center w-full">
+              {/* Standard Position Box on Top */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#121212] text-amber-300 font-sans font-bold text-xs shadow-2xs border border-amber-500/30 -mb-3 z-20">
+                <Medal className="w-3.5 h-3.5 text-amber-300" />
+                <span>3rd Place</span>
+              </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-                    Grade {thirdPlace.grade || 'B'} ({formatMark(thirdPlace.raw_marks)})
-                  </span>
-                  <span className="font-mono font-black text-amber-700 text-lg">
-                    +{thirdPlace.final_score} <span className="text-xs font-bold text-slate-500">pts</span>
-                  </span>
-                </div>
+              {/* Main Pillar Body */}
+              <div className="w-full bg-[#0A0A0A] border border-white/[0.08] rounded-2xl p-5 pt-6 sm:pt-7 shadow-xs flex flex-col items-center text-center space-y-3.5">
+                {thirdPlace ? (
+                  <>
+                    {/* Title & Subtitle */}
+                    <div className="space-y-1 w-full min-h-[58px] flex flex-col justify-center">
+                      <h4
+                        className="text-base sm:text-lg font-black text-white truncate px-1"
+                        title={thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}
+                      >
+                        {thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}
+                      </h4>
+                      {thirdPlace.is_group ? (
+                        <p
+                          className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
+                          title={thirdPlace.member_names || ''}
+                        >
+                          {thirdPlace.member_names || (thirdPlace.member_count ? `${thirdPlace.member_count} Members` : '—')}
+                        </p>
+                      ) : (
+                        <p className={`text-xs ${getHouseTeamClass(thirdPlace.team_name)}`}>
+                          {thirdPlace.team_name}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Dedicated Highlighted Metrics Row */}
+                    <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                          Grade
+                        </span>
+                        <span
+                          className={`inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                            thirdPlace.grade
+                          )}`}
+                        >
+                          {thirdPlace.grade || 'NG'}
+                        </span>
+                      </div>
+                      <div className="border-l border-amber-500/30 pl-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                          Points
+                        </span>
+                        <span className="font-mono font-black text-amber-300 text-base block leading-tight mt-0.5">
+                          {Number(thirdPlace.final_score).toFixed(0)}{' '}
+                          <span className="text-[10px] text-amber-300 font-bold">pts</span>
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
+                    No 3rd place awarded
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="py-6 text-center text-xs text-slate-400 font-medium italic">
-                No 3rd place awarded
-              </div>
-            )}
+            </div>
+
           </div>
         </div>
       )}
 
       {/* CLEAN 5-COLUMN SCOREBOARD */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
           <div>
-            <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <Award className="w-5 h-5 text-amber-700" />
+            <h3 className="text-lg font-black text-white flex items-center gap-2">
+              <Award className="w-5 h-5 text-amber-300" />
               <span>Official Scoreboard</span>
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-amber-200/60 mt-0.5">
               {results.length > 0
-                ? `${results.length} contestants evaluated. Turnout: N = ${results.length}.`
+                ? `${results.length} contestants evaluated.`
                 : 'Awaiting judge score sheets'}
             </p>
           </div>
@@ -875,28 +939,35 @@ export const ResultsVerificationPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                setAuditParticipantId(null);
-                setIsAuditModalOpen(true);
+                const initial: Record<number, { marks: number; remarks: string }> = {};
+                judgeScores.forEach((js) => {
+                  initial[js.score_sheet_id] = {
+                    marks: Number(js.total_marks) || 0,
+                    remarks: js.remarks || '',
+                  };
+                });
+                setEditedScores(initial);
+                setIsEditScoresModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#121212] hover:bg-[#121212] text-amber-200 border border-white/[0.08] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
             >
-              <Eye className="w-3.5 h-3.5 text-amber-700" />
-              <span>Audit Judge Sheets ({judgeScores.length})</span>
+              <Edit3 className="w-3.5 h-3.5 text-amber-300" />
+              <span>Edit Scores ({judgeScores.length})</span>
             </button>
           </div>
         </div>
 
         {results.length === 0 ? (
-          <div className="py-16 text-center text-slate-400 text-xs space-y-4 font-medium">
-            <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 shadow-2xs">
-              <Trophy className="w-6 h-6 text-slate-400" />
+          <div className="py-16 text-center text-amber-200/60 text-xs space-y-4 font-medium">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-[#121212] border border-white/[0.08] flex items-center justify-center text-amber-200/60 shadow-2xs">
+              <Trophy className="w-6 h-6 text-amber-200/60" />
             </div>
             <div>
-              <p className="font-bold text-slate-700 text-sm">No results calculated yet for this competition.</p>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="font-bold text-amber-200 text-sm">No results calculated yet.</p>
+              <p className="text-xs text-amber-200/60 mt-0.5">
                 {judgeScores.length > 0
                   ? `✓ ${judgeScores.length} score sheet(s) submitted by judges are ready.`
-                  : 'Judges submit marks from their scoring tablets during the event.'}
+                  : 'Awaiting judge marks.'}
               </p>
             </div>
             {judgeScores.length > 0 ? (
@@ -920,209 +991,331 @@ export const ResultsVerificationPage: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
-                  <th className="py-3 px-4 w-24">Rank</th>
-                  <th className="py-3 px-4">Contestant & Team</th>
-                  <th className="py-3 px-4 text-center w-28">Grade</th>
-                  <th className="py-3 px-4 text-center w-40 font-bold text-amber-900">Total Fest Points</th>
-                  <th className="py-3 px-4 text-right w-24">Audit</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {results.map((res) => {
-                  const isFirst = res.position === 1;
-                  const isSecond = res.position === 2;
-                  const isThird = res.position === 3;
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm min-w-[560px]">
+                <thead>
+                  <tr className="border-b border-white/[0.08] text-xs font-bold uppercase tracking-wider text-amber-200/60">
+                    <th className="py-3 px-4 w-20 text-center">Rank</th>
+                    <th className="py-3 px-4">Contestant & Team</th>
+                    <th className="py-3 px-4 text-center w-28">Score</th>
+                    <th className="py-3 px-4 text-center w-24">Grade</th>
+                    <th className="py-3 px-4 text-center w-36 font-bold text-amber-300">Total Points</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.04]">
+                  {results.map((res) => {
+                    const isFirst = res.position === 1;
+                    const isSecond = res.position === 2;
+                    const isThird = res.position === 3;
 
-                  return (
-                    <tr key={res.id} className="hover:bg-slate-50/70 transition-colors">
-                      {/* 1. Rank */}
-                      <td className="py-3.5 px-4 font-mono font-bold">
-                        {res.position ? (
-                          <div className="flex items-center gap-1.5">
-                            {isFirst ? (
-                              <Trophy className="w-4 h-4 text-amber-500" />
-                            ) : isSecond ? (
-                              <Medal className="w-4 h-4 text-slate-400" />
-                            ) : isThird ? (
-                              <Medal className="w-4 h-4 text-amber-700" />
-                            ) : null}
-                            <span
-                              className={
-                                isFirst
-                                  ? 'text-amber-700 font-black text-base'
-                                  : isSecond
-                                  ? 'text-slate-700 font-bold'
-                                  : isThird
-                                  ? 'text-amber-800 font-bold'
-                                  : 'text-slate-600 font-semibold'
-                              }
-                            >
-                              {res.position}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 font-normal pl-2">—</span>
-                        )}
-                      </td>
-
-                      {/* 2. Contestant & Team */}
-                      <td className="py-3.5 px-4">
-                        {res.is_group ? (
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-bold text-slate-900 text-sm">{res.team_name}</span>
-                              <span className="font-mono text-xs text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shrink-0">
-                                {res.member_count} Members
+                    return (
+                      <tr key={res.id} className="hover:bg-[#0A0A0A] transition-colors">
+                        {/* 1. Rank */}
+                        <td className="py-3.5 px-4 font-mono font-bold text-center">
+                          {res.position ? (
+                            <div className="flex items-center justify-center gap-1.5">
+                              {isFirst ? (
+                                <Trophy className="w-4 h-4 text-amber-500" />
+                              ) : isSecond ? (
+                                <Medal className="w-4 h-4 text-amber-200/60" />
+                              ) : isThird ? (
+                                <Medal className="w-4 h-4 text-amber-300" />
+                              ) : null}
+                              <span
+                                className={
+                                  isFirst
+                                    ? 'text-amber-300 font-black text-base'
+                                    : isSecond
+                                    ? 'text-amber-200 font-bold'
+                                    : isThird
+                                    ? 'text-amber-300 font-bold'
+                                    : 'text-amber-200/60 font-semibold'
+                                }
+                              >
+                                {res.position}
                               </span>
                             </div>
-                            <span className="text-xs text-slate-500 font-medium block mt-0.5 truncate max-w-md" title={res.member_names}>
-                              {res.member_names}
-                            </span>
-                          </div>
-                        ) : (
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-slate-900 text-sm">{res.participant_name}</span>
-                              <span className="font-mono text-xs text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
-                                {res.participant_code}
+                          ) : (
+                            <span className="text-amber-200/60 font-normal">—</span>
+                          )}
+                        </td>
+
+                        {/* 2. Contestant & Team */}
+                        <td className="py-3.5 px-4">
+                          {res.is_group ? (
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`font-bold text-sm ${getHouseTeamClass(res.team_name)}`}>{res.team_name}</span>
+                                <span className="font-mono text-xs text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08] shrink-0">
+                                  {res.member_count} Members
+                                </span>
+                              </div>
+                              <span className="text-xs text-amber-200/60 font-medium block mt-0.5 truncate max-w-md" title={res.member_names}>
+                                {res.member_names}
                               </span>
                             </div>
-                            <span className="text-xs text-slate-500 font-semibold block mt-0.5">
-                              {res.team_name}
-                            </span>
-                          </div>
-                        )}
-                      </td>
+                          ) : (
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-white text-sm">{res.participant_name}</span>
+                                <span className="font-mono text-xs text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08]">
+                                  {res.participant_code}
+                                </span>
+                              </div>
+                              <span className={`text-xs block mt-0.5 ${getHouseTeamClass(res.team_name)}`}>
+                                {res.team_name}
+                              </span>
+                            </div>
+                          )}
+                        </td>
 
-                      {/* 3. Grade & Quality */}
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="inline-flex flex-col items-center">
+                        {/* 3. Score */}
+                        <td className="py-3.5 px-4 text-center font-mono font-bold text-amber-100 text-sm">
+                          {formatMark(res.raw_marks)}
+                        </td>
+
+                        {/* 4. Grade */}
+                        <td className="py-3.5 px-4 text-center">
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-xs font-black border ${
-                              res.grade === 'A+'
-                                ? 'bg-amber-50 text-amber-900 border-amber-300'
-                                : res.grade === 'A'
-                                ? 'bg-amber-100 text-amber-950 border-amber-300'
-                                : res.grade === 'B'
-                                ? 'bg-blue-50 text-blue-900 border-blue-200'
-                                : res.grade === 'C'
-                                ? 'bg-orange-50 text-orange-900 border-orange-200'
-                                : 'bg-slate-100 text-slate-700 border-slate-200'
-                            }`}
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                              res.grade
+                            )}`}
                           >
                             {res.grade || 'NG'}
                           </span>
-                          <span className="text-[10px] font-mono text-slate-400 mt-0.5">
-                            {formatMark(res.raw_marks)}
-                          </span>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* 4. Total Fest Points (with transparent breakdown) */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="font-mono font-black text-amber-900 text-base block">
+                        {/* 5. Total Points */}
+                        <td className="py-3.5 px-4 text-center">
+                          <span className="font-mono font-black text-amber-300 text-base block">
+                            {Number(res.final_score).toFixed(0)} pts
+                          </span>
+                          <span className="text-[10px] text-amber-200/60 block font-medium">
+                            {res.grade_marks ?? 0} grade + {res.position_points ?? 0} rank
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Dedicated Score Cards */}
+            <div className="md:hidden space-y-3">
+              {results.map((res) => {
+                const isFirst = res.position === 1;
+                const isSecond = res.position === 2;
+                const isThird = res.position === 3;
+
+                return (
+                  <div
+                    key={res.id}
+                    className="p-3.5 bg-[#121212] border border-white/[0.08] rounded-xl space-y-3 shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        {res.position ? (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                            {isFirst ? (
+                              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                            ) : isSecond ? (
+                              <Medal className="w-3.5 h-3.5 text-amber-200/60" />
+                            ) : isThird ? (
+                              <Medal className="w-3.5 h-3.5 text-amber-300" />
+                            ) : null}
+                            <span
+                              className={`font-mono text-xs font-black ${
+                                isFirst
+                                  ? 'text-amber-300'
+                                  : isSecond
+                                  ? 'text-amber-200'
+                                  : isThird
+                                  ? 'text-amber-300'
+                                  : 'text-amber-200/60'
+                              }`}
+                            >
+                              Rank {res.position}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-amber-200/60 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                            Unranked
+                          </span>
+                        )}
+
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${getGradeBadgeClass(
+                            res.grade
+                          )}`}
+                        >
+                          Grade {res.grade || 'NG'}
+                        </span>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="font-mono font-black text-amber-300 text-sm">
                           {Number(res.final_score).toFixed(0)} pts
                         </span>
-                        <span className="text-[10px] text-slate-400 block font-medium">
-                          {res.grade_marks ?? 0} grade + {res.position_points ?? 0} rank
+                        <span className="text-[10px] text-amber-200/60 block font-medium">
+                          {res.grade_marks ?? 0}g + {res.position_points ?? 0}r
                         </span>
-                      </td>
-
-                      {/* 5. Audit Button */}
-                      <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={() => {
-                            setAuditParticipantId(res.participant_id);
-                            setIsAuditModalOpen(true);
-                          }}
-                          className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
-                          title="View judge scoresheet"
-                        >
-                          <Eye className="w-4 h-4 text-slate-600" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* MODAL: JUDGE SCORESHEET AUDIT */}
-      <Modal
-        isOpen={isAuditModalOpen}
-        onClose={() => setIsAuditModalOpen(false)}
-        title="Judge Score Sheet Audit"
-        maxWidth="2xl"
-      >
-        <div className="space-y-4 text-xs">
-          <p className="text-xs text-slate-500">
-            Raw marks and remarks submitted by judges for this programme.
-          </p>
-
-          {auditedJudgeScores.length === 0 ? (
-            <div className="py-8 text-center text-slate-400 text-xs font-medium">
-              No individual score sheets found.
-            </div>
-          ) : (
-            <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
-              {auditedJudgeScores.map((js) => (
-                <div
-                  key={js.score_sheet_id}
-                  className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2.5 shadow-2xs"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="font-bold text-slate-900 text-sm block">{js.participant_name}</span>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="font-mono text-[10px] text-amber-950 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                          {js.participant_code}
-                        </span>
-                        <span className="text-slate-500 font-semibold">{js.team_name}</span>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <span className="font-mono font-black text-amber-900 text-base block">
-                        {formatMark(js.total_marks)} pts
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        {js.scoresheet_status}
+                    <div>
+                      {res.is_group ? (
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`font-bold text-sm ${getHouseTeamClass(res.team_name)}`}>{res.team_name}</span>
+                            <span className="font-mono text-[10px] text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08]">
+                              {res.member_count} Members
+                            </span>
+                          </div>
+                          {res.member_names && (
+                            <span className="text-xs text-amber-200/60 font-medium block mt-1 line-clamp-2">
+                              {res.member_names}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-sm">{res.participant_name}</span>
+                            <span className="font-mono text-[10px] text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded-full border border-white/[0.08]">
+                              {res.participant_code}
+                            </span>
+                          </div>
+                          <span className={`text-xs block mt-0.5 ${getHouseTeamClass(res.team_name)}`}>
+                            {res.team_name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-xs">
+                      <span className="text-amber-200/60">Raw Score:</span>
+                      <span className="font-mono font-bold text-amber-100">{formatMark(res.raw_marks)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* MODAL: ADMIN SCORE CALIBRATION & OVERRIDE */}
+      <Modal
+        isOpen={isEditScoresModalOpen}
+        onClose={() => setIsEditScoresModalOpen(false)}
+        title="Edit Judge Scores"
+        maxWidth="lg"
+      >
+        <div className="space-y-3.5 text-xs">
+          <p className="text-xs text-amber-200/60">
+            Adjust marks directly. Standings and grades recalculate automatically.
+          </p>
+
+          {judgeScores.length === 0 ? (
+            <div className="py-8 text-center text-amber-200/60 text-xs font-medium">
+              No score sheets found for this competition.
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+              {judgeScores.map((js) => {
+                const currentMark = editedScores[js.score_sheet_id]?.marks ?? Number(js.total_marks) ?? 0;
+                const liveGrade = getGradeFromMark(currentMark);
+
+                return (
+                  <div
+                    key={js.score_sheet_id}
+                    className="p-3 rounded-xl bg-[#0A0A0A] hover:bg-[#121212] border border-white/[0.08]/90 transition-colors flex items-center justify-between gap-3"
+                  >
+                    {/* Contestant / Team Info & Judge */}
+                    <div className="min-w-0 flex-1">
+                      {isGroup ? (
+                        <div className="space-y-0.5">
+                          <span className={`font-bold text-sm block truncate ${getHouseTeamClass(js.team_name)}`}>
+                            {js.team_name}
+                          </span>
+                          <span className="text-[11px] text-amber-200/60 font-medium block">
+                            Judge: <strong className="text-amber-200">{js.judge_name}</strong>
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-bold text-white text-sm truncate">
+                              {js.participant_name}
+                            </span>
+                            {js.participant_code && (
+                              <span className="font-mono text-[10px] text-amber-300 font-bold bg-amber-500/15 px-1.5 py-0.2 rounded border border-white/[0.08]">
+                                {js.participant_code}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-amber-200/60 font-medium">
+                            <span className={getHouseTeamClass(js.team_name)}>{js.team_name}</span>
+                            <span className="mx-1.5 text-slate-300">•</span>
+                            <span>
+                              Judge: <strong className="text-amber-200">{js.judge_name}</strong>
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Score Input & Live Grade Badge */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.5"
+                          value={currentMark}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setEditedScores((prev) => ({
+                              ...prev,
+                              [js.score_sheet_id]: {
+                                marks: isNaN(val) ? 0 : Math.min(100, Math.max(0, val)),
+                                remarks: prev[js.score_sheet_id]?.remarks ?? js.remarks ?? '',
+                              },
+                            }));
+                          }}
+                          className="w-18 px-2 py-1 text-sm font-mono font-bold text-white bg-[#0A0A0A] border border-white/[0.08] rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 text-center"
+                        />
+                        <span className="text-[11px] font-bold text-amber-200/60">/ 100</span>
+                      </div>
+
+                      <span className={`w-9 text-center py-0.5 rounded-md text-xs font-black border ${liveGrade.color}`}>
+                        {liveGrade.grade}
                       </span>
                     </div>
                   </div>
-
-                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-slate-500 text-[11px]">
-                    <span>
-                      Judge: <strong className="text-slate-800">{js.judge_name}</strong> ({js.judge_code})
-                    </span>
-                    <span>
-                      {js.submitted_at ? new Date(js.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                    </span>
-                  </div>
-
-                  {js.remarks && (
-                    <div className="bg-white p-2.5 rounded-xl text-slate-700 italic text-[11px] border border-slate-200">
-                      &quot;{js.remarks}&quot;
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
-          <div className="pt-3 border-t border-slate-200 flex justify-end">
+          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-end gap-2.5">
             <button
-              className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-              onClick={() => setIsAuditModalOpen(false)}
+              className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:text-white hover:bg-[#121212] transition-colors cursor-pointer"
+              onClick={() => setIsEditScoresModalOpen(false)}
             >
-              Close
+              Cancel
+            </button>
+            <button
+              onClick={() => adminUpdateScoresMutation.mutate()}
+              disabled={adminUpdateScoresMutation.isPending || judgeScores.length === 0}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>{adminUpdateScoresMutation.isPending ? 'Saving...' : 'Save & Recalculate'}</span>
             </button>
           </div>
         </div>

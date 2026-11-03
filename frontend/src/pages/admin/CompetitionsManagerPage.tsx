@@ -16,6 +16,7 @@ import {
   Calendar,
   Layers,
   Sparkles,
+  CheckSquare,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card.js';
 import { Badge } from '../../components/ui/Badge.js';
@@ -484,13 +485,20 @@ export const CompetitionsManagerPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900">Festival Competitions</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Complete catalogue with programme groups, stage/off-stage assignment, and direct 100-mark evaluation.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-slate-950 font-black shadow-xs shrink-0">
+            <CheckSquare className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bento-title font-bold text-white tracking-tight leading-none">
+              Programmes
+            </h1>
+            <p className="text-xs text-amber-200/60 font-medium mt-1">
+              Competition catalogue & rules
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap w-full sm:w-auto">
           <button
             disabled={lockAllMutation.isPending || unlockAllMutation.isPending}
             onClick={() => {
@@ -505,7 +513,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 ? 'Freeze and lock participant registration for all open programmes'
                 : 'Unlock participant registration for all programmes'
             }
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-300 hover:border-slate-900 shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 text-xs font-semibold border border-white/[0.08] hover:border-amber-400 shadow-xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
           >
             {isAnyUnlocked ? (
               <>
@@ -548,7 +556,7 @@ export const CompetitionsManagerPage: React.FC = () => {
       </div>
 
       {/* Filter Toolbar: Option 2 (Live Lifecycle Chips on left + Category Dropdown & Search on right) */}
-      <div className="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
+      <div className="bg-[#0A0A0A] rounded-2xl p-3.5 border border-white/[0.08] shadow-xl flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
         {/* Left: Stage Lifecycle Chips */}
         <div className="flex flex-wrap items-center gap-1.5 w-full lg:w-auto">
           {statusPills.map((pill) => {
@@ -562,17 +570,13 @@ export const CompetitionsManagerPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 shadow-xs font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    : 'bg-[#121212] hover:bg-[#121212] text-amber-200/60 border border-white/[0.08]'
                 }`}
               >
                 {pill.icon}
                 <span>{pill.label}</span>
-                <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                    isActive ? 'bg-black/10 text-slate-950 font-bold' : 'bg-white text-slate-600 border border-slate-200'
-                  }`}
-                >
-                  {count}
+                <span className={`text-[10px] font-mono ${isActive ? 'text-slate-950 font-bold' : 'text-amber-200/50'}`}>
+                  ({count})
                 </span>
               </button>
             );
@@ -580,12 +584,12 @@ export const CompetitionsManagerPage: React.FC = () => {
         </div>
 
         {/* Right: Category Dropdown + Search Input + Reset */}
-        <div className="flex items-center gap-2 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           {/* Category Dropdown */}
           <select
             value={selectedGroup}
             onChange={(e) => setSelectedGroup(e.target.value)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-700 focus:outline-hidden focus:border-amber-500 cursor-pointer shrink-0"
+            className="w-full sm:w-auto px-3 py-1.5 bg-[#121212] border border-white/[0.08] rounded-full text-xs font-semibold text-amber-100 focus:outline-hidden focus:border-amber-500 cursor-pointer shrink-0"
           >
             <option value="ALL">All Categories ({competitions.length})</option>
             {['J1', 'J2', 'JUNIOR', 'SENIOR', 'GENERAL'].map((grp) => {
@@ -603,19 +607,19 @@ export const CompetitionsManagerPage: React.FC = () => {
           </select>
 
           {/* Search Box */}
-          <div className="relative flex-1 sm:w-56">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <div className="relative flex-1 w-full sm:w-56">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-amber-200/60" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search 60 programmes..."
-              className="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
+              className="w-full pl-8 pr-7 py-1.5 bg-[#121212] border border-white/[0.08] rounded-full text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-200/60 hover:text-amber-200 text-xs font-bold"
                 title="Clear search"
               >
                 ×
@@ -631,7 +635,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 setSelectedStatus('ALL');
                 setSearch('');
               }}
-              className="px-2.5 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-full transition-colors cursor-pointer shrink-0"
+              className="px-2.5 py-1.5 text-xs font-bold text-rose-300 bg-rose-500/15 hover:bg-rose-500/15 border border-rose-500/30 rounded-full transition-colors cursor-pointer shrink-0 text-center"
               title="Reset all filters"
             >
               Reset
@@ -640,101 +644,147 @@ export const CompetitionsManagerPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Competitions Table — Clean Unified Bento Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-center border-collapse">
+      {/* Competitions Container: Mobile Cards (<md) & Desktop Table (>=md) */}
+      <div className="bg-[#0A0A0A] rounded-2xl border border-white/[0.08] shadow-xl overflow-hidden">
+        {/* Mobile View: Structured Clean Cards (Touch Friendly, No Table Cutoffs) */}
+        <div className="md:hidden divide-y divide-white/[0.04]">
+          {isLoading ? (
+            <div className="py-8 text-center text-amber-200/60 font-medium text-xs">
+              Loading festival competitions...
+            </div>
+          ) : filteredCompetitions.length === 0 ? (
+            <div className="py-8 text-center text-amber-200/60 font-medium text-xs">
+              No competitions found.
+            </div>
+          ) : (
+            filteredCompetitions.map((comp) => {
+              const isCompleted = comp.status === 'COMPLETED' || comp.schedule_status === 'COMPLETED';
+              const isStage = (comp.competition_type_name || comp.competition_type) === 'STAGE';
+
+              return (
+                <div key={comp.id} className="p-3.5 space-y-2 hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-amber-400 text-xs bg-amber-500/10 px-2 py-0.5 rounded-md border border-white/[0.08]">
+                      Prog {comp.programme_number}
+                    </span>
+                    <ProgrammeStatusBadge competition={comp} />
+                  </div>
+
+                  <h3 className="font-bold text-white text-sm leading-snug">
+                    {comp.name}
+                  </h3>
+
+                  <div className="flex items-center justify-between text-xs text-amber-200/60 pt-0.5">
+                    <span className="text-[11px] font-medium text-amber-200/80">
+                      {comp.programme_group_name || comp.group_name || 'General'} · {isStage ? 'Stage' : 'Off-Stage'} · {comp.participation_type === 'GROUP' ? 'Group' : 'Individual'}
+                    </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        disabled={isCompleted}
+                        className={`p-1.5 rounded-lg text-amber-200/60 hover:text-white bg-[#121212] border border-white/[0.08] transition-colors cursor-pointer ${
+                          isCompleted ? 'opacity-30 cursor-not-allowed' : ''
+                        }`}
+                        onClick={() => !isCompleted && toggleRegStatusMutation.mutate(comp)}
+                        title={comp.status === 'ACTIVE' ? 'Lock Entries' : 'Unlock Entries'}
+                      >
+                        {comp.status === 'ACTIVE' ? (
+                          <Unlock className="w-3.5 h-3.5 text-emerald-400" />
+                        ) : (
+                          <Lock className="w-3.5 h-3.5 text-amber-400" />
+                        )}
+                      </button>
+                      <button
+                        disabled={isCompleted}
+                        className={`p-1.5 rounded-lg text-amber-200/60 hover:text-white bg-[#121212] border border-white/[0.08] transition-colors cursor-pointer ${
+                          isCompleted ? 'opacity-30 cursor-not-allowed' : ''
+                        }`}
+                        onClick={() => !isCompleted && handleOpenEdit(comp)}
+                        title="Edit Competition"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-amber-400" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop View: Full Bento Table */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs min-w-[640px]">
             <thead>
-              <tr className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/80">
-                <th className="py-3.5 px-4 text-center w-28">Prog No</th>
-                <th className="py-3.5 px-4 text-center">Competition Name</th>
-                <th className="py-3.5 px-4 text-center">Group</th>
-                <th className="py-3.5 px-4 text-center">Type</th>
-                <th className="py-3.5 px-4 text-center">Participation</th>
-                <th className="py-3.5 px-4 text-center">Status</th>
-                <th className="py-3.5 px-4 text-center w-28">Actions</th>
+              <tr className="border-b border-white/[0.08] text-[10px] font-bold uppercase tracking-wider text-amber-300/70 bg-[#121212]">
+                <th className="py-3 px-4 text-left w-16 font-bold">No.</th>
+                <th className="py-3 px-4 text-left font-bold">Programme</th>
+                <th className="py-3 px-4 text-left font-bold">Category</th>
+                <th className="py-3 px-4 text-left font-bold">Type</th>
+                <th className="py-3 px-4 text-left font-bold">Format</th>
+                <th className="py-3 px-4 text-left font-bold">Status</th>
+                <th className="py-3 px-4 text-right w-24 font-bold">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.04]">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400 font-medium">
+                  <td colSpan={7} className="py-8 text-center text-amber-200/60 font-medium">
                     Loading festival competitions...
                   </td>
                 </tr>
               ) : filteredCompetitions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400 font-medium">
-                    No competitions found matching filters.
+                  <td colSpan={7} className="py-8 text-center text-amber-200/60 font-medium">
+                    No competitions found.
                   </td>
                 </tr>
               ) : (
                 filteredCompetitions.map((comp) => {
                   const isCompleted = comp.status === 'COMPLETED' || comp.schedule_status === 'COMPLETED';
+                  const isStage = (comp.competition_type_name || comp.competition_type) === 'STAGE';
 
                   return (
-                    <tr key={comp.id} className="hover:bg-slate-50/90 transition-colors">
+                    <tr key={comp.id} className="hover:bg-white/[0.04] transition-colors">
                       {/* Programme Number */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="font-mono text-xs font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-3 py-1 rounded-full inline-block shadow-2xs">
-                          {comp.programme_number}
-                        </span>
+                      <td className="py-3 px-4 text-left font-mono font-bold text-amber-400">
+                        {comp.programme_number}
                       </td>
 
                       {/* Competition Name */}
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="font-bold text-slate-900 text-[13px]">
+                      <td className="py-3 px-4 text-left">
+                        <div className="font-bold text-white text-sm">
                           {comp.name}
                         </div>
                       </td>
 
                       {/* Group */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 inline-block">
-                          {comp.programme_group_name || comp.group_name || '-'}
-                        </span>
+                      <td className="py-3 px-4 text-left text-amber-200/80 font-medium">
+                        {comp.programme_group_name || comp.group_name || '—'}
                       </td>
 
                       {/* Type */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span
-                          className={`text-xs font-bold px-3 py-1 rounded-full border inline-block ${
-                            (comp.competition_type_name || comp.competition_type) === 'STAGE'
-                              ? 'bg-purple-50 text-purple-700 border-purple-200'
-                              : 'bg-blue-50 text-blue-700 border-blue-200'
-                          }`}
-                        >
-                          {comp.competition_type_name || comp.competition_type || 'OFF_STAGE'}
-                        </span>
+                      <td className="py-3 px-4 text-left text-slate-300 font-medium">
+                        {isStage ? 'Stage' : 'Off-Stage'}
                       </td>
 
                       {/* Participation */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span
-                          className={`text-xs font-bold px-3 py-1 rounded-full border inline-block ${
-                            comp.participation_type === 'GROUP'
-                              ? 'bg-amber-50 text-amber-800 border-amber-200'
-                              : 'bg-slate-100 text-slate-700 border-slate-200'
-                          }`}
-                        >
-                          {comp.participation_type === 'GROUP' ? 'GROUP' : 'INDIVIDUAL'}
-                        </span>
+                      <td className="py-3 px-4 text-left text-amber-200/70 font-medium">
+                        {comp.participation_type === 'GROUP' ? 'Group' : 'Individual'}
                       </td>
 
                       {/* Status */}
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="flex justify-center">
-                          <ProgrammeStatusBadge competition={comp} />
-                        </div>
+                      <td className="py-3 px-4 text-left">
+                        <ProgrammeStatusBadge competition={comp} />
                       </td>
 
                       {/* Actions */}
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
                           <button
                             disabled={isCompleted}
-                            className={`p-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-800 shadow-2xs transition-all hover:scale-[1.05] cursor-pointer ${
-                              isCompleted ? 'opacity-40 cursor-not-allowed' : ''
+                            className={`p-1.5 rounded-lg text-amber-200/60 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer ${
+                              isCompleted ? 'opacity-30 cursor-not-allowed' : ''
                             }`}
                             onClick={() => !isCompleted && toggleRegStatusMutation.mutate(comp)}
                             title={
@@ -744,20 +794,20 @@ export const CompetitionsManagerPage: React.FC = () => {
                             }
                           >
                             {comp.status === 'ACTIVE' ? (
-                              <Unlock className="w-3.5 h-3.5 text-emerald-600" />
+                              <Unlock className="w-3.5 h-3.5 text-emerald-400" />
                             ) : (
-                              <Lock className="w-3.5 h-3.5 text-amber-500" />
+                              <Lock className="w-3.5 h-3.5 text-amber-400" />
                             )}
                           </button>
                           <button
                             disabled={isCompleted}
-                            className={`p-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-800 shadow-2xs transition-all hover:scale-[1.05] cursor-pointer ${
-                              isCompleted ? 'opacity-40 cursor-not-allowed' : ''
+                            className={`p-1.5 rounded-lg text-amber-200/60 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer ${
+                              isCompleted ? 'opacity-30 cursor-not-allowed' : ''
                             }`}
                             onClick={() => !isCompleted && handleOpenEdit(comp)}
                             title={isCompleted ? 'Completed programme cannot be edited' : 'Edit Competition & Rules'}
                           >
-                            <Pencil className="w-3.5 h-3.5 text-slate-700" />
+                            <Pencil className="w-3.5 h-3.5 text-amber-400" />
                           </button>
                         </div>
                       </td>
@@ -779,8 +829,8 @@ export const CompetitionsManagerPage: React.FC = () => {
           maxWidth="xl"
         >
           <div className="space-y-5">
-            <p className="text-xs text-slate-400">
-              Configure judging criteria and maximum marks for judges evaluating this competition.
+            <p className="text-xs text-amber-200/60">
+              Set criteria and maximum marks for this competition.
             </p>
 
             {/* Existing Criteria List */}
@@ -788,17 +838,17 @@ export const CompetitionsManagerPage: React.FC = () => {
               {criteria.map((crit, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800"
+                  className="flex items-center justify-between p-3 rounded-xl bg-[#121212] border border-white/[0.08]"
                 >
                   <div>
                     <span className="text-sm font-bold text-white">{crit.name}</span>
-                    <span className="text-xs text-slate-400 ml-2 font-mono">
+                    <span className="text-xs text-amber-200/60 ml-2 font-mono">
                       Max: {crit.max_marks} pts
                     </span>
                   </div>
                   <button
                     onClick={() => handleRemoveCriterion(idx)}
-                    className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
+                    className="p-1 text-amber-200/60 hover:text-rose-400 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -807,25 +857,25 @@ export const CompetitionsManagerPage: React.FC = () => {
 
               <div className="flex justify-between items-center px-3 py-2 text-xs font-bold text-slate-300">
                 <span>Total Score Cap:</span>
-                <span className="text-indigo-400 font-mono text-sm">{totalMaxMarks} pts</span>
+                <span className="text-amber-300 font-mono text-sm">{totalMaxMarks} pts</span>
               </div>
             </div>
 
             {/* Add New Criterion Line */}
-            <div className="pt-4 border-t border-slate-800 flex gap-2">
+            <div className="pt-4 border-t border-white/[0.08] flex gap-2">
               <input
                 type="text"
                 value={newCritName}
                 onChange={(e) => setNewCritName(e.target.value)}
                 placeholder="Criterion Name (e.g. Pronunciation)"
-                className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 px-3 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
               />
               <input
                 type="number"
                 value={newCritMax}
                 onChange={(e) => setNewCritMax(e.target.value)}
                 placeholder="Max"
-                className="w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-24 px-3 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/30"
               />
               <Button variant="secondary" size="md" onClick={handleAddCriterion}>
                 <Plus className="w-4 h-4" />
@@ -833,7 +883,7 @@ export const CompetitionsManagerPage: React.FC = () => {
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
+            <div className="pt-4 border-t border-white/[0.08] flex justify-end gap-3">
               <Button
                 variant="ghost"
                 onClick={() => setIsCriteriaModalOpen(false)}
@@ -864,7 +914,7 @@ export const CompetitionsManagerPage: React.FC = () => {
           {/* Row 1: Programme Number & Competition Name */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3.5">
             <div className="sm:col-span-1">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Prog No *
               </label>
               <input
@@ -873,12 +923,12 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={formData.programme_number}
                 onChange={(e) => setFormData({ ...formData, programme_number: e.target.value })}
                 placeholder="e.g. 61"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
             <div className="sm:col-span-3">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Competition Name *
               </label>
               <input
@@ -887,7 +937,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g. Classical Monologue"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500"
               />
             </div>
           </div>
@@ -895,14 +945,14 @@ export const CompetitionsManagerPage: React.FC = () => {
           {/* Row 2: Programme Group, Competition Type, Participation Type */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Programme Group *
               </label>
               <select
                 required
                 value={formData.programme_group_id}
                 onChange={(e) => setFormData({ ...formData, programme_group_id: e.target.value })}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 <option value="">Select Group</option>
                 {programmeGroups.map((g) => (
@@ -914,13 +964,13 @@ export const CompetitionsManagerPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Competition Type
               </label>
               <select
                 value={formData.competition_type_id}
                 onChange={(e) => handleTypeChange(e.target.value, false)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 <option value="">Select Type</option>
                 {competitionTypes.map((t) => (
@@ -932,13 +982,13 @@ export const CompetitionsManagerPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Participation
               </label>
               <select
                 value={formData.participation_type}
                 onChange={(e) => setFormData({ ...formData, participation_type: e.target.value })}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
               >
                 <option value="INDIVIDUAL">INDIVIDUAL</option>
                 <option value="GROUP">GROUP</option>
@@ -950,7 +1000,7 @@ export const CompetitionsManagerPage: React.FC = () => {
           {formData.participation_type === 'GROUP' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Max Participants per Group *
                 </label>
                 <input
@@ -960,11 +1010,11 @@ export const CompetitionsManagerPage: React.FC = () => {
                   value={formData.max_participants}
                   onChange={(e) => setFormData({ ...formData, max_participants: e.target.value })}
                   placeholder="e.g. 4"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Max Entries per Team
                 </label>
                 <input
@@ -973,13 +1023,13 @@ export const CompetitionsManagerPage: React.FC = () => {
                   value={formData.max_entries_per_team}
                   onChange={(e) => setFormData({ ...formData, max_entries_per_team: e.target.value })}
                   placeholder="Leave blank for Unlimited"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
             </div>
           ) : (
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Max Entries per Team
               </label>
               <input
@@ -988,14 +1038,14 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={formData.max_entries_per_team}
                 onChange={(e) => setFormData({ ...formData, max_entries_per_team: e.target.value })}
                 placeholder="Leave blank for Unlimited"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
               />
             </div>
           )}
 
           {/* Row 4: Description / Format */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
               Description / Format
             </label>
             <textarea
@@ -1003,13 +1053,13 @@ export const CompetitionsManagerPage: React.FC = () => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Brief description of the event format or background..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
+              className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-medium text-white placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
           </div>
 
           {/* Row 5: Rules / Guidelines */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
               Rules / Guidelines
             </label>
             <textarea
@@ -1017,15 +1067,15 @@ export const CompetitionsManagerPage: React.FC = () => {
               value={formData.rules}
               onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
               placeholder="e.g. Time limit 5 mins, no electronic aids permitted..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
+              className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-medium text-white placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex justify-end gap-2.5">
+          <div className="pt-4 border-t border-white/[0.08] flex justify-end gap-2.5">
             <button
               type="button"
               onClick={() => setIsAddModalOpen(false)}
-              className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:bg-[#121212] transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -1055,7 +1105,7 @@ export const CompetitionsManagerPage: React.FC = () => {
             {/* Row 1: Programme Number & Competition Name */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3.5">
               <div className="sm:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Prog No *
                 </label>
                 <input
@@ -1063,12 +1113,12 @@ export const CompetitionsManagerPage: React.FC = () => {
                   required
                   value={editFormData.programme_number}
                   onChange={(e) => setEditFormData({ ...editFormData, programme_number: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
 
               <div className="sm:col-span-3">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Competition Name *
                 </label>
                 <input
@@ -1076,7 +1126,7 @@ export const CompetitionsManagerPage: React.FC = () => {
                   required
                   value={editFormData.name}
                   onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500"
                 />
               </div>
             </div>
@@ -1084,14 +1134,14 @@ export const CompetitionsManagerPage: React.FC = () => {
             {/* Row 2: Programme Group, Competition Type, Participation Type (Clean 3-col grid, Status dropdown removed) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Programme Group *
                 </label>
                 <select
                   required
                   value={editFormData.programme_group_id}
                   onChange={(e) => setEditFormData({ ...editFormData, programme_group_id: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="">Select Group</option>
                   {programmeGroups.map((g) => (
@@ -1103,13 +1153,13 @@ export const CompetitionsManagerPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Competition Type
                 </label>
                 <select
                   value={editFormData.competition_type_id}
                   onChange={(e) => handleTypeChange(e.target.value, true)}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="">Select Type</option>
                   {competitionTypes.map((t) => (
@@ -1121,13 +1171,13 @@ export const CompetitionsManagerPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Participation
                 </label>
                 <select
                   value={editFormData.participation_type}
                   onChange={(e) => setEditFormData({ ...editFormData, participation_type: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white focus:outline-hidden focus:border-amber-500 cursor-pointer"
                 >
                   <option value="INDIVIDUAL">INDIVIDUAL</option>
                   <option value="GROUP">GROUP</option>
@@ -1139,7 +1189,7 @@ export const CompetitionsManagerPage: React.FC = () => {
             {editFormData.participation_type === 'GROUP' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                     Max Participants per Group *
                   </label>
                   <input
@@ -1149,11 +1199,11 @@ export const CompetitionsManagerPage: React.FC = () => {
                     value={editFormData.max_participants}
                     onChange={(e) => setEditFormData({ ...editFormData, max_participants: e.target.value })}
                     placeholder="e.g. 4"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                    className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                     Max Entries per Team
                   </label>
                   <input
@@ -1162,13 +1212,13 @@ export const CompetitionsManagerPage: React.FC = () => {
                     value={editFormData.max_entries_per_team}
                     onChange={(e) => setEditFormData({ ...editFormData, max_entries_per_team: e.target.value })}
                     placeholder="Leave blank for Unlimited"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                    className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
                   />
                 </div>
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                   Max Entries per Team
                 </label>
                 <input
@@ -1177,14 +1227,14 @@ export const CompetitionsManagerPage: React.FC = () => {
                   value={editFormData.max_entries_per_team}
                   onChange={(e) => setEditFormData({ ...editFormData, max_entries_per_team: e.target.value })}
                   placeholder="Leave blank for Unlimited"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-semibold text-white font-mono focus:outline-hidden focus:border-amber-500"
                 />
               </div>
             )}
 
             {/* Row 4: Description / Format */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Description / Format
               </label>
               <textarea
@@ -1192,13 +1242,13 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={editFormData.description}
                 onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                 placeholder="Event format or details..."
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-medium text-white placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
             {/* Row 5: Official Rules & Instructions */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
                 Official Rules & Instructions
               </label>
               <textarea
@@ -1206,12 +1256,12 @@ export const CompetitionsManagerPage: React.FC = () => {
                 value={editFormData.rules}
                 onChange={(e) => setEditFormData({ ...editFormData, rules: e.target.value })}
                 placeholder="Specific rules or constraints..."
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
+                className="w-full px-3.5 py-2 bg-[#121212] border border-white/[0.08] rounded-xl text-xs font-medium text-white placeholder-slate-400 focus:outline-hidden focus:border-amber-500"
               />
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -1221,20 +1271,20 @@ export const CompetitionsManagerPage: React.FC = () => {
                     handleOpenDelete(target);
                   }
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 hover:border-rose-300 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold text-rose-300 hover:bg-rose-500/15 border border-rose-500/30 hover:border-rose-500/30 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete Programme</span>
               </button>
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => {
                     setIsEditModalOpen(false);
                     setEditingComp(null);
                   }}
-                  className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-full text-xs font-semibold text-amber-200/60 hover:bg-[#121212] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1263,10 +1313,10 @@ export const CompetitionsManagerPage: React.FC = () => {
           maxWidth="md"
         >
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400">
+            <div className="flex items-center gap-3 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400">
               <AlertTriangle className="w-5 h-5 flex-shrink-0" />
               <p className="text-xs leading-relaxed font-semibold">
-                This action is irreversible. All related criteria, schedule entries, and participation registrations will also be deleted.
+                This action cannot be undone. All related data will be removed.
               </p>
             </div>
 
@@ -1274,7 +1324,7 @@ export const CompetitionsManagerPage: React.FC = () => {
               Are you sure you want to delete <span className="font-bold text-white">{deletingComp.programme_number} - {deletingComp.name}</span> ({deletingComp.group_name})?
             </p>
 
-            <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
+            <div className="pt-4 border-t border-white/[0.08] flex justify-end gap-3">
               <Button
                 type="button"
                 variant="ghost"

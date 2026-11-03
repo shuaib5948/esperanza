@@ -176,7 +176,7 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#070503] text-slate-100 selection:bg-amber-400 selection:text-black font-sans antialiased overflow-x-hidden relative">
+    <div className="min-h-screen w-full bg-[#040404] text-slate-100 selection:bg-amber-400 selection:text-black font-sans antialiased overflow-x-hidden relative">
       {/* ===================================================================
           PERSISTENT CONTINUOUS FESTIVAL BOKEH & ATMOSPHERE BACKDROP
           (Flows seamlessly behind Hero, Manifesto, Standings, Posters, Gallery)
@@ -186,7 +186,7 @@ export const HomePage: React.FC = () => {
         style={{ backgroundImage: `url('/hero/hero-bg.png')` }}
       />
       {/* Persistent Soft Radial Vignette Overlay to maintain Obsidian Depth */}
-      <div className="fixed inset-0 pointer-events-none select-none z-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#070503_85%)]" />
+      <div className="fixed inset-0 pointer-events-none select-none z-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#040404_85%)]" />
 
       {/* ===================================================================
           SECTION 1: FIXED SINGLE-SCREEN CINEMATIC FESTIVAL HERO
@@ -202,8 +202,8 @@ export const HomePage: React.FC = () => {
         />
 
         {/* Soft Vignettes for Navbar & Section Bleed */}
-        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#070503]/80 via-[#070503]/30 to-transparent pointer-events-none z-0" />
-        <div className="absolute bottom-0 inset-x-0 h-24 sm:h-60 bg-gradient-to-t from-[#070503] via-[#070503]/85 via-40% to-transparent pointer-events-none z-0" />
+        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#040404]/80 via-[#040404]/30 to-transparent pointer-events-none z-0" />
+        <div className="absolute bottom-0 inset-x-0 h-24 sm:h-60 bg-gradient-to-t from-[#040404] via-[#040404]/85 via-40% to-transparent pointer-events-none z-0" />
 
         {/* Centerpiece Hero Title & Subtitle Lockup */}
         <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center justify-center space-y-3 sm:space-y-4 px-2 my-auto">
@@ -273,14 +273,14 @@ export const HomePage: React.FC = () => {
         </picture>
 
         {/* Top Seamless Dark Gradient Blend (Feathering Top Edge Flush into Hero) */}
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-20 sm:h-36 md:h-52 bg-gradient-to-b from-[#070503] via-[#070503]/80 via-35% to-transparent z-10" />
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-20 sm:h-36 md:h-52 bg-gradient-to-b from-[#040404] via-[#040404]/80 via-35% to-transparent z-10" />
 
         {/* Bottom Seamless Dark Gradient Blend (Feathering Bottom Edge Flush into Standings) */}
-        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-24 sm:h-40 md:h-56 bg-gradient-to-t from-[#070503] via-[#070503]/85 via-40% to-transparent z-10" />
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-24 sm:h-40 md:h-56 bg-gradient-to-t from-[#040404] via-[#040404]/85 via-40% to-transparent z-10" />
 
         {/* Left & Right Side Vignette Gradients for Flawless Atmospheric Integration */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-6 sm:w-14 bg-gradient-to-r from-[#070503] via-[#070503]/60 to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-6 sm:w-14 bg-gradient-to-l from-[#070503] via-[#070503]/60 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-6 sm:w-14 bg-gradient-to-r from-[#040404] via-[#040404]/60 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-6 sm:w-14 bg-gradient-to-l from-[#040404] via-[#040404]/60 to-transparent z-10" />
       </section>
 
       {/* ===================================================================

@@ -78,6 +78,7 @@ export class CompetitionRepository {
     return query<CompetitionRow[]>(`
       SELECT c.*,
              pg.name as programme_group_name,
+             pg.name as programme_group,
              pg.code as programme_group_code,
              pg.name as group_name,
              pg.code as group_code,
@@ -108,6 +109,7 @@ export class CompetitionRepository {
     const rows = await query<CompetitionRow[]>(`
       SELECT c.*,
              pg.name as programme_group_name,
+             pg.name as programme_group,
              pg.code as programme_group_code,
              pg.name as group_name,
              pg.code as group_code,

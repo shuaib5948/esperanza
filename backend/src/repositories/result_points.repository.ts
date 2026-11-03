@@ -315,7 +315,7 @@ export class PointsRepository {
       ORDER BY pg.display_order ASC, t.id ASC
     `);
 
-    // Type breakdown (points per team per competition_type)
+    // Type breakdown (points per team per competition_type + General division events)
     const typeRows = await query<any[]>(`
       SELECT t.id as team_id, t.name as team_name,
              ct.id as type_id, ct.name as type_name,
@@ -328,10 +328,23 @@ export class PointsRepository {
       ORDER BY ct.id ASC, t.id ASC
     `);
 
+    // General events breakdown (includes all General stage and off-stage events)
+    const generalRows = await query<any[]>(`
+      SELECT t.id as team_id, t.name as team_name,
+             0 as type_id, 'GENERAL' as type_name,
+             COALESCE(SUM(tp.points), 0) as points
+      FROM teams t
+      JOIN programme_groups pg ON pg.code = 'GEN'
+      LEFT JOIN competitions c ON c.programme_group_id = pg.id
+      LEFT JOIN team_points tp ON tp.team_id = t.id AND tp.competition_id = c.id
+      GROUP BY t.id
+      ORDER BY t.id ASC
+    `);
+
     return {
       teams,
       groupBreakdown: groupRows,
-      typeBreakdown: typeRows,
+      typeBreakdown: [...typeRows, ...generalRows],
     };
   }
 

@@ -20,6 +20,9 @@ import {
   UserCheck,
   ClipboardList,
   BarChart2,
+  Trophy,
+  FileSpreadsheet,
+  History,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -48,38 +51,52 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm lg:hidden"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:sticky top-0 lg:top-3 xl:top-4 z-50 lg:z-20 h-screen lg:h-[calc(100vh-1.5rem)] xl:h-[calc(100vh-2rem)] w-60 xl:w-64 bg-white lg:rounded-[24px] p-4 flex flex-col justify-between shrink-0 shadow-2xs border border-slate-100/80 transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 lg:top-3 xl:top-4 z-50 lg:z-20 h-screen lg:h-[calc(100vh-1.5rem)] xl:h-[calc(100vh-2rem)] w-60 xl:w-64 lg:rounded-[24px] p-4 flex flex-col justify-between shrink-0 shadow-2xl transition-transform duration-300 bg-[#0A0A0A] border border-white/[0.08] text-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.8)] ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <div className="flex flex-col flex-1 overflow-y-auto pr-1">
-          {/* Brand Header: Text only with subtitle Ashariyya Da'wa Fest */}
+          {/* Brand Header: Official Esperanza Emblem & Font Logo */}
           <div className="flex items-center justify-between px-2 py-1.5 mb-4">
             <div
-              className="cursor-pointer"
+              className="cursor-pointer flex items-center gap-2.5 min-w-0"
               onClick={() => {
                 navigate(isAdmin ? '/admin' : isTeamLeader ? '/team' : '/');
                 onClose();
               }}
             >
-              <h1 className="text-xl font-black text-amber-900 tracking-tight leading-none">
-                Esperanza
-              </h1>
-              <p className="text-[10px] font-bold text-amber-700 tracking-wide mt-1">
-                Ashariyya Da'wa Fest
-              </p>
+              <img
+                src="/assets/esperanza-logo.png"
+                alt="Esperanza Logo"
+                className="h-8 w-auto object-contain shrink-0 brightness-100 drop-shadow-[0_0_10px_rgba(245,158,11,0.35)]"
+              />
+              <div className="flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <img
+                    src="/assets/esperanza-font-logo.png"
+                    alt="Esperanza"
+                    className="h-4.5 w-auto object-contain brightness-105 drop-shadow-[0_2px_8px_rgba(245,158,11,0.25)]"
+                  />
+                  <span className="text-[10px] font-black font-mono text-amber-300 bg-amber-400/15 border border-amber-400/30 px-1.5 py-0.5 rounded-md leading-none">
+                    9.0
+                  </span>
+                </div>
+                <p className="text-[9px] font-bold tracking-wider uppercase mt-1 text-amber-200/60 truncate">
+                  Ashariyya Da'wa Fest
+                </p>
+              </div>
             </div>
 
             {/* Close Button on Mobile */}
             <button
               onClick={onClose}
-              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
             >
               <X className="w-4 h-4" />
             </button>
@@ -90,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <div className="space-y-4">
               {/* MENU Section */}
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-200/60 px-3 block mb-1">
                   MENU
                 </span>
 
@@ -100,10 +117,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   end
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
+                    `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all relative ${
                       isActive
                         ? THEME.classes.activeTab
-                        : THEME.classes.inactiveTab
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`
                   }
                 >
@@ -123,10 +140,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   to="/admin/competitions"
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
+                    `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold transition-all relative ${
                       isActive
                         ? THEME.classes.activeTab
-                        : THEME.classes.inactiveTab
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`
                   }
                 >
@@ -143,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
                           isActive
                             ? THEME.classes.badgeActive
-                            : THEME.classes.badgeInactive
+                            : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
                         }`}
                       >
                         60
@@ -152,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   )}
                 </NavLink>
 
-                {/* Schedule & Lineup */}
+                {/* Schedule */}
                 <NavLink
                   to="/admin/schedule"
                   onClick={onClose}
@@ -170,7 +187,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <Calendar className="w-4 h-4" />
-                      <span>Schedule & Lineup</span>
+                      <span>Schedule</span>
                     </>
                   )}
                 </NavLink>
@@ -192,7 +209,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       {isActive && (
                         <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
-                      <UserCheck className="w-4 h-4" />
+                      <Users className="w-4 h-4" />
                       <span>Participants</span>
                     </>
                   )}
@@ -242,27 +259,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
-                        <BarChart2 className="w-4 h-4" />
+                        <Trophy className="w-4 h-4" />
                         <span>Leaderboard</span>
                       </div>
-                      {isProduction && (
-                        <span
-                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                            isActive
-                              ? 'bg-black/10 text-slate-950 font-bold'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          Soon
-                        </span>
-                      )}
                     </>
                   )}
                 </NavLink>
               </div>
 
               {/* ACTIONS Section */}
-              <div className="space-y-1 pt-2 border-t border-slate-100">
+              <div className="space-y-1 pt-2 border-t border-white/[0.08]">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">
                   ACTIONS
                 </span>
@@ -311,17 +317,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <Megaphone className="w-4 h-4" />
                         <span>Announcements</span>
                       </div>
-                      {isProduction && (
-                        <span
-                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                            isActive
-                              ? 'bg-black/10 text-slate-950 font-bold'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          Soon
-                        </span>
-                      )}
                     </>
                   )}
                 </NavLink>
@@ -344,20 +339,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
-                        <FileText className="w-4 h-4" />
+                        <FileSpreadsheet className="w-4 h-4" />
                         <span>Export CSVs</span>
                       </div>
-                      {isProduction && (
-                        <span
-                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                            isActive
-                              ? 'bg-black/10 text-slate-950 font-bold'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          Soon
-                        </span>
-                      )}
                     </>
                   )}
                 </NavLink>
@@ -380,20 +364,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
                       )}
                       <div className="flex items-center gap-3">
-                        <SlidersHorizontal className="w-4 h-4" />
+                        <History className="w-4 h-4" />
                         <span>Audit Logs</span>
                       </div>
-                      {isProduction && (
-                        <span
-                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                            isActive
-                              ? 'bg-black/10 text-slate-950 font-bold'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          Soon
-                        </span>
-                      )}
                     </>
                   )}
                 </NavLink>
@@ -402,7 +375,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ) : isTeamLeader ? (
             /* TEAM LEADER MENU */
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-200/60 px-3 block mb-1">
                 TEAM PORTAL
               </span>
               <NavLink
@@ -492,17 +465,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       <Megaphone className="w-4 h-4" />
                       <span>Announcements</span>
                     </div>
-                    {isProduction && (
-                      <span
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                          isActive
-                            ? 'bg-black/10 text-slate-950 font-bold'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        Soon
-                      </span>
-                    )}
                   </>
                 )}
               </NavLink>
@@ -511,7 +473,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Bottom Section: Stage Kiosk Launcher + User Logout */}
-        <div className="pt-3 border-t border-slate-100 flex flex-col gap-3">
+        <div className="pt-3 border-t border-white/[0.08] flex flex-col gap-3">
           {/* Bottom Stage Kiosk Launcher Card with Luxury Amber Gold Background */}
           {isAdmin && (
             <div className={`relative rounded-2xl p-3 ${THEME.classes.heroCardSubtle} overflow-hidden`}>
@@ -529,7 +491,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <Tv className="w-3 h-3 text-amber-300" />
                 </div>
                 <h4 className="text-xs font-black font-bento-title text-amber-100">Stage Screen</h4>
-                <p className="text-[10px] text-amber-200/70 mb-2 leading-tight font-medium">Live single stage display</p>
+                <p className="text-[10px] text-amber-200/60 mb-2 leading-tight font-medium">Live single stage display</p>
                 <button
                   onClick={() => {
                     navigate('/admin/stage-queue');

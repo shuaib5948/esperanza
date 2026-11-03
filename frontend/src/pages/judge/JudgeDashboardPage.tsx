@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { Gavel, CheckCircle2, ChevronRight, Award, Clock, Radio } from 'lucide-react';
 import { Card } from '../../components/ui/Card.js';
+import { THEME } from '../../theme/theme.js';
 import { Badge } from '../../components/ui/Badge.js';
 import { Button } from '../../components/ui/Button.js';
 
@@ -31,7 +32,7 @@ export const JudgeDashboardPage: React.FC = () => {
             </span>
             <h1 className="text-3xl font-black text-white">Judge Scoring Portal</h1>
           </div>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-amber-200/60 mt-1">
             Official Evaluation Panel • Code: <strong className="text-slate-200">{judge?.judge_code || 'JUDGE-01'}</strong>
           </p>
         </div>
@@ -44,7 +45,7 @@ export const JudgeDashboardPage: React.FC = () => {
         </h3>
 
         {assignments.length === 0 ? (
-          <Card className="text-center py-12 text-slate-500">
+          <Card className="text-center py-12 text-amber-200/60">
             No competitions currently scheduled or assigned.
           </Card>
         ) : (
@@ -59,19 +60,19 @@ export const JudgeDashboardPage: React.FC = () => {
                   key={comp.competition_id}
                   className={`transition-all space-y-4 ${
                     isLive
-                      ? 'border-emerald-500/60 bg-emerald-950/20 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-500/30'
-                      : 'hover:border-slate-700'
+                      ? 'border-amber-500/60 bg-amber-950/20 shadow-lg shadow-amber-950/30 ring-1 ring-amber-500/30'
+                      : 'hover:border-amber-500/30'
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-mono font-bold text-indigo-400">
+                        <span className="text-xs font-mono font-bold text-amber-300">
                           PROGRAMME {comp.programme_number}
                         </span>
                         {isLive && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
-                            <Radio className="w-3 h-3 text-emerald-400" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">
+                            <Radio className="w-3 h-3 text-amber-400" />
                             LIVE ON STAGE
                           </span>
                         )}
@@ -85,7 +86,7 @@ export const JudgeDashboardPage: React.FC = () => {
                     </Badge>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                  <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
                     <span>
                       Evaluated: <strong className="text-white">{comp.total_submitted}</strong> /{' '}
                       {comp.total_registered} Performers
@@ -95,7 +96,7 @@ export const JudgeDashboardPage: React.FC = () => {
                       <Button
                         variant={isLive ? 'primary' : 'secondary'}
                         size="sm"
-                        className={isLive ? 'bg-emerald-600 hover:bg-emerald-500 font-bold' : ''}
+                        className={isLive ? `${THEME.classes.primaryBtn} text-xs font-bold` : 'text-xs font-bold'}
                       >
                         <span>{isLive ? 'Score Live Stage' : 'Open Scoresheet'}</span>
                         <ChevronRight className="w-3.5 h-3.5 ml-1" />

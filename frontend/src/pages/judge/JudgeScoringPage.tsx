@@ -13,12 +13,14 @@ import {
   Table,
   Sliders,
   Award,
+  Medal,
   Check,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card.js';
 import { Badge } from '../../components/ui/Badge.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
+import { THEME } from '../../theme/theme.js';
 
 interface Participant {
   participant_id: number;
@@ -39,6 +41,17 @@ interface Participant {
 }
 
 const SCORE_PRESETS = [60, 70, 75, 80, 85, 90, 95, 100];
+
+const formatProgTitle = (name?: string, group?: string) => {
+  if (!name) return 'Evaluation Score Sheet';
+  if (!group) return name;
+  const trimmedName = name.trim();
+  const trimmedGroup = group.trim();
+  if (trimmedName.toLowerCase().startsWith(trimmedGroup.toLowerCase())) {
+    return trimmedName;
+  }
+  return `${trimmedGroup} - ${trimmedName}`;
+};
 
 export const JudgeScoringPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -225,7 +238,7 @@ export const JudgeScoringPage: React.FC = () => {
         isDraft: true,
       });
 
-      const currentLetter = currentParticipant.code_letter || `Performer #${activePerformerIndex + 1}`;
+      const currentLetter = currentParticipant.code_letter || `Performer ${activePerformerIndex + 1}`;
 
       // Check if this was the last performer
       if (activePerformerIndex >= participants.length - 1) {
@@ -233,7 +246,7 @@ export const JudgeScoringPage: React.FC = () => {
         setViewMode('MATRIX');
       } else {
         const nextIndex = activePerformerIndex + 1;
-        const nextLetter = participants[nextIndex]?.code_letter || `Performer #${nextIndex + 1}`;
+        const nextLetter = participants[nextIndex]?.code_letter || `Performer ${nextIndex + 1}`;
         setActivePerformerIndex(nextIndex);
         success(`Saved ${currentLetter}. Now evaluating Code Letter ${nextLetter}!`);
       }
@@ -250,21 +263,21 @@ export const JudgeScoringPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <Link
               to="/judge"
-              className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+              className="p-1.5 rounded-lg bg-[#0A0A0A] text-amber-200/60 hover:text-white hover:bg-[#121212] transition-colors"
               title="Back to Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-sm font-bold text-indigo-400">
+                <span className="font-mono text-sm font-bold text-amber-300">
                   PROGRAMME {competition?.programme_number}
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-black text-white">
-                  {competition?.name || 'Evaluation Score Sheet'}
+                  {formatProgTitle(competition?.name, competition?.programme_group || competition?.programme_group_name || competition?.group_name)}
                 </h1>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+              <p className="text-xs sm:text-sm text-amber-200/60 mt-0.5">
                 Official Blind Adjudication • {participants.length} Contestants • Direct 100 Marks Scale
               </p>
             </div>
@@ -272,13 +285,13 @@ export const JudgeScoringPage: React.FC = () => {
         </div>
 
         {/* View Mode Switcher */}
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+        <div className="flex items-center gap-2 bg-[#121212] border border-white/[0.08] p-1 rounded-xl">
           <button
             onClick={() => setViewMode('SEQUENTIAL')}
             className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               viewMode === 'SEQUENTIAL'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
+                : 'text-amber-200/60 hover:text-white'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
@@ -290,7 +303,7 @@ export const JudgeScoringPage: React.FC = () => {
             className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               viewMode === 'MATRIX'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
+                : 'text-amber-200/60 hover:text-white'
             }`}
           >
             <Table className="w-3.5 h-3.5" />
@@ -300,9 +313,9 @@ export const JudgeScoringPage: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <Card className="text-center py-20 text-slate-400 text-sm">Loading competition score sheet...</Card>
+        <Card className="text-center py-20 text-amber-200/60 text-sm">Loading competition score sheet...</Card>
       ) : participants.length === 0 ? (
-        <Card className="text-center py-20 text-slate-500 text-sm">
+        <Card className="text-center py-20 text-amber-200/60 text-sm">
           No participants registered or assigned for this competition yet.
         </Card>
       ) : viewMode === 'SEQUENTIAL' ? (
@@ -316,7 +329,7 @@ export const JudgeScoringPage: React.FC = () => {
               const isSelected = idx === activePerformerIndex;
               const pMark = getParticipantMark(p.participant_id);
               const isCompleted = pMark > 0;
-              const displayLabel = p.code_letter ? `Code ${p.code_letter}` : `Performer #${idx + 1}`;
+              const displayLabel = p.code_letter ? `Code ${p.code_letter}` : `Performer ${idx + 1}`;
 
               return (
                 <button
@@ -324,30 +337,30 @@ export const JudgeScoringPage: React.FC = () => {
                   onClick={() => setActivePerformerIndex(idx)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 border ${
                     isSelected
-                      ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30 scale-105'
+                      ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black border-amber-400 shadow-md scale-105'
                       : isCompleted
-                      ? 'bg-slate-900/90 text-emerald-400 border-emerald-500/30 hover:border-emerald-500/60'
-                      : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700'
+                      ? 'bg-[#121212]/95 text-amber-300 border-amber-500/30 hover:border-amber-500/60'
+                      : 'bg-[#0A0A0A] text-slate-400 border-white/[0.08] hover:border-white/20'
                   }`}
                 >
                   {p.code_letter ? (
                     <span
                       className={`w-5 h-5 rounded-md flex items-center justify-center font-mono text-xs ${
-                        isSelected ? 'bg-white text-indigo-700' : 'bg-slate-800 text-slate-300'
+                        isSelected ? 'bg-slate-950 text-amber-300 font-black' : 'bg-[#0A0A0A] text-slate-300'
                       }`}
                     >
                       {p.code_letter}
                     </span>
                   ) : null}
                   <span>{displayLabel}</span>
-                  {isCompleted && <Check className="w-3.5 h-3.5 text-emerald-400 ml-0.5" />}
+                  {isCompleted && <Check className="w-3.5 h-3.5 text-amber-400 ml-0.5" />}
                 </button>
               );
             })}
 
             <button
               onClick={() => setViewMode('MATRIX')}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ml-auto"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 border border-white/[0.08] hover:bg-amber-500/200/20 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ml-auto"
             >
               <Table className="w-3.5 h-3.5" />
               <span>Review All Matrix ➔</span>
@@ -357,7 +370,7 @@ export const JudgeScoringPage: React.FC = () => {
           {currentParticipant ? (
             <div className="space-y-6">
               {/* Blind Performer Spotlight Header */}
-              <Card className="border-indigo-500/40 bg-gradient-to-r from-indigo-950/40 via-slate-900/80 to-slate-950 p-6 rounded-2xl relative overflow-hidden">
+              <Card className="border-amber-500/40/40 bg-gradient-to-r from-indigo-950/40 via-slate-900/80 to-slate-950 p-6 rounded-2xl relative overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white font-black text-3xl flex items-center justify-center shadow-xl shadow-indigo-600/30 shrink-0">
@@ -365,7 +378,7 @@ export const JudgeScoringPage: React.FC = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs uppercase font-extrabold tracking-wider text-indigo-400">
+                        <span className="text-xs uppercase font-extrabold tracking-wider text-amber-300">
                           CONTESTANT {activePerformerIndex + 1} OF {participants.length}
                         </span>
                         {isAllLocked ? (
@@ -387,19 +400,18 @@ export const JudgeScoringPage: React.FC = () => {
                         PERFORMER CODE LETTER{' '}
                         {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}
                       </h2>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">
+                      <p className="text-xs text-amber-200/60 font-mono mt-0.5">
                         REG CODE: {currentParticipant.participant_code} • Blind Adjudication Active
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold block">
+                    <span className="text-xs uppercase tracking-wider text-amber-200/60 font-semibold block">
                       Performer Total Mark
                     </span>
-                    <span className="text-3xl font-black text-indigo-400">
-                      {getParticipantMark(currentParticipant.participant_id).toFixed(1)}{' '}
-                      <span className="text-sm font-semibold text-slate-400">/ 100</span>
+                    <span className="text-3xl font-black text-amber-300">
+                      {Math.round(getParticipantMark(currentParticipant.participant_id))}
                     </span>
                   </div>
                 </div>
@@ -407,9 +419,9 @@ export const JudgeScoringPage: React.FC = () => {
 
               {/* Ready / Start Barrier */}
               {!startedPerformers[currentParticipant.participant_id] && !isAllLocked ? (
-                <Card className="py-16 text-center space-y-4 border-indigo-500/30 bg-slate-900/60">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
-                    <Play className="w-8 h-8 ml-1" />
+                <Card className="py-16 text-center space-y-4 border-amber-500/30 bg-[#0A0A0A]">
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center justify-center">
+                    <Play className="w-8 h-8 ml-1 text-amber-400" />
                   </div>
                   <div className="max-w-md mx-auto">
                     <h3 className="text-xl font-black text-white">
@@ -423,7 +435,7 @@ export const JudgeScoringPage: React.FC = () => {
                   <Button
                     variant="primary"
                     size="lg"
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3 text-base shadow-xl shadow-emerald-600/30"
+                    className={`${THEME.classes.primaryBtn} px-8 py-3 text-base shadow-xl rounded-full`}
                     onClick={() => {
                       setStartedPerformers((prev) => ({
                         ...prev,
@@ -441,22 +453,22 @@ export const JudgeScoringPage: React.FC = () => {
               ) : (
                 /* Direct 100-Mark Scoring Card */
                 <Card className="space-y-6">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                     <h3 className="text-base font-bold text-white flex items-center gap-2">
-                      <Award className="w-5 h-5 text-indigo-400" />
+                      <Award className="w-5 h-5 text-amber-300" />
                       <span>Direct Scoring (Out of 100 Marks)</span>
                     </h3>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-amber-200/60">
                       Enter the contestant's score directly from 0 to 100 points
                     </span>
                   </div>
 
                   {/* Direct Score Big Input & Range */}
-                  <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-6">
+                  <div className="p-6 rounded-2xl bg-[#121212] border border-white/[0.08] space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                       <div>
                         <h4 className="text-lg font-black text-white">Direct Total Mark</h4>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-amber-200/60 mt-0.5">
                           Type numeric score or use slider and preset buttons below
                         </p>
                       </div>
@@ -466,16 +478,15 @@ export const JudgeScoringPage: React.FC = () => {
                           type="number"
                           min="0"
                           max="100"
-                          step="0.5"
+                          step="1"
                           disabled={isAllLocked}
                           value={allMarks[currentParticipant.participant_id] ?? 0}
                           onChange={(e) => {
                             const val = parseFloat(e.target.value) || 0;
                             handleMarkChange(currentParticipant.participant_id, val);
                           }}
-                          className="w-32 px-4 py-3 bg-slate-800 border-2 border-indigo-500/50 rounded-xl text-3xl font-black text-indigo-400 text-center focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 disabled:opacity-60 font-mono shadow-inner"
+                          className="w-32 px-4 py-3 bg-[#0A0A0A] border-2 border-amber-500/40 rounded-xl text-3xl font-black text-amber-300 text-center focus:outline-none focus:ring-4 focus:ring-amber-500/30 focus:border-amber-400 disabled:opacity-60 font-mono shadow-inner"
                         />
-                        <span className="text-xl font-bold text-slate-400">/ 100</span>
                       </div>
                     </div>
 
@@ -485,16 +496,16 @@ export const JudgeScoringPage: React.FC = () => {
                         type="range"
                         min="0"
                         max="100"
-                        step="0.5"
+                        step="1"
                         disabled={isAllLocked}
                         value={allMarks[currentParticipant.participant_id] ?? 0}
                         onChange={(e) => {
                           const val = parseFloat(e.target.value) || 0;
                           handleMarkChange(currentParticipant.participant_id, val);
                         }}
-                        className="w-full accent-indigo-500 h-3 bg-slate-800 rounded-lg cursor-pointer disabled:opacity-40"
+                        className="w-full accent-amber-500 h-3 bg-[#0A0A0A] rounded-lg cursor-pointer disabled:opacity-40"
                       />
-                      <div className="flex justify-between text-[11px] font-mono font-semibold text-slate-500">
+                      <div className="flex justify-between text-[11px] font-mono font-semibold text-amber-200/60">
                         <span>0</span>
                         <span>25</span>
                         <span>50</span>
@@ -504,8 +515,8 @@ export const JudgeScoringPage: React.FC = () => {
                     </div>
 
                     {/* Quick Preset Buttons */}
-                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80">
-                      <span className="text-xs font-semibold text-slate-400 mr-2">Quick Presets:</span>
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/[0.08]/80">
+                      <span className="text-xs font-semibold text-amber-200/60 mr-2">Quick Presets:</span>
                       {SCORE_PRESETS.map((preset) => (
                         <button
                           key={preset}
@@ -515,7 +526,7 @@ export const JudgeScoringPage: React.FC = () => {
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
                             allMarks[currentParticipant.participant_id] === preset
                               ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
-                              : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                              : 'bg-[#0A0A0A] text-slate-300 border-amber-500/30 hover:bg-[#121212] hover:text-white'
                           }`}
                         >
                           {preset}
@@ -526,7 +537,7 @@ export const JudgeScoringPage: React.FC = () => {
 
                   {/* Remarks Input */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <label className="text-xs font-bold uppercase tracking-wider text-amber-200/60">
                       Judge Remarks / Feedback (Optional)
                     </label>
                     <textarea
@@ -535,12 +546,12 @@ export const JudgeScoringPage: React.FC = () => {
                       placeholder="Enter qualitative comments, observations, or feedback for this performance..."
                       value={allRemarks[currentParticipant.participant_id] || ''}
                       onChange={(e) => handleRemarksChange(currentParticipant.participant_id, e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60 resize-none"
+                      className="w-full px-3.5 py-2.5 bg-[#121212] border border-white/[0.08] rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:opacity-60 resize-none"
                     />
                   </div>
 
                   {/* Navigation and Next Actions */}
-                  <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="pt-4 border-t border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
                       {activePerformerIndex > 0 && (
                         <Button
@@ -574,7 +585,7 @@ export const JudgeScoringPage: React.FC = () => {
                       <Button
                         variant="primary"
                         size="md"
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/30"
+                        className={`${THEME.classes.primaryBtn} shadow-md`}
                         onClick={handleCompleteAndNext}
                         isLoading={saveIndividualScoresMutation.isPending}
                         disabled={isAllLocked}
@@ -605,10 +616,10 @@ export const JudgeScoringPage: React.FC = () => {
         /* MODE 2: OVERALL REVIEW & CALIBRATION MATRIX                   */
         /* ============================================================== */
         <div className="space-y-6">
-          <div className="p-4 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-indigo-950/30 border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-black text-white flex items-center gap-2">
-                <Table className="w-4 h-4 text-indigo-400" />
+                <Table className="w-4 h-4 text-amber-300" />
                 <span>Overall Review & Score Calibration Matrix</span>
               </h3>
               <p className="text-xs text-slate-300 mt-0.5">
@@ -625,29 +636,29 @@ export const JudgeScoringPage: React.FC = () => {
           </div>
 
           {/* Spreadsheet Matrix Table */}
-          <Card className="p-0 overflow-hidden border-slate-800 shadow-xl">
+          <Card className="p-0 overflow-hidden border-white/[0.08] shadow-xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-slate-950 border-b border-slate-800 text-xs font-bold uppercase text-slate-400">
+                  <tr className="bg-slate-950 border-b border-white/[0.08] text-xs font-bold uppercase text-amber-200/60">
                     <th className="py-3 px-4 w-16">Lot</th>
                     <th className="py-3 px-4 min-w-[150px]">Contestant</th>
                     <th className="py-3 px-4 text-center min-w-[140px]">
-                      <div>Mark / 100</div>
-                      <div className="text-[10px] text-slate-500 font-normal">Direct Score</div>
+                      <div>Mark</div>
+                      <div className="text-[10px] text-amber-200/60 font-normal">Direct Score</div>
                     </th>
                     <th className="py-3 px-3 text-center w-20">Rank</th>
                     <th className="py-3 px-4 min-w-[200px]">Remarks</th>
                     <th className="py-3 px-4 text-right min-w-[100px]">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 bg-slate-900/30">
+                <tbody className="divide-y divide-amber-500/15 bg-[#121212]/60">
                   {participants.map((p, idx) => {
                     const pTotal = allMarks[p.participant_id] ?? 0;
                     const pRank = participantRanks[p.participant_id];
 
                     return (
-                      <tr key={p.participant_id} className="hover:bg-slate-800/40 transition-colors">
+                      <tr key={p.participant_id} className="hover:bg-white/[0.04] transition-colors">
                         <td className="py-3.5 px-4 font-mono font-black text-slate-300">
                           {p.code_letter ? (
                             <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
@@ -661,7 +672,7 @@ export const JudgeScoringPage: React.FC = () => {
                           <span className="font-bold text-white block">
                             Code Letter {p.code_letter || String.fromCharCode(65 + idx)}
                           </span>
-                          <span className="text-xs text-slate-400 font-mono">{p.participant_code}</span>
+                          <span className="text-xs text-amber-200/60 font-mono">{p.participant_code}</span>
                         </td>
                         {/* Direct Score Input for Live Calibration */}
                         <td className="py-3.5 px-4 text-center">
@@ -670,16 +681,15 @@ export const JudgeScoringPage: React.FC = () => {
                               type="number"
                               min="0"
                               max="100"
-                              step="0.5"
+                              step="1"
                               disabled={isAllLocked}
                               value={allMarks[p.participant_id] ?? 0}
                               onChange={(e) => {
                                 const val = parseFloat(e.target.value) || 0;
                                 handleMarkChange(p.participant_id, val);
                               }}
-                              className="w-24 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-base font-black text-indigo-400 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60 font-mono"
+                              className="w-24 px-3 py-1.5 bg-[#0A0A0A] border border-white/[0.08] rounded-lg text-base font-black text-amber-300 text-center focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:opacity-60 font-mono"
                             />
-                            <span className="text-xs font-semibold text-slate-500">/ 100</span>
                           </div>
                         </td>
                         {/* Dynamically Calibrated Rank */}
@@ -688,18 +698,26 @@ export const JudgeScoringPage: React.FC = () => {
                             <span
                               className={`inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-black ${
                                 pRank === 1
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  ? 'bg-amber-500/20 text-amber-300 border border-white/[0.08]'
                                   : pRank === 2
-                                  ? 'bg-slate-300/20 text-slate-200 border border-slate-400/30'
+                                  ? 'bg-amber-400/50/20 text-slate-200 border border-slate-400/30'
                                   : pRank === 3
                                   ? 'bg-amber-700/20 text-amber-400 border border-amber-700/30'
-                                  : 'text-slate-400'
+                                  : 'text-amber-200/60'
                               }`}
                             >
-                              {pRank === 1 ? '1st' : pRank === 2 ? '2nd' : pRank === 3 ? '3rd' : `${pRank}th`}
+                              {pRank === 1 ? (
+                              <Medal className="w-5 h-5 text-amber-500 inline" />
+                            ) : pRank === 2 ? (
+                              <Medal className="w-5 h-5 text-amber-200/60 inline" />
+                            ) : pRank === 3 ? (
+                              <Medal className="w-5 h-5 text-amber-700 inline" />
+                            ) : (
+                              `${pRank}`
+                            )}
                             </span>
                           ) : (
-                            <span className="text-slate-600 text-xs">—</span>
+                            <span className="text-amber-200/60 text-xs">—</span>
                           )}
                         </td>
                         {/* Remarks Input */}
@@ -710,7 +728,7 @@ export const JudgeScoringPage: React.FC = () => {
                             placeholder="Add remarks..."
                             value={allRemarks[p.participant_id] || ''}
                             onChange={(e) => handleRemarksChange(p.participant_id, e.target.value)}
-                            className="w-full px-2.5 py-1.5 bg-slate-800/80 border border-slate-700/80 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60"
+                            className="w-full px-2.5 py-1.5 bg-[#0A0A0A] border border-white/[0.08] rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:opacity-60"
                           />
                         </td>
                         {/* Status */}
@@ -738,8 +756,8 @@ export const JudgeScoringPage: React.FC = () => {
           </Card>
 
           {/* Matrix Actions Footer */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-800">
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/[0.08]">
+            <div className="flex items-center gap-2 text-xs text-amber-200/60">
               <Award className="w-4 h-4 text-amber-400" />
               <span>
                 Verify that all 100-scale marks and calibrated rankings are accurate before locking the score sheet.
@@ -762,7 +780,7 @@ export const JudgeScoringPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="md"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/30"
+                  className={`${THEME.classes.primaryBtn} shadow-md`}
                   onClick={() => setIsBulkLockModalOpen(true)}
                   disabled={saveBulkScoresMutation.isPending}
                 >
@@ -770,8 +788,8 @@ export const JudgeScoringPage: React.FC = () => {
                   <span>Lock & Submit Official Scores</span>
                 </Button>
               ) : (
-                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="p-2.5 rounded-xl bg-[#0A0A0A] border border-white/[0.08] text-xs text-slate-300 flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>Official Scoresheet Locked</span>
                 </div>
               )}
@@ -788,21 +806,21 @@ export const JudgeScoringPage: React.FC = () => {
         maxWidth="md"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm">
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-white/[0.08] text-amber-300 text-sm">
             <AlertTriangle className="w-5 h-5 shrink-0 text-amber-400" />
             <span>
               Once locked, your marks out of 100 for all {participants.length} contestants will be permanently submitted and finalized for official results computation.
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+          <div className="p-4 rounded-xl bg-[#121212] border border-white/[0.08] space-y-2 text-xs">
             <div className="flex justify-between text-slate-400">
               <span>Programme:</span>
               <strong className="text-white">{competition?.programme_number} - {competition?.name}</strong>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Total Contestants Evaluated:</span>
-              <strong className="text-emerald-400">{participants.length} Contestants</strong>
+              <strong className="text-amber-300">{participants.length} Contestants</strong>
             </div>
           </div>
 
@@ -812,7 +830,7 @@ export const JudgeScoringPage: React.FC = () => {
             </Button>
             <Button
               variant="primary"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+              className={`${THEME.classes.primaryBtn} px-5 py-2`}
               isLoading={saveBulkScoresMutation.isPending}
               onClick={() => saveBulkScoresMutation.mutate({ isDraft: false })}
             >

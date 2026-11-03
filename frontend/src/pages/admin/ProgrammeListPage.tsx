@@ -151,42 +151,42 @@ export const ProgrammeListPage: React.FC = () => {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-black text-white flex items-center gap-3">
-          <ListOrdered className="w-6 h-6 text-indigo-400" />
+          <ListOrdered className="w-6 h-6 text-amber-300" />
           Programme List & Team Assignments
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-amber-200/60 mt-1">
           Complete overview of all 60 competition programmes with team participant assignments.
         </p>
       </div>
 
       {/* Summary Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-950/60 border-slate-800 p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Programmes</span>
-          <span className="text-2xl font-bold text-slate-100">{processedData.totalComps}</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="bg-[#0A0A0A]/90 border-amber-500/30 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
+          <span className="text-[10px] sm:text-xs font-semibold text-amber-200/60 uppercase tracking-wider">Total Programmes</span>
+          <span className="text-xl sm:text-2xl font-bold text-slate-100">{processedData.totalComps}</span>
         </Card>
-        <Card className="bg-slate-950/60 border-slate-800 p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Assignments</span>
-          <span className="text-2xl font-bold text-slate-100">{processedData.totalAssigned}</span>
+        <Card className="bg-[#0A0A0A]/90 border-amber-500/30 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
+          <span className="text-[10px] sm:text-xs font-semibold text-amber-200/60 uppercase tracking-wider">Total Assignments</span>
+          <span className="text-xl sm:text-2xl font-bold text-slate-100">{processedData.totalAssigned}</span>
         </Card>
-        <Card className="bg-slate-950/60 border-slate-800 p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Team Diraya Coverage</span>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-slate-100">{processedData.dirayaCoverage}</span>
-            <span className="text-xs text-slate-500">/{processedData.totalComps}</span>
+        <Card className="bg-[#0A0A0A]/90 border-amber-500/30 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
+          <span className="text-[10px] sm:text-xs font-semibold text-amber-200/60 uppercase tracking-wider">Diraya Coverage</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-bold text-slate-100">{processedData.dirayaCoverage}</span>
+            <span className="text-[11px] sm:text-xs text-amber-200/60">/{processedData.totalComps}</span>
           </div>
         </Card>
-        <Card className="bg-slate-950/60 border-slate-800 p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Team Rivaya Coverage</span>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-slate-100">{processedData.rivayaCoverage}</span>
-            <span className="text-xs text-slate-500">/{processedData.totalComps}</span>
+        <Card className="bg-[#0A0A0A]/90 border-amber-500/30 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1 backdrop-blur-sm">
+          <span className="text-[10px] sm:text-xs font-semibold text-amber-200/60 uppercase tracking-wider">Rivaya Coverage</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-bold text-slate-100">{processedData.rivayaCoverage}</span>
+            <span className="text-[11px] sm:text-xs text-amber-200/60">/{processedData.totalComps}</span>
           </div>
         </Card>
       </div>
 
       {/* Filters (Single Line) */}
-      <Card className="bg-slate-950/60 border-slate-800 p-3 rounded-xl backdrop-blur-sm">
+      <Card className="bg-[#0A0A0A]/90 border-amber-500/30 p-3 rounded-xl backdrop-blur-sm">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           {/* Category Tabs */}
           <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
@@ -197,7 +197,7 @@ export const ProgrammeListPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   activeCategory === cat
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800'
+                    : 'bg-[#0A0A0A] text-amber-200/60 hover:text-white hover:bg-[#0A0A0A]'
                 }`}
               >
                 {cat}
@@ -207,15 +207,15 @@ export const ProgrammeListPage: React.FC = () => {
 
           {/* Right Controls: Type Selector & Search */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl px-2.5 py-1.5">
-              <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <div className="flex items-center gap-2 bg-[#121212] border border-white/[0.08] rounded-xl px-2.5 py-1.5">
+              <Filter className="w-3.5 h-3.5 text-amber-200/60 shrink-0" />
               <select
                 value={activeType}
                 onChange={(e) => setActiveType(e.target.value)}
                 className="bg-transparent text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer pr-1"
               >
                 {types.map((t) => (
-                  <option key={t} value={t} className="bg-slate-900 text-slate-200">
+                  <option key={t} value={t} className="bg-[#121212] text-slate-200">
                     {t === 'ALL' ? 'ALL TYPES' : t}
                   </option>
                 ))}
@@ -223,13 +223,13 @@ export const ProgrammeListPage: React.FC = () => {
             </div>
 
             <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-amber-200/60 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search programmes or participants..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500"
+                className="w-full bg-[#121212] border border-white/[0.08] rounded-xl pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 placeholder-slate-500"
               />
             </div>
           </div>
@@ -238,14 +238,14 @@ export const ProgrammeListPage: React.FC = () => {
 
       {/* Programme Cards */}
       {isLoading ? (
-        <Card className="bg-slate-950/60 border-slate-800 rounded-xl p-8">
-          <div className="text-center text-slate-400">Loading data...</div>
+        <Card className="bg-[#0A0A0A]/90 border-amber-500/30 rounded-xl p-8">
+          <div className="text-center text-amber-200/60">Loading data...</div>
         </Card>
       ) : processedData.items.length === 0 ? (
-        <Card className="bg-slate-950/60 border-slate-800 rounded-xl p-8">
+        <Card className="bg-[#0A0A0A]/90 border-amber-500/30 rounded-xl p-8">
           <div className="flex flex-col items-center justify-center space-y-3">
-            <Users className="w-12 h-12 text-slate-700" />
-            <p className="text-slate-400 font-medium">No programmes found matching the filters.</p>
+            <Users className="w-12 h-12 text-amber-200" />
+            <p className="text-amber-200/60 font-medium">No programmes found matching the filters.</p>
           </div>
         </Card>
       ) : (
@@ -257,45 +257,36 @@ export const ProgrammeListPage: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className="bg-slate-950/60 border border-slate-800 rounded-xl overflow-hidden transition-all hover:border-slate-700"
+                className="bg-[#0A0A0A]/90 border border-white/[0.08] rounded-xl overflow-hidden transition-all hover:border-amber-500/30"
               >
                 {/* Card Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-900/50 border-b border-slate-800/60">
+                <div className="flex items-center justify-between px-4 py-3 bg-[#0A0A0A] border-b border-white/[0.08]">
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="font-mono text-lg font-black text-indigo-400 shrink-0">
+                    <span className="font-mono text-lg font-black text-amber-300 shrink-0">
                       {item.programme_number || '—'}
                     </span>
                     <div className="min-w-0">
                       <h3 className="font-bold text-sm text-white truncate">{item.name}</h3>
                       {item.competition_code && (
-                        <span className="font-mono text-[10px] text-slate-500">{item.competition_code}</span>
+                        <span className="font-mono text-[10px] text-amber-200/60">{item.competition_code}</span>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-3">
                     <ProgrammeStatusBadge competition={item} />
-                    <Badge variant="neutral" size="sm">
-                      {item.programme_group_name || item.group_name || '-'}
-                    </Badge>
-                    <Badge variant={isStage ? 'warning' : 'info'} size="sm">
-                      {isStage ? 'STAGE' : (typeName || 'GENERAL')}
-                    </Badge>
-                    <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-slate-800 border border-slate-700/50 text-slate-200 font-bold text-xs" title="Total Assigned">
-                      {item.totalAssigned}
-                    </div>
                   </div>
                 </div>
 
                 {/* Card Body — Two-column team layout */}
-                <div className="grid grid-cols-2 divide-x divide-slate-800/50">
+                <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.04]">
                   {/* Team Diraya */}
-                  <div className="p-3.5 border-l-[3px] border-l-indigo-500/60">
+                  <div className="p-3.5 border-l-[3px] border-l-emerald-500/60">
                     <div className="flex items-center gap-1.5 mb-2.5">
-                      <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">
+                      <div className="w-2 h-2 rounded-full bg-[#00E676]"></div>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">
                         Diraya
                       </span>
-                      <span className="text-[10px] text-slate-600 ml-auto">
+                      <span className="text-[10px] text-amber-200/60 ml-auto">
                         {item.diraya.length} assigned
                       </span>
                     </div>
@@ -304,9 +295,9 @@ export const ProgrammeListPage: React.FC = () => {
                         {item.diraya.map((p, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center gap-2 bg-slate-900/80 border border-slate-800/60 rounded-lg px-2.5 py-1.5"
+                            className="flex items-center gap-2 bg-[#121212] border border-white/[0.08] rounded-lg px-2.5 py-1.5"
                           >
-                            <span className="font-mono text-[10px] bg-indigo-500/15 text-indigo-300 px-1.5 py-0.5 rounded font-bold shrink-0">
+                            <span className="font-mono text-[10px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold shrink-0">
                               {p.participant_code}
                             </span>
                             <span className="text-xs font-semibold text-slate-200 truncate">
@@ -316,20 +307,20 @@ export const ProgrammeListPage: React.FC = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center py-3 text-xs text-slate-600 italic">
+                      <div className="flex items-center justify-center py-3 text-xs text-amber-200/60 italic">
                         No participants assigned
                       </div>
                     )}
                   </div>
 
                   {/* Team Rivaya */}
-                  <div className="p-3.5 border-r-[3px] border-r-sky-500/60">
+                  <div className="p-3.5 border-r-[3px] border-r-rose-500/60">
                     <div className="flex items-center gap-1.5 mb-2.5">
-                      <div className="w-2 h-2 rounded-full bg-sky-500"></div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-sky-400">
+                      <div className="w-2 h-2 rounded-full bg-[#FF2A6D]"></div>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-rose-300">
                         Rivaya
                       </span>
-                      <span className="text-[10px] text-slate-600 ml-auto">
+                      <span className="text-[10px] text-amber-200/60 ml-auto">
                         {item.rivaya.length} assigned
                       </span>
                     </div>
@@ -338,9 +329,9 @@ export const ProgrammeListPage: React.FC = () => {
                         {item.rivaya.map((p, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center gap-2 bg-slate-900/80 border border-slate-800/60 rounded-lg px-2.5 py-1.5"
+                            className="flex items-center gap-2 bg-[#121212] border border-white/[0.08] rounded-lg px-2.5 py-1.5"
                           >
-                            <span className="font-mono text-[10px] bg-sky-500/15 text-sky-300 px-1.5 py-0.5 rounded font-bold shrink-0">
+                            <span className="font-mono text-[10px] bg-rose-500/15 text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded font-bold shrink-0">
                               {p.participant_code}
                             </span>
                             <span className="text-xs font-semibold text-slate-200 truncate">
@@ -350,7 +341,7 @@ export const ProgrammeListPage: React.FC = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center py-3 text-xs text-slate-600 italic">
+                      <div className="flex items-center justify-center py-3 text-xs text-amber-200/60 italic">
                         No participants assigned
                       </div>
                     )}

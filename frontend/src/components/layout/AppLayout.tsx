@@ -4,6 +4,7 @@ import { Navbar } from './Navbar.js';
 import { Sidebar } from './Sidebar.js';
 import { BentoHeader } from './BentoHeader.js';
 import { useAuth } from '../../context/AuthContext.js';
+import { MinimalFestivalLoader } from '../ui/MinimalFestivalLoader.js';
 
 interface AppLayoutProps {
   requireAuth?: boolean;
@@ -16,18 +17,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ requireAuth = false, allow
   const location = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 font-bento">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-400 animate-spin" />
-          <p className="text-sm font-semibold text-slate-400">Loading Esperanza 2026...</p>
-        </div>
-      </div>
-    );
+    return <MinimalFestivalLoader />;
   }
 
   if (requireAuth && !user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/?login=true" state={{ from: location }} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
@@ -55,7 +49,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ requireAuth = false, allow
       return <Outlet />;
     }
     return (
-      <div className={`min-h-screen flex flex-col ${isHome ? 'bg-[#070503] text-white relative' : 'bg-[#ffffc5] text-slate-900'}`}>
+      <div className="min-h-screen flex flex-col bg-[#040404] text-slate-100 relative">
         <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} isPublic={true} />
         <main className={`flex-1 w-full ${isHome ? 'p-0 max-w-none' : 'p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto'}`}>
           <Outlet />
@@ -64,21 +58,21 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ requireAuth = false, allow
     );
   }
 
-  // 3. All Remaining Authenticated Pages (Admin, Team, etc.) -> Unified High-Class Bento Grid Design System
+  // 3. All Authenticated Portals (Admin, Team, Judge, Participant) -> Unified Dark Luxury Bento Grid System
   return (
-    <div className={`w-full bg-[#EEF1EE] flex gap-3 xl:gap-4 font-bento text-slate-800 antialiased items-start select-none bento-portal ${
-      isJudge ? 'h-screen p-3 overflow-hidden' : 'min-h-screen p-3 xl:p-4'
+    <div className={`w-full flex gap-3 xl:gap-4 font-bento antialiased items-start bento-portal bg-[#040404] text-slate-100 p-2 sm:p-3 xl:p-4 ${
+      isJudge ? 'min-h-screen md:h-screen md:overflow-hidden select-none' : 'min-h-screen'
     }`}>
       {showSidebar && <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />}
       <main
-        className={`flex-1 rounded-[24px] flex flex-col min-w-0 ${
+        className={`flex-1 rounded-2xl sm:rounded-[24px] flex flex-col min-w-0 bg-[#0A0A0A] border border-white/[0.08] text-slate-100 p-3.5 sm:p-5 xl:p-6 gap-3.5 sm:gap-5 shadow-[0_10px_40px_rgba(0,0,0,0.8)] relative overflow-x-hidden ${
           isJudge
-            ? 'h-full bg-gradient-to-br from-[#0D472D] via-[#0A3B25] to-[#062919] text-white p-3.5 sm:p-5 shadow-xl border border-emerald-800/40 relative overflow-hidden justify-between'
-            : 'bg-white p-5 xl:p-6 gap-5 shadow-2xs border border-slate-100/80 lg:min-h-[calc(100vh-1.5rem)] xl:min-h-[calc(100vh-2rem)]'
+            ? 'min-h-full md:h-full justify-between'
+            : 'lg:min-h-[calc(100vh-1.5rem)] xl:min-h-[calc(100vh-2rem)]'
         }`}
       >
         <BentoHeader onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
-        <div className={`min-w-0 ${isJudge ? 'flex-1 flex flex-col justify-center overflow-hidden' : 'flex-1 flex flex-col'}`}>
+        <div className={`min-w-0 ${isJudge ? 'flex-1 flex flex-col justify-start md:justify-center overflow-y-auto md:overflow-hidden' : 'flex-1 flex flex-col'}`}>
           <Outlet />
         </div>
       </main>
