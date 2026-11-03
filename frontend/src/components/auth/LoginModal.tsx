@@ -66,9 +66,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const quickLogin = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
+  const selectRoleShortcut = (username: string) => {
+    setEmail(username);
+    setPassword('');
   };
 
   return (
@@ -161,43 +161,43 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </button>
         </form>
 
-        {/* Quick Demo Credentials Bar */}
+        {/* Role Shortcuts (Fills username only) */}
         <div className="mt-5 pt-4 border-t border-white/[0.08] relative z-10">
           <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2 text-center">
-            Quick Demo Shortcuts
+            Role Shortcuts
           </p>
           <div className="grid grid-cols-3 gap-1.5 text-[10px]">
             <button
               type="button"
-              onClick={() => quickLogin('admin', 'admin123')}
+              onClick={() => selectRoleShortcut('admin')}
               className="p-1.5 rounded-lg bg-[#121212] hover:bg-white/10 text-slate-200 border border-white/[0.08] hover:border-amber-400/30 transition-all font-semibold cursor-pointer truncate"
             >
               Admin
             </button>
             <button
               type="button"
-              onClick={() => quickLogin('diraya', 'team123')}
+              onClick={() => selectRoleShortcut('diraya')}
               className="p-1.5 rounded-lg bg-[#121212] hover:bg-white/10 text-[#00E676] border border-white/[0.08] hover:border-[#00E676]/40 transition-all font-bold cursor-pointer truncate"
             >
               Diraya
             </button>
             <button
               type="button"
-              onClick={() => quickLogin('rivaya', 'team123')}
+              onClick={() => selectRoleShortcut('rivaya')}
               className="p-1.5 rounded-lg bg-[#121212] hover:bg-white/10 text-[#FF2A6D] border border-white/[0.08] hover:border-[#FF2A6D]/40 transition-all font-bold cursor-pointer truncate"
             >
               Rivaya
             </button>
             <button
               type="button"
-              onClick={() => quickLogin('judge1', 'judge123')}
+              onClick={() => selectRoleShortcut('judge1')}
               className="p-1.5 rounded-lg bg-[#121212] hover:bg-white/10 text-amber-300 border border-white/[0.08] hover:border-amber-400/30 transition-all font-semibold cursor-pointer truncate"
             >
               Stage Judge
             </button>
             <button
               type="button"
-              onClick={() => quickLogin('offjudge', 'offjudge123')}
+              onClick={() => selectRoleShortcut('offjudge')}
               className="p-1.5 rounded-lg bg-[#121212] hover:bg-white/10 text-amber-300 border border-white/[0.08] hover:border-amber-400/30 transition-all font-semibold cursor-pointer truncate col-span-2"
             >
               Off-Stage Judge
