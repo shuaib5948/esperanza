@@ -157,6 +157,11 @@ export const CompetitionsManagerPage: React.FC = () => {
     }
   };
 
+  const invalidateAllCompetitionQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ['competitions'] });
+    queryClient.invalidateQueries({ queryKey: ['competitions-all'] });
+  };
+
   // 3. Save criteria mutation
   const saveCriteriaMutation = useMutation({
     mutationFn: async (updatedCriteria: Criterion[]) => {
@@ -167,7 +172,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('Evaluation criteria updated successfully');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
       setIsCriteriaModalOpen(false);
     },
     onError: (err: any) => {
@@ -182,7 +187,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('Competition status updated');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
     },
     onError: (err: any) => {
       error(err.message || 'Failed to update status');
@@ -196,7 +201,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('New competition created successfully');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
       setIsAddModalOpen(false);
       setFormData({
         programme_number: '',
@@ -276,7 +281,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('Competition updated successfully');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
       setIsEditModalOpen(false);
       setEditingComp(null);
     },
@@ -292,7 +297,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('All competition registrations locked');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
     },
     onError: (err: any) => {
       error(err.message || 'Failed to lock registrations');
@@ -305,7 +310,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('All competition registrations unlocked');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
     },
     onError: (err: any) => {
       error(err.message || 'Failed to unlock registrations');
@@ -321,7 +326,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     onSuccess: (_, comp) => {
       const newStatus = comp.status === 'ACTIVE' ? 'locked (CLOSED)' : 'unlocked (ACTIVE)';
       success(`Registration ${newStatus} for ${comp.programme_number} - ${comp.name}`);
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
     },
     onError: (err: any) => {
       error(err.message || 'Failed to toggle registration status');
@@ -394,7 +399,7 @@ export const CompetitionsManagerPage: React.FC = () => {
     },
     onSuccess: () => {
       success('Competition deleted successfully');
-      queryClient.invalidateQueries({ queryKey: ['competitions'] });
+      invalidateAllCompetitionQueries();
       setIsDeleteModalOpen(false);
       setDeletingComp(null);
     },

@@ -84,8 +84,37 @@ export class EntryService {
     // 4. Team entry limit (null or 0 means unlimited entries for that item)
     const existingEntriesCount = await EntryRepository.countActiveTeamEntries(competitionId, teamId);
     const maxEntriesAllowed = competition.max_entries_per_team;
+    const isIndividual = competition.participation_type === 'INDIVIDUAL';
+    const maxParticipants = isIndividual ? 1 : (competition.max_participants || 10);
+
     if (maxEntriesAllowed !== null && maxEntriesAllowed !== undefined && maxEntriesAllowed > 0) {
       if (existingEntriesCount >= maxEntriesAllowed) {
+        // If it's a GROUP competition and the team already has an active entry,
+        // check if that entry still has vacant slots to append the new participants
+        if (!isIndividual && existingEntriesCount === 1) {
+          const teamEntries = await EntryRepository.findByCompetitionAndTeam(competitionId, teamId);
+          if (teamEntries.length > 0) {
+            const activeEntry = teamEntries[0];
+            const currentCount = activeEntry.participants?.length || activeEntry.participant_count || 0;
+            if (currentCount + participantIds.length <= maxParticipants) {
+              for (const pId of participantIds) {
+                await this.addParticipantToEntry({
+                  entryId: activeEntry.id,
+                  participantId: pId,
+                  authorizedTeamId: teamId,
+                });
+              }
+              return (await EntryRepository.findById(activeEntry.id))!;
+            } else {
+              throw {
+                statusCode: 400,
+                code: 'GROUP_MAX_EXCEEDED',
+                message: `Cannot add ${participantIds.length} participant(s). Group already has ${currentCount} member(s) and maximum allowed is ${maxParticipants}`,
+              };
+            }
+          }
+        }
+
         throw {
           statusCode: 400,
           code: 'MAX_ENTRIES_EXCEEDED',
@@ -153,9 +182,6 @@ export class EntryService {
     }
 
     // 6. Participation constraints: Individual vs Group
-    const isIndividual = competition.participation_type === 'INDIVIDUAL';
-    const maxParticipants = isIndividual ? 1 : (competition.max_participants || 10);
-
     if (isIndividual) {
       if (participantIds.length !== 1) {
         throw {

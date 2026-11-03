@@ -365,30 +365,31 @@ export const TeamRegistrationsPage: React.FC = () => {
 
   const toggleParticipantSelection = (id: number) => {
     if (!selectedCompForAssign) return;
-    const isGroup = selectedCompForAssign.participation_type === 'GROUP';
+    const isGroup = (selectedCompForAssign.participation_type || '').toUpperCase() === 'GROUP';
     const isUnlimited =
       selectedCompForAssign.max_entries_per_team === null || selectedCompForAssign.max_entries_per_team === undefined;
     const maxEntriesAllowed = selectedCompForAssign.max_entries_per_team;
     const assignedList = assignedMap.get(selectedCompForAssign.id) || [];
-    const remainingSlots = isUnlimited
-      ? 999
-      : Math.max(0, (maxEntriesAllowed || 1) - assignedList.length);
-
     const maxGroupMembers = selectedCompForAssign.max_participants || (isGroup ? 4 : 1);
+
+    const totalAllowed = isUnlimited
+      ? 999
+      : isGroup
+      ? (maxEntriesAllowed || 1) * maxGroupMembers
+      : (maxEntriesAllowed || 1);
+
+    const remainingSlots = Math.max(0, totalAllowed - assignedList.length);
 
     if (selectedParticipantIds.includes(id)) {
       setSelectedParticipantIds(selectedParticipantIds.filter((pId) => pId !== id));
     } else {
-      if (isGroup) {
-        if (selectedParticipantIds.length >= maxGroupMembers) {
-          error(`Maximum limit of ${maxGroupMembers} participants reached for this group entry.`);
-          return;
-        }
-      } else {
-        if (!isUnlimited && selectedParticipantIds.length >= remainingSlots) {
-          error(`Maximum ${remainingSlots} ${remainingSlots === 1 ? 'entry' : 'entries'} remaining for this competition.`);
-          return;
-        }
+      if (selectedParticipantIds.length >= remainingSlots) {
+        error(
+          isGroup
+            ? `Cannot select more than ${remainingSlots} participant${remainingSlots === 1 ? '' : 's'}. Maximum limit is ${maxGroupMembers} participants per group.`
+            : `Maximum ${remainingSlots} ${remainingSlots === 1 ? 'entry' : 'entries'} remaining for this competition.`
+        );
+        return;
       }
       setSelectedParticipantIds([...selectedParticipantIds, id]);
     }
@@ -396,19 +397,21 @@ export const TeamRegistrationsPage: React.FC = () => {
 
   const handleSelectAllEligible = () => {
     if (!selectedCompForAssign) return;
-    const isGroup = selectedCompForAssign.participation_type === 'GROUP';
+    const isGroup = (selectedCompForAssign.participation_type || '').toUpperCase() === 'GROUP';
     const isUnlimited =
       selectedCompForAssign.max_entries_per_team === null || selectedCompForAssign.max_entries_per_team === undefined;
     const maxEntriesAllowed = selectedCompForAssign.max_entries_per_team;
     const assignedList = assignedMap.get(selectedCompForAssign.id) || [];
-    const remainingSlots = isUnlimited
-      ? eligibleParticipants.length
-      : Math.max(0, (maxEntriesAllowed || 1) - assignedList.length);
-    const maxLimit = isGroup
-      ? (selectedCompForAssign.max_participants || 4)
-      : remainingSlots;
+    const maxGroupMembers = selectedCompForAssign.max_participants || (isGroup ? 4 : 1);
 
-    const availableIds = eligibleParticipants.slice(0, maxLimit).map((p) => p.id);
+    const totalAllowed = isUnlimited
+      ? eligibleParticipants.length
+      : isGroup
+      ? (maxEntriesAllowed || 1) * maxGroupMembers
+      : (maxEntriesAllowed || 1);
+
+    const remainingSlots = Math.max(0, totalAllowed - assignedList.length);
+    const availableIds = eligibleParticipants.slice(0, remainingSlots).map((p) => p.id);
     setSelectedParticipantIds(availableIds);
   };
 
@@ -419,9 +422,12 @@ export const TeamRegistrationsPage: React.FC = () => {
       return;
     }
 
-    const isGroup = selectedCompForAssign.participation_type === 'GROUP';
-    if (isGroup && selectedParticipantIds.length < 2) {
-      error('Group events require at least 2 participants.');
+    const isGroup = (selectedCompForAssign.participation_type || '').toUpperCase() === 'GROUP';
+    const assignedList = assignedMap.get(selectedCompForAssign.id) || [];
+
+    // For brand new group registration (when 0 members are currently enrolled), enforce min 2 participants
+    if (isGroup && assignedList.length === 0 && selectedParticipantIds.length < 2) {
+      error('Group events require at least 2 participants for initial enrollment.');
       return;
     }
 
@@ -550,15 +556,19 @@ export const TeamRegistrationsPage: React.FC = () => {
           {filteredCompetitions.map((comp) => {
             const assignedList = assignedMap.get(comp.id) || [];
             const locked = isLocked(comp);
-            const isGroup = comp.participation_type === 'GROUP';
+            const isGroup = (comp.participation_type || '').toUpperCase() === 'GROUP';
             const isUnlimited =
               comp.max_entries_per_team === null || comp.max_entries_per_team === undefined;
             const maxEntries = comp.max_entries_per_team;
-            const canAddMore = isUnlimited
-              ? true
+            const maxGroupMembers = comp.max_participants || (isGroup ? 4 : 1);
+
+            const totalSlotsAllowed = isUnlimited
+              ? Infinity
               : isGroup
-              ? assignedList.length === 0 || (typeof maxEntries === 'number' && maxEntries > 1)
-              : assignedList.length < (maxEntries || 1);
+              ? (maxEntries || 1) * maxGroupMembers
+              : (maxEntries || 1);
+
+            const canAddMore = assignedList.length < totalSlotsAllowed;
 
             const groupName =
               comp.programme_group_name ||
@@ -581,7 +591,9 @@ export const TeamRegistrationsPage: React.FC = () => {
                         {formatProgTitle(comp.name, groupName)}
                       </h4>
                       <p className="text-xs text-slate-400 mt-1">
-                        {isGroup ? 'Group Event' : 'Individual'} • {isUnlimited ? 'Unlimited entries' : `Max ${maxEntries || 1} entries`}
+                        {isGroup
+                          ? `Group Event (${maxGroupMembers} per group)`
+                          : 'Individual'} • {isUnlimited ? 'Unlimited entries' : `Max ${maxEntries || 1} entries`}
                       </p>
                     </div>
 
@@ -595,7 +607,11 @@ export const TeamRegistrationsPage: React.FC = () => {
                       ) : hasEntries ? (
                         <span className="text-xs font-black text-amber-300 flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
-                          <span>{assignedList.length} Enrolled</span>
+                          <span>
+                            {isGroup
+                              ? `${assignedList.length}/${maxGroupMembers} Enrolled`
+                              : `${assignedList.length} Enrolled`}
+                          </span>
                         </span>
                       ) : (
                         <span className="text-xs text-slate-500 font-medium">Open</span>
@@ -631,7 +647,11 @@ export const TeamRegistrationsPage: React.FC = () => {
                 {/* Footer Action */}
                 <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between gap-3">
                   <span className="text-[11px] text-slate-500">
-                    {hasEntries ? `${assignedList.length} assigned` : 'No entries yet'}
+                    {hasEntries
+                      ? isGroup
+                        ? `${assignedList.length} of ${maxGroupMembers} in group`
+                        : `${assignedList.length} assigned`
+                      : 'No entries yet'}
                   </span>
 
                   <div>
@@ -716,8 +736,8 @@ export const TeamRegistrationsPage: React.FC = () => {
               </div>
               <span className="font-mono text-[11px] font-black text-amber-300 bg-amber-400/15 px-2.5 py-0.5 rounded-lg border border-amber-400/30">
                 Selected: {selectedParticipantIds.length}
-                {selectedCompForAssign.participation_type === 'GROUP'
-                  ? ` / max ${selectedCompForAssign.max_participants || 4}`
+                {(selectedCompForAssign.participation_type || '').toUpperCase() === 'GROUP'
+                  ? ` (Enrolled: ${assignedMap.get(selectedCompForAssign.id)?.length || 0} / Max: ${selectedCompForAssign.max_participants || 4})`
                   : selectedCompForAssign.max_entries_per_team
                   ? ` / max ${selectedCompForAssign.max_entries_per_team}`
                   : ' (Unlimited)'}

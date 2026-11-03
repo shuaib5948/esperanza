@@ -116,14 +116,34 @@ export class RegistrationService {
   }
 
   static async cancel(id: number) {
-    await this.getById(id);
+    const reg = await this.getById(id);
     await RegistrationRepository.updateStatus(id, 'REMOVED');
+    await query(`
+      DELETE ep FROM entry_participants ep
+      JOIN competition_entries ce ON ce.id = ep.entry_id
+      WHERE ce.competition_id = ? AND ep.participant_id = ?
+    `, [reg.competition_id, reg.participant_id]);
+    await query(`
+      DELETE ce FROM competition_entries ce
+      LEFT JOIN entry_participants ep ON ep.entry_id = ce.id
+      WHERE ep.id IS NULL
+    `);
     return this.getById(id);
   }
 
   static async delete(id: number) {
-    await this.getById(id);
+    const reg = await this.getById(id);
     await RegistrationRepository.delete(id);
+    await query(`
+      DELETE ep FROM entry_participants ep
+      JOIN competition_entries ce ON ce.id = ep.entry_id
+      WHERE ce.competition_id = ? AND ep.participant_id = ?
+    `, [reg.competition_id, reg.participant_id]);
+    await query(`
+      DELETE ce FROM competition_entries ce
+      LEFT JOIN entry_participants ep ON ep.entry_id = ce.id
+      WHERE ep.id IS NULL
+    `);
   }
 
   static async checkConflicts(participantId: number, competitionId: number) {
