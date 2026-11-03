@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext.js';
 import { ToastProvider } from './context/ToastContext.js';
 import { AppLayout } from './components/layout/AppLayout.js';
+import { PwaInstallPrompt } from './components/pwa/PwaInstallPrompt.js';
 
 import { ComingSoon } from './components/ui/ComingSoon.js';
 import { PublicComingSoon } from './components/ui/PublicComingSoon.js';
@@ -59,6 +60,7 @@ export const App: React.FC = () => {
       <AuthProvider>
         <ToastProvider>
           <BrowserRouter>
+            <PwaInstallPrompt />
             <Routes>
               {/* Public Routes */}
               <Route element={<AppLayout requireAuth={false} />}>

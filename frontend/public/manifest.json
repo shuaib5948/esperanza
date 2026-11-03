@@ -1,0 +1,30 @@
+{
+  "name": "Esperanza 9.0 • Ashariyya Da'wa Fest",
+  "short_name": "Esperanza 9.0",
+  "description": "Festival Competition Management & Live Blind Evaluation Platform",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#040404",
+  "theme_color": "#0A0A0A",
+  "categories": ["education", "events", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
