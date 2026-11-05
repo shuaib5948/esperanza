@@ -16,6 +16,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal.js';
+import { ParticipantProgrammesModal } from '../../components/participants/ParticipantProgrammesModal.js';
 import { THEME } from '../../theme/theme.js';
 
 interface Participant {
@@ -51,6 +52,13 @@ export const ParticipantsManagerPage: React.FC = () => {
   const [isEditParticipantOpen, setIsEditParticipantOpen] = useState(false);
   const [deletingParticipant, setDeletingParticipant] = useState<Participant | null>(null);
   const [isDeleteParticipantOpen, setIsDeleteParticipantOpen] = useState(false);
+  const [viewingProgrammesParticipant, setViewingProgrammesParticipant] = useState<Participant | null>(null);
+  const [isProgrammesModalOpen, setIsProgrammesModalOpen] = useState(false);
+
+  const handleOpenProgrammes = (p: Participant) => {
+    setViewingProgrammesParticipant(p);
+    setIsProgrammesModalOpen(true);
+  };
 
   // Forms State (Email field removed)
   const [newPartData, setNewPartData] = useState({
@@ -439,9 +447,13 @@ export const ParticipantsManagerPage: React.FC = () => {
               const isDiraya = (p.team_name || p.team_code || '').toUpperCase().includes('DIRAYA') || p.team_id === 1;
 
               return (
-                <div key={p.id} className="p-3.5 space-y-2 hover:bg-white/[0.02] transition-colors">
+                <div
+                  key={p.id}
+                  onClick={() => handleOpenProgrammes(p)}
+                  className="p-3.5 space-y-2 hover:bg-white/[0.04] transition-colors cursor-pointer group"
+                >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono font-bold text-amber-400 text-xs bg-amber-500/10 px-2 py-0.5 rounded-md border border-white/[0.08]">
+                    <span className="font-mono font-bold text-amber-400 text-xs bg-amber-500/10 px-2 py-0.5 rounded-md border border-white/[0.08] group-hover:border-amber-400/40">
                       Reg {regNum}
                     </span>
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-300">
@@ -450,9 +462,14 @@ export const ParticipantsManagerPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-white text-sm">
-                    {p.user_name || p.name}
-                  </h3>
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-bold text-white text-sm group-hover:text-amber-200 transition-colors">
+                      {p.user_name || p.name}
+                    </h3>
+                    <span className="text-[10px] text-amber-300/80 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded font-medium">
+                      View Programmes →
+                    </span>
+                  </div>
 
                   <div className="flex items-center justify-between text-xs pt-0.5">
                     <div className="flex items-center gap-2">
@@ -467,7 +484,10 @@ export const ParticipantsManagerPage: React.FC = () => {
                     </div>
 
                     <button
-                      onClick={() => handleOpenEditParticipant(p)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEditParticipant(p);
+                      }}
                       className="p-1.5 rounded-lg text-amber-200/60 hover:text-white bg-[#121212] border border-white/[0.08] transition-colors cursor-pointer"
                       title="Edit contestant profile"
                     >
@@ -490,7 +510,7 @@ export const ParticipantsManagerPage: React.FC = () => {
                 <th className="py-3 px-4 text-left font-bold">House / Team</th>
                 <th className="py-3 px-4 text-left font-bold">Category</th>
                 <th className="py-3 px-4 text-left font-bold">Status</th>
-                <th className="py-3 px-4 text-right w-20 font-bold">Action</th>
+                <th className="py-3 px-4 text-right w-24 font-bold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
@@ -512,7 +532,12 @@ export const ParticipantsManagerPage: React.FC = () => {
                   const isDiraya = (p.team_name || p.team_code || '').toUpperCase().includes('DIRAYA') || p.team_id === 1;
 
                   return (
-                    <tr key={p.id} className="hover:bg-white/[0.04] transition-colors">
+                    <tr
+                      key={p.id}
+                      onClick={() => handleOpenProgrammes(p)}
+                      className="hover:bg-white/[0.04] transition-colors cursor-pointer group"
+                      title="Click to view enrolled programmes"
+                    >
                       {/* Registration Number */}
                       <td className="py-3 px-4 text-left font-mono font-bold text-amber-400">
                         {regNum}
@@ -520,8 +545,13 @@ export const ParticipantsManagerPage: React.FC = () => {
 
                       {/* Contestant Name */}
                       <td className="py-3 px-4 text-left">
-                        <div className="font-bold text-white text-sm">
-                          {p.user_name || p.name}
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white text-sm group-hover:text-amber-200 transition-colors">
+                            {p.user_name || p.name}
+                          </span>
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-amber-300/80 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded font-mono">
+                            View
+                          </span>
                         </div>
                       </td>
 
@@ -547,9 +577,12 @@ export const ParticipantsManagerPage: React.FC = () => {
                       </td>
 
                       {/* Action */}
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <button
-                          onClick={() => handleOpenEditParticipant(p)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEditParticipant(p);
+                          }}
                           className="p-1.5 rounded-lg text-amber-200/60 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
                           title="Edit contestant profile"
                         >
@@ -858,6 +891,16 @@ export const ParticipantsManagerPage: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* Participant Enrolled Programmes Modal */}
+      <ParticipantProgrammesModal
+        isOpen={isProgrammesModalOpen}
+        onClose={() => {
+          setIsProgrammesModalOpen(false);
+          setViewingProgrammesParticipant(null);
+        }}
+        participant={viewingProgrammesParticipant}
+      />
     </div>
   );
 };

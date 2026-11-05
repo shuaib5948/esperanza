@@ -8,6 +8,7 @@ import {
   Sparkles,
   Layers,
 } from 'lucide-react';
+import { ParticipantProgrammesModal } from '../../components/participants/ParticipantProgrammesModal.js';
 import { THEME } from '../../theme/theme.js';
 
 interface Participant {
@@ -26,6 +27,13 @@ interface Participant {
 
 export const TeamRosterPage: React.FC = () => {
   const [search, setSearch] = useState('');
+  const [viewingProgrammesParticipant, setViewingProgrammesParticipant] = useState<Participant | null>(null);
+  const [isProgrammesModalOpen, setIsProgrammesModalOpen] = useState(false);
+
+  const handleOpenProgrammes = (p: Participant) => {
+    setViewingProgrammesParticipant(p);
+    setIsProgrammesModalOpen(true);
+  };
 
   // 1. Fetch team participants (backend automatically isolates to own team)
   const {
@@ -122,28 +130,36 @@ export const TeamRosterPage: React.FC = () => {
             filtered.map((p) => (
               <div
                 key={p.id}
-                className="p-3.5 rounded-xl bg-[#121212] border border-white/[0.06] space-y-1 shadow-2xs"
+                onClick={() => handleOpenProgrammes(p)}
+                className="p-3.5 rounded-xl bg-[#121212] border border-white/[0.06] hover:border-amber-400/40 hover:bg-[#161616] transition-all space-y-1 shadow-2xs cursor-pointer group"
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="font-mono text-xs text-amber-300 font-bold shrink-0">
                       {p.participant_code}
                     </span>
-                    <h4 className="text-sm font-bold text-white truncate">
+                    <h4 className="text-sm font-bold text-white group-hover:text-amber-200 transition-colors truncate">
                       {p.user_name || p.name}
                     </h4>
                   </div>
-                  <span className="text-xs font-bold text-emerald-400 shrink-0">
-                    • {p.status || 'Active'}
+                  <span className="text-[10px] text-amber-300/80 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded font-mono shrink-0">
+                    Programmes →
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-slate-400 pt-0.5">
-                  <span>{p.category_name}</span>
-                  <span>•</span>
-                  <span>{Number(p.individual_stage_count || 0)} Stage</span>
-                  <span>•</span>
-                  <span>{Number(p.individual_offstage_count || 0)} Off-Stage</span>
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <span>{p.category_name}</span>
+                    <span>•</span>
+                    <span>{Number(p.individual_stage_count || 0)} Stage</span>
+                    <span>•</span>
+                    <span>{Number(p.individual_offstage_count || 0)} Off-Stage</span>
+                  </div>
+
+                  <span className="text-xs font-bold text-emerald-400 shrink-0 inline-flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>{p.status || 'Active'}</span>
+                  </span>
                 </div>
               </div>
             ))
@@ -178,7 +194,12 @@ export const TeamRosterPage: React.FC = () => {
                 </tr>
               ) : (
                 filtered.map((p) => (
-                  <tr key={p.id} className="hover:bg-[#121212]/50 transition-colors">
+                  <tr
+                    key={p.id}
+                    onClick={() => handleOpenProgrammes(p)}
+                    className="hover:bg-white/[0.04] transition-colors cursor-pointer group"
+                    title="Click to view enrolled programmes"
+                  >
                     {/* Chest Code */}
                     <td className="py-3.5 px-4">
                       <span className="font-mono text-xs text-amber-300 font-bold">
@@ -188,9 +209,14 @@ export const TeamRosterPage: React.FC = () => {
 
                     {/* Participant Name */}
                     <td className="py-3.5 px-4">
-                      <span className="font-bold text-white text-sm block">
-                        {p.user_name || p.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white text-sm block group-hover:text-amber-200 transition-colors">
+                          {p.user_name || p.name}
+                        </span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-amber-300/80 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded font-mono">
+                          View
+                        </span>
+                      </div>
                     </td>
 
                     {/* Category Division (Clean text, no pill box) */}
@@ -228,6 +254,16 @@ export const TeamRosterPage: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Participant Enrolled Programmes Modal */}
+      <ParticipantProgrammesModal
+        isOpen={isProgrammesModalOpen}
+        onClose={() => {
+          setIsProgrammesModalOpen(false);
+          setViewingProgrammesParticipant(null);
+        }}
+        participant={viewingProgrammesParticipant}
+      />
     </div>
   );
 };
