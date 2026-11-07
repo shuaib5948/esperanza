@@ -1,39 +1,108 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../api/client.js';
 import { FestivalBokehField } from './ui/FestivalBokehField.js';
+import { OfficialResultPosterCard } from './OfficialResultPosterCard.js';
 
 export interface PosterCardItem {
-  id: number;
+  id?: number;
+  competition_id?: number;
+  competition_name?: string;
+  programme_group?: string;
+  programme_number?: number | string;
+  participation_type?: string;
+  winners?: any[];
   imageUrl?: string;
   title?: string;
 }
 
 // -----------------------------------------------------------------------------
-// Official Esperanza 9.0 Poster Cards (Clean Minimal Blank Cards with Logo Only)
+// Official Esperanza 9.0 Default Sample Results Matching Custom Template
 // -----------------------------------------------------------------------------
-export const FESTIVAL_POSTERS: PosterCardItem[] = [
-  { id: 1 },
-  { id: 2 },
-  { id: 3 },
-  { id: 4 },
-  { id: 5 },
-  { id: 6 },
+export const DEFAULT_SAMPLE_POSTERS: PosterCardItem[] = [
+  {
+    competition_id: 1,
+    competition_name: 'Madh Song',
+    programme_group: 'Junior',
+    winners: [
+      { position: 1, participant_name: 'Muhammed Ali', team_name: 'Rivaya' },
+      { position: 2, participant_name: 'Ahmed Raza', team_name: 'Diraya' },
+      { position: 3, participant_name: 'Bilal Perumbavoor', team_name: 'Rivaya' },
+    ],
+  },
+  {
+    competition_id: 2,
+    competition_name: 'Quiz',
+    programme_group: 'Senior',
+    winners: [
+      { position: 1, participant_name: 'House Diraya', team_name: 'Diraya', is_group: true, group_members: 'Farhan & Zayan' },
+      { position: 2, participant_name: 'House Rivaya', team_name: 'Rivaya', is_group: true, group_members: 'Hafiz & Adil' },
+    ],
+  },
+  {
+    competition_id: 3,
+    competition_name: 'Elocution',
+    programme_group: 'Junior',
+    winners: [
+      { position: 1, participant_name: 'Zaid Rahman', team_name: 'Rivaya' },
+      { position: 2, participant_name: 'Shamil K', team_name: 'Diraya' },
+      { position: 3, participant_name: 'Ihsanullah', team_name: 'Diraya' },
+    ],
+  },
+  {
+    competition_id: 4,
+    competition_name: 'Magazine',
+    programme_group: 'General',
+    winners: [
+      { position: 1, participant_name: 'Editorial Board', team_name: 'Rivaya', is_group: true, group_members: 'Team Rivaya' },
+      { position: 2, participant_name: 'Writers Guild', team_name: 'Diraya', is_group: true, group_members: 'Team Diraya' },
+    ],
+  },
+  {
+    competition_id: 5,
+    competition_name: 'Pencil Drawing',
+    programme_group: 'Senior',
+    winners: [
+      { position: 1, participant_name: 'Rayan Ahmed', team_name: 'Diraya' },
+      { position: 2, participant_name: 'Fawaz Bin Ali', team_name: 'Rivaya' },
+      { position: 3, participant_name: 'Nihad CP', team_name: 'Rivaya' },
+    ],
+  },
 ];
 
-// Backwards-compatible alias for any external references
-export const MOCKUP_POSTERS = FESTIVAL_POSTERS;
-
-// Triplicated posters array for infinite seamless looping
-const BASE_POSTERS = FESTIVAL_POSTERS;
-const BASE_COUNT = BASE_POSTERS.length;
-const LOOPED_POSTERS = [...BASE_POSTERS, ...BASE_POSTERS, ...BASE_POSTERS];
+export const FESTIVAL_POSTERS = DEFAULT_SAMPLE_POSTERS;
+export const MOCKUP_POSTERS = DEFAULT_SAMPLE_POSTERS;
 
 export const ResultPostersSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
 
+  // Fetch real published posters from live screen display endpoint
+  const { data } = useQuery({
+    queryKey: ['home-result-posters'],
+    queryFn: async () => {
+      const res = await api.get<any>('/live-screen/display');
+      return res.data;
+    },
+    staleTime: 15000,
+  });
+
+  const basePosters = React.useMemo(() => {
+    if (data?.result_posters && data.result_posters.length > 0) {
+      return data.result_posters;
+    }
+    return DEFAULT_SAMPLE_POSTERS;
+  }, [data?.result_posters]);
+
+  const baseCount = basePosters.length;
+  const loopedPosters = React.useMemo(
+    () => [...basePosters, ...basePosters, ...basePosters],
+    [basePosters]
+  );
+
   // Start in the middle set of the triplicated loop
-  const [currentIndex, setCurrentIndex] = useState(BASE_COUNT);
+  const [currentIndex, setCurrentIndex] = useState(baseCount);
   const [selectedPoster, setSelectedPoster] = useState<PosterCardItem | null>(null);
   const [isInteracting, setIsInteracting] = useState(false);
   const [isInView, setIsInView] = useState(false);
@@ -50,21 +119,20 @@ export const ResultPostersSection: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Compute card dimensions dynamically per viewport matching 2200px x 2600px ratio (22:26)
+  // Compute card dimensions dynamically per viewport matching 866px x 1024px ratio
   const getCardDimensions = () => {
     if (windowWidth < 640) {
-      const w = Math.min(260, windowWidth - 64);
-      const h = Math.round(w * (2600 / 2200));
+      const w = Math.min(270, windowWidth - 64);
+      const h = Math.round(w * (1024 / 866));
       return { width: w, height: h, gap: 16 };
     }
     if (windowWidth < 1024) {
-      const w = 270;
-      const h = Math.round(w * (2600 / 2200));
+      const w = 280;
+      const h = Math.round(w * (1024 / 866));
       return { width: w, height: h, gap: 20 };
     }
-    // Reduced desktop dimension preserving exact 2200:2600 (11:13) portrait ratio
-    const w = 300;
-    const h = Math.round(w * (2600 / 2200));
+    const w = 310;
+    const h = Math.round(w * (1024 / 866));
     return { width: w, height: h, gap: 24 };
   };
 
@@ -92,7 +160,7 @@ export const ResultPostersSection: React.FC = () => {
     if (!isInView || selectedPoster || isInteracting) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => prev + 1);
+      setCurrentIndex((prev: number) => prev + 1);
     }, 3500);
 
     return () => clearInterval(interval);
@@ -100,12 +168,12 @@ export const ResultPostersSection: React.FC = () => {
 
   // Handle seamless infinite loop wrap-around without jumps
   const handleAnimationComplete = () => {
-    if (currentIndex >= BASE_COUNT * 2) {
+    if (currentIndex >= baseCount * 2) {
       setIsTransitioning(false);
-      setCurrentIndex((prev) => prev - BASE_COUNT);
-    } else if (currentIndex < BASE_COUNT) {
+      setCurrentIndex((prev: number) => prev - baseCount);
+    } else if (currentIndex < baseCount) {
       setIsTransitioning(false);
-      setCurrentIndex((prev) => prev + BASE_COUNT);
+      setCurrentIndex((prev: number) => prev + baseCount);
     }
   };
 
@@ -118,11 +186,11 @@ export const ResultPostersSection: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handlePrev = () => setCurrentIndex((prev) => prev - 1);
-  const handleNext = () => setCurrentIndex((prev) => prev + 1);
-  const handleDotClick = (dotIndex: number) => setCurrentIndex(BASE_COUNT + dotIndex);
+  const handlePrev = () => setCurrentIndex((prev: number) => prev - 1);
+  const handleNext = () => setCurrentIndex((prev: number) => prev + 1);
+  const handleDotClick = (dotIndex: number) => setCurrentIndex(baseCount + dotIndex);
 
-  const activeDotIndex = ((currentIndex % BASE_COUNT) + BASE_COUNT) % BASE_COUNT;
+  const activeDotIndex = ((currentIndex % baseCount) + baseCount) % baseCount;
   const centerOffsetPx = currentIndex * (cardWidth + gap) + cardWidth / 2;
 
   return (
@@ -195,7 +263,7 @@ export const ResultPostersSection: React.FC = () => {
                 }
               }}
             >
-              {LOOPED_POSTERS.map((poster, index) => {
+              {loopedPosters.map((poster: PosterCardItem, index: number) => {
                 const distance = Math.abs(index - currentIndex);
                 const isCenter = distance === 0;
                 const isAdjacent = distance === 1;
@@ -218,7 +286,7 @@ export const ResultPostersSection: React.FC = () => {
 
                 return (
                   <motion.div
-                    key={`${poster.id}-${index}`}
+                    key={`${poster.competition_id || poster.id || index}-${index}`}
                     style={{
                       width: cardWidth,
                       height: cardHeight,
@@ -240,39 +308,14 @@ export const ResultPostersSection: React.FC = () => {
                     }}
                     className="shrink-0 cursor-pointer select-none transition-all group"
                   >
-                    {/* The Pure Poster Card: Sleek 2200x2600 Frame with Official Logo */}
                     <div
-                      className={`relative h-full w-full aspect-[22/26] rounded-2xl overflow-hidden transition-all duration-300 p-4 sm:p-5 flex items-center justify-center ${
+                      className={`relative h-full w-full rounded-2xl overflow-hidden transition-all duration-300 ${
                         isCenter
-                          ? 'border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.3),0_15px_30px_rgba(0,0,0,0.9)] bg-gradient-to-b from-[#181108] via-[#0b0804] to-[#040201]'
-                          : 'border border-amber-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.7)] bg-gradient-to-b from-[#120d06] via-[#080502] to-[#030201]'
+                          ? 'border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.35),0_15px_30px_rgba(0,0,0,0.9)]'
+                          : 'border border-amber-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.7)]'
                       }`}
                     >
-                      {/* Clean Geometric Inner Border Inlay matching 2200x2600 Proportion */}
-                      <div className="w-full h-full rounded-xl border border-amber-500/30 flex flex-col items-center justify-center relative overflow-hidden bg-black/40">
-                        {/* Ambient Radial Golden Glow */}
-                        <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
-
-                        {/* Official Esperanza Geometric Logo (Crisp Centered Emblem) */}
-                        <img
-                          src="/assets/esperanza-logo.png"
-                          alt="Esperanza Logo"
-                          className={`w-auto object-contain pointer-events-none select-none transition-all duration-500 ${
-                            isCenter
-                              ? 'h-20 sm:h-24 md:h-28 drop-shadow-[0_0_24px_rgba(245,158,11,0.5)] scale-105'
-                              : 'h-14 sm:h-16 md:h-20 drop-shadow-[0_0_12px_rgba(245,158,11,0.25)] opacity-80'
-                          }`}
-                        />
-
-                        {/* Subtle Corner Accents on Inner Border */}
-                        <div className="absolute top-2.5 left-2.5 w-2 h-2 border-t border-l border-amber-400/40" />
-                        <div className="absolute top-2.5 right-2.5 w-2 h-2 border-t border-r border-amber-400/40" />
-                        <div className="absolute bottom-2.5 left-2.5 w-2 h-2 border-b border-l border-amber-400/40" />
-                        <div className="absolute bottom-2.5 right-2.5 w-2 h-2 border-b border-r border-amber-400/40" />
-
-                        {/* Subtle Specular Sheen Sweep on Hover */}
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      </div>
+                      <OfficialResultPosterCard poster={poster} className="w-full h-full" />
                     </div>
                   </motion.div>
                 );
@@ -292,7 +335,7 @@ export const ResultPostersSection: React.FC = () => {
 
             {/* Dot Indicators */}
             <div className="flex items-center gap-1.5">
-              {BASE_POSTERS.map((_, dotIdx) => (
+              {basePosters.map((_: PosterCardItem, dotIdx: number) => (
                 <button
                   key={dotIdx}
                   onClick={() => handleDotClick(dotIdx)}
@@ -318,7 +361,7 @@ export const ResultPostersSection: React.FC = () => {
       </div>
 
       {/* ===================================================================
-          FULLSCREEN POSTER VIEWER MODAL (2200x2600 EXACT RATIO • THAT POSTER ONLY)
+          FULLSCREEN POSTER VIEWER MODAL (OFFICIAL RESULT POSTER TEMPLATE)
       =================================================================== */}
       <AnimatePresence>
         {selectedPoster && (
@@ -343,35 +386,9 @@ export const ResultPostersSection: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
 
-              {/* Exact 2200x2600 Aspect Ratio Container (Showing THAT Poster Only) */}
-              <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-amber-400/90 shadow-[0_0_50px_rgba(245,158,11,0.35),0_20px_50px_rgba(0,0,0,0.9)] bg-gradient-to-b from-[#181108] via-[#0b0804] to-[#040201] aspect-[22/26] max-h-[82vh] w-auto flex items-center justify-center p-5 sm:p-8">
-                {selectedPoster.imageUrl ? (
-                  /* Uploaded Poster Image (Clean Display) */
-                  <img
-                    src={selectedPoster.imageUrl}
-                    alt={selectedPoster.title || 'Esperanza Result Poster'}
-                    className="w-full h-full object-contain select-none rounded-xl"
-                  />
-                ) : (
-                  /* Official Blank Poster Card (2200x2600 Frame with Centered Logo Only) */
-                  <div className="w-full h-full rounded-xl sm:rounded-2xl border border-amber-500/30 flex flex-col items-center justify-center relative overflow-hidden bg-black/50 p-6 min-w-[260px] sm:min-w-[340px]">
-                    {/* Ambient Radial Golden Glow */}
-                    <div className="absolute inset-0 bg-radial from-amber-500/15 via-transparent to-transparent pointer-events-none" />
-
-                    {/* Official Centered Emblem Logo */}
-                    <img
-                      src="/assets/esperanza-logo.png"
-                      alt="Esperanza Emblem"
-                      className="h-32 sm:h-44 md:h-52 w-auto object-contain pointer-events-none select-none drop-shadow-[0_0_30px_rgba(245,158,11,0.55)]"
-                    />
-
-                    {/* Corner Accents on Inner Border */}
-                    <div className="absolute top-3 left-3 w-3 h-3 border-t-2 border-l-2 border-amber-400/60" />
-                    <div className="absolute top-3 right-3 w-3 h-3 border-t-2 border-r-2 border-amber-400/60" />
-                    <div className="absolute bottom-3 left-3 w-3 h-3 border-b-2 border-l-2 border-amber-400/60" />
-                    <div className="absolute bottom-3 right-3 w-3 h-3 border-b-2 border-r-2 border-amber-400/60" />
-                  </div>
-                )}
+              {/* Exact 866x1024 Aspect Ratio Container (Showing THAT Poster Only) */}
+              <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-amber-400/90 shadow-[0_0_50px_rgba(245,158,11,0.35),0_20px_50px_rgba(0,0,0,0.9)] max-h-[82vh] w-[320px] sm:w-[410px] md:w-[470px]">
+                <OfficialResultPosterCard poster={selectedPoster} />
               </div>
             </motion.div>
           </div>

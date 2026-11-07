@@ -11,6 +11,7 @@ export default {
         display: ['"Plus Jakarta Sans"', 'sans-serif'],
         jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
         overcame: ['"OvercameBold"', 'sans-serif'],
+        graduate: ['"Graduate"', 'Rockwell', 'serif'],
       },
       colors: {
         brand: {

@@ -265,6 +265,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     </>
                   )}
                 </NavLink>
+
+                {/* Live Screen */}
+                <NavLink
+                  to="/admin/live-screen"
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
+                      isActive
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {isActive && (
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
+                      )}
+                      <div className="flex items-center gap-3">
+                        <Tv className="w-4 h-4" />
+                        <span>Live Screen</span>
+                      </div>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    </>
+                  )}
+                </NavLink>
               </div>
 
               {/* ACTIONS Section */}
@@ -491,15 +517,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <Tv className="w-3 h-3 text-amber-300" />
                 </div>
                 <h4 className="text-xs font-black font-bento-title text-amber-100">Stage Screen</h4>
-                <p className="text-[10px] text-amber-200/60 mb-2 leading-tight font-medium">Live single stage display</p>
+                <p className="text-[10px] text-amber-200/60 mb-2 leading-tight font-medium">Broadcast control console</p>
                 <button
                   onClick={() => {
-                    navigate('/admin/stage-queue');
+                    navigate('/admin/live-screen');
                     onClose();
                   }}
                   className="w-full py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-[10px] font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition-all cursor-pointer"
                 >
-                  <span>Launch Kiosk</span>
+                  <span>Launch Console</span>
                   <ArrowUpRight className="w-3 h-3" />
                 </button>
               </div>

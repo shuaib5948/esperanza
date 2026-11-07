@@ -15,6 +15,7 @@ import { PublicSchedulePage } from './pages/PublicSchedulePage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { LiveLeaderboardPage } from './pages/LiveLeaderboardPage.js';
 import { CertificateVerifyPage } from './pages/CertificateVerifyPage.js';
+import { LiveStageScreenPage } from './pages/LiveStageScreenPage.js';
 
 // Admin Pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.js';
@@ -30,6 +31,7 @@ import { ReportsExportPage } from './pages/admin/ReportsExportPage.js';
 import { AuditLogsPage } from './pages/admin/AuditLogsPage.js';
 import { ProgrammeListPage } from './pages/admin/ProgrammeListPage.js';
 import { AdminLeaderboardPage } from './pages/admin/AdminLeaderboardPage.js';
+import { LiveScreenControlPage } from './pages/admin/LiveScreenControlPage.js';
 
 // Team Leader Pages
 import { TeamDashboardPage } from './pages/team/TeamDashboardPage.js';
@@ -71,6 +73,9 @@ export const App: React.FC = () => {
                 <Route path="/login" element={<Navigate to="/?login=true" replace />} />
               </Route>
 
+              {/* Standalone Full-Screen Stage Projector Display (No Navbar/Sidebar) */}
+              <Route path="/live-screen" element={<LiveStageScreenPage />} />
+
               {/* Admin Routes */}
               <Route element={<AppLayout requireAuth={true} allowedRoles={['ADMIN']} />}>
                 <Route path="/admin" element={<AdminDashboardPage />} />
@@ -79,6 +84,7 @@ export const App: React.FC = () => {
                 <Route path="/admin/participants" element={<ParticipantsManagerPage />} />
                 <Route path="/admin/schedule" element={<ScheduleManagerPage />} />
                 <Route path="/admin/stage-queue" element={<StageQueueControlPage />} />
+                <Route path="/admin/live-screen" element={<LiveScreenControlPage />} />
                 <Route path="/admin/attendance" element={<Navigate to="/admin/stage-queue" replace />} />
                 <Route path="/admin/judging" element={<Navigate to="/admin" replace />} />
                 <Route path="/admin/results" element={<ResultsVerificationPage />} />

@@ -38,7 +38,7 @@ export class LiveScreenController {
   static async updateControl(req: Request, res: Response, next: NextFunction) {
     try {
       const { mode, active_competition_id, custom_title } = req.body;
-      const validModes = ['AUTO', 'AD', 'LEADERBOARD', 'RESULT'];
+      const validModes = ['AUTO', 'AD', 'LEADERBOARD', 'GRAPH', 'RESULT'];
       
       const selectedMode = validModes.includes(mode) ? mode : 'AUTO';
       const compId = active_competition_id ? Number(active_competition_id) : null;

@@ -2,10 +2,34 @@ import { query } from '../database/connection.js';
 
 export interface LiveScreenState {
   id: number;
-  mode: 'AUTO' | 'AD' | 'LEADERBOARD' | 'RESULT';
+  mode: 'AUTO' | 'AD' | 'LEADERBOARD' | 'GRAPH' | 'RESULT';
   active_competition_id: number | null;
   custom_title: string | null;
   updated_at: Date;
+}
+
+// Helper to format programme name cleanly, e.g. "General - Magazine" (stripping internal codes like "j1-booktest")
+function formatProgramName(group?: string, name?: string): string {
+  const g = (group || '').trim();
+  let n = (name || '').trim();
+  if (!n) return g || 'Competition';
+
+  // Strip code prefixes like "j1-", "j01-", "s2-", "g1-", "sj1-", "p1-"
+  n = n.replace(/^[a-z]{1,3}[-_]?\d+\s*[-:–—.]?\s*/i, '');
+  n = n.replace(/^\d+\s*[-:–—.]\s*/, '');
+  n = n.replace(/^[-:–—.]+\s*/, '').trim();
+
+  if (!g) return n;
+
+  const groupRegex = new RegExp(`^${g}\\s*[-–—:]?\\s*`, 'i');
+  const cleanName = groupRegex.test(n) ? n.replace(groupRegex, '').trim() : n;
+  const formattedGroup = g
+    .toLowerCase()
+    .split(' ')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
+  return `${formattedGroup} - ${cleanName || n}`;
 }
 
 export class LiveScreenRepository {
@@ -51,7 +75,7 @@ export class LiveScreenRepository {
   }
 
   static async updateState(
-    mode: 'AUTO' | 'AD' | 'LEADERBOARD' | 'RESULT',
+    mode: 'AUTO' | 'AD' | 'LEADERBOARD' | 'GRAPH' | 'RESULT',
     activeCompetitionId: number | null = null,
     customTitle: string | null = null
   ) {
@@ -117,13 +141,59 @@ export class LiveScreenRepository {
         ORDER BY published_at DESC, c.programme_number ASC
         LIMIT 20
       `);
+      publishedCompetitions = (publishedCompetitions || []).map((comp) => ({
+        ...comp,
+        competition_name: formatProgramName(comp.programme_group, comp.competition_name),
+      }));
     } catch {
       publishedCompetitions = [];
     }
 
-    // 3. Detailed Results of Published Competitions (1st, 2nd, 3rd)
+    // 3. Detailed Results of Published Competitions (1st, 2nd, 3rd, 4th, etc.)
     let resultPosters: any[] = [];
     try {
+      // Map group members for team/group competitions: "competition_id:team_id" -> "Name 1, Name 2, ..."
+      const groupMembersMap = new Map<string, string>();
+      try {
+        const entryMembers = await query<any[]>(`
+          SELECT 
+            ce.competition_id,
+            ce.team_id,
+            GROUP_CONCAT(DISTINCT u.name ORDER BY u.name SEPARATOR ', ') as member_names
+          FROM competition_entries ce
+          JOIN entry_participants ep ON ep.entry_id = ce.id
+          JOIN participants p ON p.id = ep.participant_id
+          JOIN users u ON u.id = p.user_id
+          WHERE ce.status != 'CANCELLED'
+          GROUP BY ce.competition_id, ce.team_id
+        `);
+        for (const m of (entryMembers || [])) {
+          if (m.member_names) {
+            groupMembersMap.set(`${m.competition_id}:${m.team_id}`, m.member_names);
+          }
+        }
+
+        const regMembers = await query<any[]>(`
+          SELECT 
+            r.competition_id,
+            p.team_id,
+            GROUP_CONCAT(DISTINCT u.name ORDER BY u.name SEPARATOR ', ') as member_names
+          FROM registrations r
+          JOIN participants p ON p.id = r.participant_id
+          JOIN users u ON u.id = p.user_id
+          WHERE r.status != 'REMOVED'
+          GROUP BY r.competition_id, p.team_id
+        `);
+        for (const m of (regMembers || [])) {
+          const key = `${m.competition_id}:${m.team_id}`;
+          if (!groupMembersMap.has(key) && m.member_names) {
+            groupMembersMap.set(key, m.member_names);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching group members for live screen:', err);
+      }
+
       const rawResults = await query<any[]>(`
         SELECT r.id, r.competition_id, r.position, r.final_score,
                c.name as competition_name, c.programme_number, c.participation_type,
@@ -138,7 +208,7 @@ export class LiveScreenRepository {
         LEFT JOIN participants p ON p.id = r.participant_id
         LEFT JOIN users u ON u.id = p.user_id
         LEFT JOIN teams t ON t.id = r.team_id
-        WHERE r.status = 'PUBLISHED' AND r.position IN (1, 2, 3)
+        WHERE r.status = 'PUBLISHED' AND r.position IS NOT NULL AND r.position > 0
         ORDER BY r.position ASC
       `);
 
@@ -148,7 +218,7 @@ export class LiveScreenRepository {
         compMap.set(comp.id, {
           competition_id: comp.id,
           programme_number: comp.programme_number,
-          competition_name: comp.competition_name,
+          competition_name: formatProgramName(comp.programme_group, comp.competition_name),
           programme_group: comp.programme_group,
           participation_type: comp.participation_type,
           published_at: comp.published_at,
@@ -161,24 +231,30 @@ export class LiveScreenRepository {
           compMap.set(row.competition_id, {
             competition_id: row.competition_id,
             programme_number: row.programme_number,
-            competition_name: row.competition_name,
+            competition_name: formatProgramName(row.programme_group, row.competition_name),
             programme_group: row.programme_group,
             participation_type: row.participation_type,
             published_at: row.published_at,
             winners: [],
           });
         }
+
+        const key = `${row.competition_id}:${row.team_id}`;
+        const groupMembers = groupMembersMap.get(key) || null;
+        const isGroup = (row.participation_type || '').toUpperCase() === 'GROUP' || (row.participation_type || '').toUpperCase() === 'TEAM';
+
         compMap.get(row.competition_id).winners.push({
-          position: row.position,
+          position: Number(row.position),
           participant_name: row.participant_name || row.team_name,
-          participant_code: row.participant_code,
+          group_members: groupMembers,
+          is_group: isGroup,
           team_name: row.team_name,
           team_code: row.team_code,
           team_color: row.team_color,
           score: row.final_score,
         });
       }
-      // Sort winners in each poster by position (1st, 2nd, 3rd)
+      // Sort winners in each poster by position (1st, 2nd, 3rd, 4th, etc.)
       resultPosters = Array.from(compMap.values())
         .filter((p) => p.winners && p.winners.length > 0)
         .map((p) => ({
@@ -189,7 +265,29 @@ export class LiveScreenRepository {
       resultPosters = [];
     }
 
-    // 4. Resolve Active Result Poster (if specific competition chosen or fallback to most recent)
+    // 4. Recent Completed / Verified Results for Battle Line Progression Graph
+    let recentResults: any[] = [];
+    try {
+      recentResults = await query<any[]>(`
+        SELECT c.id as competition_id, c.programme_number, c.name as competition_name,
+               c.participation_type, pg.name as programme_group,
+               COALESCE(SUM(CASE WHEN UPPER(t.code) = 'DIRAYA' OR UPPER(t.name) LIKE '%DIRAYA%' THEN tp.points ELSE 0 END), 0) as diraya_score,
+               COALESCE(SUM(CASE WHEN UPPER(t.code) = 'RIVAYA' OR UPPER(t.name) LIKE '%RIVAYA%' THEN tp.points ELSE 0 END), 0) as rivaya_score
+        FROM competitions c
+        JOIN results r ON r.competition_id = c.id AND r.status = 'PUBLISHED'
+        LEFT JOIN programme_groups pg ON pg.id = c.programme_group_id
+        LEFT JOIN team_points tp ON tp.competition_id = c.id
+        LEFT JOIN teams t ON t.id = tp.team_id
+        GROUP BY c.id, c.programme_number, c.name, c.participation_type, pg.name
+        HAVING diraya_score > 0 OR rivaya_score > 0
+        ORDER BY c.programme_number ASC, c.id ASC
+        LIMIT 10
+      `);
+    } catch {
+      recentResults = [];
+    }
+
+    // 5. Resolve Active Result Poster (if specific competition chosen or fallback to most recent)
     let activePoster = null;
     if (state.active_competition_id) {
       activePoster = resultPosters.find((p) => Number(p.competition_id) === Number(state.active_competition_id)) || null;
@@ -203,6 +301,7 @@ export class LiveScreenRepository {
       leaderboard,
       published_competitions: publishedCompetitions,
       result_posters: resultPosters,
+      recent_results: recentResults,
       active_poster: activePoster,
       timestamp: new Date().toISOString(),
     };

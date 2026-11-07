@@ -450,7 +450,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           Mobile: Grouped into one centered, balanced unit (~405px total)
           Desktop: Anchored heading at top, dais grounded at bottom
       =================================================================== */}
-      <div className="relative z-10 w-full max-w-2xl sm:max-w-3xl mx-auto flex flex-col items-center justify-center my-auto md:my-0 md:h-full md:justify-between">
+      <div className="relative z-10 w-full max-w-2xl sm:max-w-3xl md:max-w-4xl mx-auto flex flex-col items-center justify-center my-auto md:my-0 md:h-full md:justify-between">
         {/* HEADING: "T E A M   S T A N D I N G S" WITH GOLD DIVIDER & DIAMOND */}
         <motion.div
           initial={{ opacity: 0, y: -16 }}
@@ -481,7 +481,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
         >
         
         {/* The Two Stepped Podium Blocks Side-by-Side (Sitting Flush on the Dais Base) */}
-        <div className="flex items-end justify-center gap-2 sm:gap-5 md:gap-6 w-full z-10">
+        <div className="flex items-end justify-center gap-2.5 sm:gap-5 md:gap-6 w-full z-10">
           
           {/* -------------------------------------------------------------
               TEAM 1 — RIVAYA (BURGUNDY • TIED AT 115, THEN SURGES TO 148)
@@ -489,7 +489,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => cheerTeam('RIVAYA')}
-            className="flex flex-col items-center w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
+            className="flex flex-col items-center w-[44vw] max-w-[175px] sm:w-60 md:w-72 lg:w-80 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
           >
             {/* 3D Gold Crown (Descends on Crowning Stage only if single winner; hidden if tied) */}
             <div className="flex flex-col items-center -mb-1 relative z-20">
@@ -564,7 +564,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => cheerTeam('DIRAYA')}
-            className="flex flex-col items-center w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
+            className="flex flex-col items-center w-[44vw] max-w-[175px] sm:w-60 md:w-72 lg:w-80 cursor-pointer group select-none transition-transform duration-300 hover:-translate-y-1.5 active:translate-y-0"
           >
             {/* 3D Gold Crown (Descends on Crowning Stage only if single winner; hidden if tied) */}
             <div className="flex flex-col items-center -mb-1 relative z-20">
@@ -638,7 +638,7 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
             4. THE RAISED CIRCULAR GOLDEN STAGE DAIS / BASE
             (Straight-On Front Eye-Level Perspective • Seamlessly Joined to Blocks)
         =================================================================== */}
-        <div className="relative w-[92vw] max-w-[330px] sm:w-full sm:max-w-xl md:max-w-2xl -mt-5 sm:-mt-6 flex flex-col items-center pointer-events-none z-0">
+        <div className="relative w-[96vw] max-w-[390px] sm:w-full sm:max-w-2xl md:max-w-3xl -mt-5 sm:-mt-6 flex flex-col items-center pointer-events-none z-0">
           
           {/* Top Surface of the Circular Raised Dais (Matching Eye-Level Horizon) */}
           <div className="w-full h-11 sm:h-14 rounded-[100%] border-2 border-amber-500/70 bg-gradient-to-b from-[#181105] via-[#0d0903] to-[#040301] shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_0_12px_rgba(245,158,11,0.18)] relative flex items-center justify-center overflow-hidden">
@@ -646,9 +646,9 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
             <div className="w-[96%] h-[82%] rounded-[100%] border border-amber-500/30 bg-gradient-to-b from-amber-500/10 to-transparent" />
 
             {/* Subtle Vertical Reflections Across the Dais Platform */}
-            <div className="absolute inset-0 flex items-center justify-center gap-2 sm:gap-5 md:gap-6 opacity-35 blur-[2px]">
-              <div className="w-[38vw] max-w-[130px] sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-rose-500/40 to-transparent rounded-[100%]" />
-              <div className="w-[38vw] max-w-[130px] sm:w-44 h-8 sm:h-10 bg-gradient-to-b from-emerald-500/40 to-transparent rounded-[100%]" />
+            <div className="absolute inset-0 flex items-center justify-center gap-2.5 sm:gap-5 md:gap-6 opacity-35 blur-[2px]">
+              <div className="w-[44vw] max-w-[175px] sm:w-60 md:w-72 lg:w-80 h-8 sm:h-10 bg-gradient-to-b from-rose-500/40 to-transparent rounded-[100%]" />
+              <div className="w-[44vw] max-w-[175px] sm:w-60 md:w-72 lg:w-80 h-8 sm:h-10 bg-gradient-to-b from-emerald-500/40 to-transparent rounded-[100%]" />
             </div>
           </div>
 
@@ -659,9 +659,9 @@ export const TeamStandingsSection: React.FC<TeamStandingsSectionProps> = ({
           <div className="w-[94%] h-4 sm:h-6 rounded-[100%] bg-black/98 blur-sm sm:blur-md -mt-2 sm:-mt-3" />
 
           {/* Glossy Floor Mirror Reflections Falling Downward Directly Beneath Plinth */}
-          <div className="w-full flex items-start justify-center gap-2 sm:gap-5 md:gap-6 opacity-30 transform scale-y-[-1] blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_80%)] overflow-hidden h-10 sm:h-16 mt-0.5">
-            <div className="w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 h-16 sm:h-20 bg-gradient-to-t from-transparent via-[#2b050b]/60 to-[#FF2A6D]/30" />
-            <div className="w-[38vw] max-w-[130px] sm:w-48 md:w-56 lg:w-64 h-12 sm:h-16 bg-gradient-to-t from-transparent via-[#082212]/60 to-[#00E676]/30" />
+          <div className="w-full flex items-start justify-center gap-2.5 sm:gap-5 md:gap-6 opacity-30 transform scale-y-[-1] blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_80%)] overflow-hidden h-10 sm:h-16 mt-0.5">
+            <div className="w-[44vw] max-w-[175px] sm:w-60 md:w-72 lg:w-80 h-16 sm:h-20 bg-gradient-to-t from-transparent via-[#2b050b]/60 to-[#FF2A6D]/30" />
+            <div className="w-[44vw] max-w-[175px] sm:w-60 md:w-72 lg:w-80 h-12 sm:h-16 bg-gradient-to-t from-transparent via-[#082212]/60 to-[#00E676]/30" />
           </div>
         </div>
       </div>
