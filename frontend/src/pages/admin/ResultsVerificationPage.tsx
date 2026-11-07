@@ -433,10 +433,14 @@ export const ResultsVerificationPage: React.FC = () => {
     return (selectedComp?.participation_type || '').toUpperCase() === 'GROUP' || results.some((r) => r.is_group);
   }, [selectedComp, results]);
 
-  // Top 3 Podium Winners
-  const firstPlace = results.find((r) => r.position === 1);
-  const secondPlace = results.find((r) => r.position === 2);
-  const thirdPlace = results.find((r) => r.position === 3);
+  // Top 3 Podium Winners (supports multiple joint winners per rank)
+  const firstPlaces = useMemo(() => results.filter((r) => r.position === 1), [results]);
+  const secondPlaces = useMemo(() => results.filter((r) => r.position === 2), [results]);
+  const thirdPlaces = useMemo(() => results.filter((r) => r.position === 3), [results]);
+
+  const firstPlace = firstPlaces[0];
+  const secondPlace = secondPlaces[0];
+  const thirdPlace = thirdPlaces[0];
 
   // =========================================================================
   // VIEW 1: PROGRAMME LIST VIEW (First show list of completed programmes)
@@ -740,7 +744,7 @@ export const ResultsVerificationPage: React.FC = () => {
       </div>
 
       {/* FREE-STANDING STEPPED PODIUM (LIVE BROADCAST GRAPHICS) */}
-      {results.length > 0 && (firstPlace || secondPlace || thirdPlace) && (
+      {results.length > 0 && (firstPlaces.length > 0 || secondPlaces.length > 0 || thirdPlaces.length > 0) && (
         <div className="pt-4 pb-2">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 items-end max-w-4xl mx-auto">
             
@@ -749,60 +753,64 @@ export const ResultsVerificationPage: React.FC = () => {
               {/* Standard Position Box on Top */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#121212] text-slate-200 font-sans font-bold text-xs shadow-2xs border border-white/[0.08] -mb-3 z-20">
                 <Medal className="w-3.5 h-3.5 text-amber-200/60" />
-                <span>2nd Place</span>
+                <span>{secondPlaces.length > 1 ? 'Joint 2nd Place' : '2nd Place'}</span>
               </div>
 
               {/* Main Pillar Body */}
               <div className="w-full bg-[#0A0A0A] border border-white/[0.08] rounded-2xl p-5 pt-6 sm:pt-7 shadow-xs flex flex-col items-center text-center space-y-3.5">
-                {secondPlace ? (
-                  <>
-                    {/* Title & Subtitle */}
-                    <div className="space-y-1 w-full min-h-[58px] flex flex-col justify-center">
-                      <h4
-                        className="text-base sm:text-lg font-black text-white truncate px-1"
-                        title={secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}
-                      >
-                        {secondPlace.is_group ? secondPlace.team_name : secondPlace.participant_name}
-                      </h4>
-                      {secondPlace.is_group ? (
-                        <p
-                          className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
-                          title={secondPlace.member_names || ''}
-                        >
-                          {secondPlace.member_names || (secondPlace.member_count ? `${secondPlace.member_count} Members` : '—')}
-                        </p>
-                      ) : (
-                        <p className={`text-xs ${getHouseTeamClass(secondPlace.team_name)}`}>
-                          {secondPlace.team_name}
-                        </p>
-                      )}
-                    </div>
+                {secondPlaces.length > 0 ? (
+                  <div className="w-full space-y-3.5">
+                    {secondPlaces.map((sp, idx) => (
+                      <div key={sp.id || idx} className={`${idx > 0 ? 'pt-3.5 border-t border-white/[0.08]' : ''} space-y-3`}>
+                        {/* Title & Subtitle */}
+                        <div className="space-y-1 w-full min-h-[50px] flex flex-col justify-center">
+                          <h4
+                            className="text-base sm:text-lg font-black text-white truncate px-1"
+                            title={sp.is_group ? sp.team_name : sp.participant_name}
+                          >
+                            {sp.is_group ? sp.team_name : sp.participant_name}
+                          </h4>
+                          {sp.is_group ? (
+                            <p
+                              className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
+                              title={sp.member_names || ''}
+                            >
+                              {sp.member_names || (sp.member_count ? `${sp.member_count} Members` : '—')}
+                            </p>
+                          ) : (
+                            <p className={`text-xs ${getHouseTeamClass(sp.team_name)}`}>
+                              {sp.team_name}
+                            </p>
+                          )}
+                        </div>
 
-                    {/* Dedicated Highlighted Metrics Row */}
-                    <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
-                      <div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
-                          Grade
-                        </span>
-                        <span
-                          className={`inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
-                            secondPlace.grade
-                          )}`}
-                        >
-                          {secondPlace.grade || 'NG'}
-                        </span>
+                        {/* Dedicated Highlighted Metrics Row */}
+                        <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                              Grade
+                            </span>
+                            <span
+                              className={`inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                                sp.grade
+                              )}`}
+                            >
+                              {sp.grade || 'NG'}
+                            </span>
+                          </div>
+                          <div className="border-l border-amber-500/30 pl-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                              Points
+                            </span>
+                            <span className="font-mono font-black text-white text-base block leading-tight mt-0.5">
+                              {Number(sp.final_score).toFixed(0)}{' '}
+                              <span className="text-[10px] text-amber-200/60 font-bold">pts</span>
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="border-l border-amber-500/30 pl-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
-                          Points
-                        </span>
-                        <span className="font-mono font-black text-white text-base block leading-tight mt-0.5">
-                          {Number(secondPlace.final_score).toFixed(0)}{' '}
-                          <span className="text-[10px] text-amber-200/60 font-bold">pts</span>
-                        </span>
-                      </div>
-                    </div>
-                  </>
+                    ))}
+                  </div>
                 ) : (
                   <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
                     No 2nd place awarded
@@ -816,60 +824,64 @@ export const ResultsVerificationPage: React.FC = () => {
               {/* Standard Position Box on Top */}
               <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-sans font-bold text-xs shadow-xs border border-white/[0.08] -mb-3 z-20">
                 <Trophy className="w-3.5 h-3.5 text-slate-950" />
-                <span>1st Place</span>
+                <span>{firstPlaces.length > 1 ? 'Joint 1st Place' : '1st Place'}</span>
               </div>
 
               {/* Main Pillar Body */}
               <div className="w-full bg-[#121212] border-2 border-amber-400 shadow-lg shadow-amber-500/10 rounded-2xl p-5 sm:p-6 pt-7 sm:pt-8 flex flex-col items-center text-center space-y-4">
-                {firstPlace ? (
-                  <>
-                    {/* Title & Subtitle */}
-                    <div className="space-y-1 w-full min-h-[58px] flex flex-col justify-center">
-                      <h4
-                        className="text-lg sm:text-xl font-black text-white truncate px-1"
-                        title={firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}
-                      >
-                        {firstPlace.is_group ? firstPlace.team_name : firstPlace.participant_name}
-                      </h4>
-                      {firstPlace.is_group ? (
-                        <p
-                          className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
-                          title={firstPlace.member_names || ''}
-                        >
-                          {firstPlace.member_names || (firstPlace.member_count ? `${firstPlace.member_count} Members` : '—')}
-                        </p>
-                      ) : (
-                        <p className={`text-xs ${getHouseTeamClass(firstPlace.team_name)}`}>
-                          {firstPlace.team_name}
-                        </p>
-                      )}
-                    </div>
+                {firstPlaces.length > 0 ? (
+                  <div className="w-full space-y-4">
+                    {firstPlaces.map((fp, idx) => (
+                      <div key={fp.id || idx} className={`${idx > 0 ? 'pt-3.5 border-t border-amber-400/20' : ''} space-y-3`}>
+                        {/* Title & Subtitle */}
+                        <div className="space-y-1 w-full min-h-[50px] flex flex-col justify-center">
+                          <h4
+                            className="text-lg sm:text-xl font-black text-white truncate px-1"
+                            title={fp.is_group ? fp.team_name : fp.participant_name}
+                          >
+                            {fp.is_group ? fp.team_name : fp.participant_name}
+                          </h4>
+                          {fp.is_group ? (
+                            <p
+                              className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
+                              title={fp.member_names || ''}
+                            >
+                              {fp.member_names || (fp.member_count ? `${fp.member_count} Members` : '—')}
+                            </p>
+                          ) : (
+                            <p className={`text-xs ${getHouseTeamClass(fp.team_name)}`}>
+                              {fp.team_name}
+                            </p>
+                          )}
+                        </div>
 
-                    {/* Dedicated Highlighted Metrics Row */}
-                    <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
-                      <div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
-                          Grade
-                        </span>
-                        <span
-                          className={`inline-block mt-0.5 px-3 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
-                            firstPlace.grade
-                          )}`}
-                        >
-                          {firstPlace.grade || 'NG'}
-                        </span>
+                        {/* Dedicated Highlighted Metrics Row */}
+                        <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                              Grade
+                            </span>
+                            <span
+                              className={`inline-block mt-0.5 px-3 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                                fp.grade
+                              )}`}
+                            >
+                              {fp.grade || 'NG'}
+                            </span>
+                          </div>
+                          <div className="border-l border-amber-500/30 pl-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                              Points
+                            </span>
+                            <span className="font-mono font-black text-amber-300 text-lg block leading-tight mt-0.5">
+                              {Number(fp.final_score).toFixed(0)}{' '}
+                              <span className="text-[10px] text-amber-300 font-bold">pts</span>
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="border-l border-amber-500/30 pl-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
-                          Points
-                        </span>
-                        <span className="font-mono font-black text-amber-300 text-lg block leading-tight mt-0.5">
-                          {Number(firstPlace.final_score).toFixed(0)}{' '}
-                          <span className="text-[10px] text-amber-300 font-bold">pts</span>
-                        </span>
-                      </div>
-                    </div>
-                  </>
+                    ))}
+                  </div>
                 ) : (
                   <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
                     No 1st place awarded
@@ -883,60 +895,64 @@ export const ResultsVerificationPage: React.FC = () => {
               {/* Standard Position Box on Top */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#121212] text-amber-300 font-sans font-bold text-xs shadow-2xs border border-amber-500/30 -mb-3 z-20">
                 <Medal className="w-3.5 h-3.5 text-amber-300" />
-                <span>3rd Place</span>
+                <span>{thirdPlaces.length > 1 ? 'Joint 3rd Place' : '3rd Place'}</span>
               </div>
 
               {/* Main Pillar Body */}
               <div className="w-full bg-[#0A0A0A] border border-white/[0.08] rounded-2xl p-5 pt-6 sm:pt-7 shadow-xs flex flex-col items-center text-center space-y-3.5">
-                {thirdPlace ? (
-                  <>
-                    {/* Title & Subtitle */}
-                    <div className="space-y-1 w-full min-h-[58px] flex flex-col justify-center">
-                      <h4
-                        className="text-base sm:text-lg font-black text-white truncate px-1"
-                        title={thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}
-                      >
-                        {thirdPlace.is_group ? thirdPlace.team_name : thirdPlace.participant_name}
-                      </h4>
-                      {thirdPlace.is_group ? (
-                        <p
-                          className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
-                          title={thirdPlace.member_names || ''}
-                        >
-                          {thirdPlace.member_names || (thirdPlace.member_count ? `${thirdPlace.member_count} Members` : '—')}
-                        </p>
-                      ) : (
-                        <p className={`text-xs ${getHouseTeamClass(thirdPlace.team_name)}`}>
-                          {thirdPlace.team_name}
-                        </p>
-                      )}
-                    </div>
+                {thirdPlaces.length > 0 ? (
+                  <div className="w-full space-y-3.5">
+                    {thirdPlaces.map((tp, idx) => (
+                      <div key={tp.id || idx} className={`${idx > 0 ? 'pt-3.5 border-t border-white/[0.08]' : ''} space-y-3`}>
+                        {/* Title & Subtitle */}
+                        <div className="space-y-1 w-full min-h-[50px] flex flex-col justify-center">
+                          <h4
+                            className="text-base sm:text-lg font-black text-white truncate px-1"
+                            title={tp.is_group ? tp.team_name : tp.participant_name}
+                          >
+                            {tp.is_group ? tp.team_name : tp.participant_name}
+                          </h4>
+                          {tp.is_group ? (
+                            <p
+                              className="text-xs text-amber-200/60 font-medium line-clamp-2 px-1 leading-snug"
+                              title={tp.member_names || ''}
+                            >
+                              {tp.member_names || (tp.member_count ? `${tp.member_count} Members` : '—')}
+                            </p>
+                          ) : (
+                            <p className={`text-xs ${getHouseTeamClass(tp.team_name)}`}>
+                              {tp.team_name}
+                            </p>
+                          )}
+                        </div>
 
-                    {/* Dedicated Highlighted Metrics Row */}
-                    <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
-                      <div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
-                          Grade
-                        </span>
-                        <span
-                          className={`inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
-                            thirdPlace.grade
-                          )}`}
-                        >
-                          {thirdPlace.grade || 'NG'}
-                        </span>
+                        {/* Dedicated Highlighted Metrics Row */}
+                        <div className="w-full grid grid-cols-2 gap-2 text-center bg-[#0A0A0A] p-2.5 rounded-xl border border-white/[0.08] shadow-2xs">
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                              Grade
+                            </span>
+                            <span
+                              className={`inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-black border ${getGradeBadgeClass(
+                                tp.grade
+                              )}`}
+                            >
+                              {tp.grade || 'NG'}
+                            </span>
+                          </div>
+                          <div className="border-l border-amber-500/30 pl-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
+                              Points
+                            </span>
+                            <span className="font-mono font-black text-amber-300 text-base block leading-tight mt-0.5">
+                              {Number(tp.final_score).toFixed(0)}{' '}
+                              <span className="text-[10px] text-amber-300 font-bold">pts</span>
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="border-l border-amber-500/30 pl-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 block">
-                          Points
-                        </span>
-                        <span className="font-mono font-black text-amber-300 text-base block leading-tight mt-0.5">
-                          {Number(thirdPlace.final_score).toFixed(0)}{' '}
-                          <span className="text-[10px] text-amber-300 font-bold">pts</span>
-                        </span>
-                      </div>
-                    </div>
-                  </>
+                    ))}
+                  </div>
                 ) : (
                   <div className="py-8 text-center text-xs text-amber-200/60 font-medium italic">
                     No 3rd place awarded

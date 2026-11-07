@@ -202,7 +202,7 @@ export const OfficialResultPosterCard: React.FC<OfficialResultPosterCardProps> =
         {/* Rankers List (1, 2, 3...) - Just below Program Name with comfortable gap */}
         <div className="flex flex-col space-y-[1.6cqw]">
           {allWinners.length > 0 ? (
-            allWinners.map((w) => {
+            allWinners.map((w, idx) => {
               const pos = Number(w.position);
               const isRivaya = (w.team_name || w.team_code || '').toUpperCase().includes('RIVAYA');
               const teamDisplay = isRivaya ? 'Rivaya' : 'Diraya';
@@ -222,7 +222,7 @@ export const OfficialResultPosterCard: React.FC<OfficialResultPosterCardProps> =
 
               return (
                 <div
-                  key={pos}
+                  key={`${pos}-${idx}`}
                   className="flex items-baseline gap-[1.4cqw] leading-tight overflow-hidden"
                   style={{ fontSize: rankCount >= 4 ? '2.9cqw' : '3.3cqw' }}
                 >
