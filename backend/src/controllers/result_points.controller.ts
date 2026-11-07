@@ -228,4 +228,13 @@ export class PointsController {
       next(error);
     }
   }
+
+  static async publishLeaderboard(req: AuthenticatedRequest, res: Response, next: any) {
+    try {
+      const result = await PointsService.publishLeaderboard(req.user!.id);
+      return ApiResponse.success(res, result, result.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

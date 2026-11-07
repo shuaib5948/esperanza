@@ -52,5 +52,11 @@ router.post(
   authorizeRoles('ADMIN'),
   PointsController.recalculatePoints
 );
+router.post(
+  '/admin/publish-leaderboard',
+  authenticate,
+  authorizeRoles('ADMIN'),
+  PointsController.publishLeaderboard
+);
 
 export default router;

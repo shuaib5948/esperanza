@@ -6,7 +6,7 @@ export class DashboardRepository {
     const [teamCount] = await query<any[]>('SELECT COUNT(*) as total FROM teams');
     const [partCount] = await query<any[]>('SELECT COUNT(*) as total FROM participants');
     const [compCount] = await query<any[]>('SELECT COUNT(*) as total FROM competitions');
-    const [pubCompCount] = await query<any[]>("SELECT COUNT(*) as total FROM competitions WHERE status = 'CLOSED'");
+    const [pubCompCount] = await query<any[]>("SELECT COUNT(DISTINCT competition_id) as total FROM results WHERE status = 'PUBLISHED'");
     const [liveCompCount] = await query<any[]>("SELECT COUNT(*) as total FROM schedules WHERE status = 'LIVE'");
     const [regCount] = await query<any[]>('SELECT COUNT(*) as total FROM registrations');
     const [pendingRegCount] = await query<any[]>("SELECT COUNT(*) as total FROM registrations WHERE status = 'ASSIGNED'");
@@ -17,7 +17,7 @@ export class DashboardRepository {
       SELECT t.id, t.name, t.code, t.color,
              COALESCE(SUM(tp.points), 0) as total_points
       FROM teams t
-      LEFT JOIN team_points tp ON tp.team_id = t.id
+      LEFT JOIN team_points tp ON tp.team_id = t.id AND tp.is_published = 1
       GROUP BY t.id, t.name, t.code, t.color
       ORDER BY total_points DESC, t.name ASC
     `);

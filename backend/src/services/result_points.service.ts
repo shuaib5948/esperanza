@@ -231,9 +231,9 @@ export class ResultService {
         // If results were previously published, automatically sync updated points into team_points
         if (wasPublished && item.team_id && points > 0) {
           await conn.query(`
-            INSERT INTO team_points (team_id, competition_id, result_id, points)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE points = VALUES(points)
+            INSERT INTO team_points (team_id, competition_id, result_id, points, is_published)
+            VALUES (?, ?, ?, ?, TRUE)
+            ON DUPLICATE KEY UPDATE points = VALUES(points), is_published = TRUE
           `, [item.team_id, competitionId, insertRes.insertId, points]);
         }
       }
@@ -312,7 +312,7 @@ export class ResultService {
 
   static async publish(id: number, adminUserId: number) {
     const res = await this.getById(id);
-    const points = Number(res.points_awarded) || 0;
+    const points = Number(res.points_awarded) > 0 ? Number(res.points_awarded) : (Number(res.final_score) || 0);
     await ResultRepository.publishResult(id, adminUserId, points);
     return this.getById(id);
   }
@@ -324,7 +324,7 @@ export class ResultService {
     }
     for (const r of results) {
       if (r.status !== 'PUBLISHED') {
-        const points = Number(r.points_awarded) || 0;
+        const points = Number(r.points_awarded) > 0 ? Number(r.points_awarded) : (Number(r.final_score) || 0);
         await ResultRepository.publishResult(r.id, adminUserId, points);
       }
     }
@@ -401,5 +401,9 @@ export class PointsService {
 
   static async recalculatePoints(adminUserId: number) {
     return PointsRepository.recalculatePoints(adminUserId);
+  }
+
+  static async publishLeaderboard(adminUserId: number) {
+    return PointsRepository.publishLeaderboard(adminUserId);
   }
 }

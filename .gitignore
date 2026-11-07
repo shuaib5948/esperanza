@@ -30,3 +30,4 @@ Thumbs.db
 uploads/
 backend/uploads/
 *.sql
+!backend/src/database/migrations/*.sql

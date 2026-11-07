@@ -20,6 +20,7 @@ import {
   ListOrdered,
   FileCheck2,
   CheckCircle2,
+  UploadCloud,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card.js';
 import { Badge } from '../../components/ui/Badge.js';
@@ -35,6 +36,8 @@ interface TeamBreakdownResponse {
     color: string;
     logo_url?: string;
     total_points: number;
+    public_points?: number;
+    pending_points?: number;
     first_places: number;
     second_places: number;
     third_places: number;
@@ -43,6 +46,7 @@ interface TeamBreakdownResponse {
     b_count: number;
     c_count: number;
     scored_competitions_count: number;
+    total_competitions_count?: number;
   }[];
   groupBreakdown: {
     team_id: number;
@@ -59,6 +63,10 @@ interface TeamBreakdownResponse {
     type_name: string;
     points: number;
   }[];
+  totalPublishedCompetitions?: number;
+  pendingCompetitionsCount?: number;
+  pendingPointsTotal?: number;
+  lastPublishedAt?: string | null;
 }
 
 interface ParticipantEventResult {
@@ -205,9 +213,32 @@ export const AdminLeaderboardPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-individual-leaderboard'] });
       queryClient.invalidateQueries({ queryKey: ['admin-points-log'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['public-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['live-screen'] });
     },
     onError: (err: any) => {
       error(err.message || 'Failed to recalculate points');
+    },
+  });
+
+  // Publish Leaderboard to Public Mutation
+  const publishLeaderboardMutation = useMutation({
+    mutationFn: async () => {
+      return api.post('/points/admin/publish-leaderboard');
+    },
+    onSuccess: (res: any) => {
+      const msg = res?.data?.message || 'Leaderboard published! Public standings & screens updated.';
+      success(msg);
+      queryClient.invalidateQueries({ queryKey: ['admin-team-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-individual-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-points-log'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['public-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['live-screen'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    },
+    onError: (err: any) => {
+      error(err.message || 'Failed to publish leaderboard');
     },
   });
 
@@ -218,6 +249,11 @@ export const AdminLeaderboardPage: React.FC = () => {
   };
 
   const isGlobalFetching = isTeamFetching || isIndividualFetching || isLogFetching;
+
+  // Pending release stats
+  const pendingCompsCount = Number(teamData?.pendingCompetitionsCount || 0);
+  const pendingPointsTotal = Number(teamData?.pendingPointsTotal || 0);
+  const lastPublishedAt = teamData?.lastPublishedAt;
 
   // Teams & Lead calculations
   const teams = teamData?.teams || [];
@@ -295,8 +331,11 @@ export const AdminLeaderboardPage: React.FC = () => {
     : null;
 
   const publishedEventsCount = useMemo(() => {
+    if (teamData?.totalPublishedCompetitions !== undefined && teamData.totalPublishedCompetitions > 0) {
+      return teamData.totalPublishedCompetitions;
+    }
     return Math.max(...teams.map((t) => Number(t.scored_competitions_count) || 0), 0);
-  }, [teams]);
+  }, [teamData, teams]);
 
   // Filtered Individual Contestants
   const filteredIndividuals = useMemo(() => {
@@ -355,17 +394,74 @@ export const AdminLeaderboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Header Quick Refresh Button */}
-        <button
-          onClick={handleRefreshAll}
-          disabled={isGlobalFetching}
-          title="Refresh Points Data"
-          className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 text-xs font-semibold border border-white/[0.08] hover:border-amber-400 shadow-xs transition-all hover:scale-[1.02] cursor-pointer shrink-0"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isGlobalFetching ? 'animate-spin text-amber-400' : 'text-amber-200/60'}`} />
-          <span className="hidden sm:inline">Refresh</span>
-        </button>
+        {/* Action Controls: Publish Leaderboard + Quick Refresh */}
+        <div className="flex items-center gap-2 shrink-0">
+          {pendingCompsCount > 0 ? (
+            <button
+              onClick={() => publishLeaderboardMutation.mutate()}
+              disabled={publishLeaderboardMutation.isPending}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full ${THEME.classes.primaryBtn} text-xs font-black shadow-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer animate-pulse`}
+              title="Click to release pending points to public leaderboard & stage screen"
+            >
+              <UploadCloud className="w-4 h-4" />
+              <span>
+                {publishLeaderboardMutation.isPending
+                  ? 'Publishing...'
+                  : `Publish Leaderboard (${pendingCompsCount} new)`}
+              </span>
+            </button>
+          ) : (
+            <div
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-[11px] font-bold"
+              title={lastPublishedAt ? `Last published: ${new Date(lastPublishedAt).toLocaleTimeString()}` : 'Public leaderboard is live and up to date'}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Public Live</span>
+            </div>
+          )}
+
+          {/* Header Quick Refresh Button */}
+          <button
+            onClick={handleRefreshAll}
+            disabled={isGlobalFetching}
+            title="Refresh Points Data"
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-100 text-xs font-semibold border border-white/[0.08] hover:border-amber-400 shadow-xs transition-all hover:scale-[1.02] cursor-pointer shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isGlobalFetching ? 'animate-spin text-amber-400' : 'text-amber-200/60'}`} />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
       </div>
+
+      {/* Alert Banner when there are pending unpublished scores */}
+      {pendingCompsCount > 0 && (
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+              <UploadCloud className="w-5 h-5 text-amber-400" />
+            </div>
+            <div className="min-w-0">
+              <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 flex-wrap">
+                <span>{pendingCompsCount} Competition Result{pendingCompsCount > 1 ? 's' : ''} Ready to Release</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-black text-[11px] border border-amber-400/30">
+                  +{formatScore(pendingPointsTotal)} PTS PENDING
+                </span>
+              </h4>
+              <p className="text-[11px] text-amber-200/70 mt-0.5">
+                These scores are verified internally. Click &ldquo;Publish to Public Now&rdquo; to update the live public leaderboard and stage screen.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => publishLeaderboardMutation.mutate()}
+            disabled={publishLeaderboardMutation.isPending}
+            className={`px-4 py-2 rounded-xl ${THEME.classes.primaryBtn} text-xs font-black shadow-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-1.5`}
+          >
+            <UploadCloud className="w-3.5 h-3.5" />
+            <span>{publishLeaderboardMutation.isPending ? 'Publishing...' : 'Publish to Public Now'}</span>
+          </button>
+        </div>
+      )}
 
       {/* Structured 3-Tab Segmented Navigation Bar */}
       <div className="bg-[#0A0A0A] border border-white/[0.08] p-1 sm:p-1.5 rounded-2xl">

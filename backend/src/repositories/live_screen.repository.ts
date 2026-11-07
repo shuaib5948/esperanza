@@ -119,7 +119,7 @@ export class LiveScreenRepository {
                  WHERE r.team_id = t.id AND r.status = 'PUBLISHED' AND r.position = 3
                ) as bronze_count
         FROM teams t
-        LEFT JOIN team_points tp ON tp.team_id = t.id
+        LEFT JOIN team_points tp ON tp.team_id = t.id AND tp.is_published = 1
         GROUP BY t.id, t.name, t.code, t.color
         ORDER BY total_points DESC, t.name ASC
       `);

@@ -29,7 +29,7 @@ export class TeamRepository {
       FROM teams t
       LEFT JOIN users u ON u.id = t.leader_user_id
       LEFT JOIN participants p ON p.team_id = t.id AND p.status = 'ACTIVE'
-      LEFT JOIN team_points tp ON tp.team_id = t.id
+      LEFT JOIN team_points tp ON tp.team_id = t.id AND tp.is_published = 1
       GROUP BY t.id
       ORDER BY total_points DESC, t.id ASC
     `);
@@ -45,7 +45,7 @@ export class TeamRepository {
       FROM teams t
       LEFT JOIN users u ON u.id = t.leader_user_id
       LEFT JOIN participants p ON p.team_id = t.id AND p.status = 'ACTIVE'
-      LEFT JOIN team_points tp ON tp.team_id = t.id
+      LEFT JOIN team_points tp ON tp.team_id = t.id AND tp.is_published = 1
       WHERE t.id = ?
       GROUP BY t.id
     `, [id]);

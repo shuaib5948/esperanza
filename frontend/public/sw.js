@@ -49,7 +49,15 @@ self.addEventListener('fetch', (event) => {
   // API calls: Network-First
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
+      fetch(event.request).catch(async () => {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        return new Response(JSON.stringify({ error: 'Network connection unavailable' }), {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'application/json' },
+        });
+      })
     );
     return;
   }
@@ -68,7 +76,8 @@ self.addEventListener('fetch', (event) => {
         .catch(async () => {
           const cached = await caches.match(event.request);
           if (cached) return cached;
-          return caches.match('/index.html') || caches.match('/');
+          const fallback = (await caches.match('/index.html')) || (await caches.match('/'));
+          return fallback || new Response('Offline', { status: 503, statusText: 'Offline' });
         })
     );
     return;
@@ -87,7 +96,7 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => cachedResponse);
+        .catch(() => cachedResponse || new Response(null, { status: 404, statusText: 'Not Found' }));
 
       return cachedResponse || fetchPromise;
     })
