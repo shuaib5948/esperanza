@@ -894,14 +894,25 @@ export const JudgeTabletPortalPage: React.FC = () => {
                   className="p-4 rounded-2xl bg-[#0A0A0A] border border-white/[0.08] shadow-md space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 rounded-lg bg-[#121212] border border-amber-500/30 text-amber-300 font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-8 h-8 rounded-lg bg-[#121212] border border-amber-500/30 text-amber-300 font-black text-xs flex items-center justify-center shadow-xs shrink-0">
                         {displayLetter}
                       </span>
-                      <div>
-                        <span className="text-xs font-bold text-white">
-                          {isStageComp ? `Code ${displayLetter}` : isGroupComp ? p.team_name : `Code ${p.participant_code}`}
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-white block truncate">
+                          {isGroupComp ? p.team_name : (p.participant_name || `Contestant ${p.participant_code}`)}
                         </span>
+                        <div className="text-[10px] text-slate-400 flex items-center gap-1.5 flex-wrap">
+                          <span>Code: <strong className="text-amber-300 font-semibold">{p.participant_code}</strong></span>
+                          <span>•</span>
+                          <span>Lot: <strong className="text-white">{displayLetter}</strong></span>
+                          {p.team_name && !isGroupComp && (
+                            <>
+                              <span>•</span>
+                              <span>{p.team_name}</span>
+                            </>
+                          )}
+                        </div>
                         {isGroupComp && p.member_names && (
                           <p className="text-[10px] text-slate-400 line-clamp-1">{p.member_names}</p>
                         )}
@@ -974,8 +985,8 @@ export const JudgeTabletPortalPage: React.FC = () => {
                 <thead className="sticky top-0 z-10 bg-[#121212] border-b border-white/[0.08] shadow-2xs">
                   <tr className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400">
                     <th className="py-3.5 px-4 text-center bg-[#121212]">Lot</th>
-                    <th className="py-3.5 px-4 text-center bg-[#121212]">
-                      {isStageComp ? 'Performer Code' : isGroupComp ? 'Team & Members' : 'Contestant Code'}
+                    <th className="py-3.5 px-4 text-left bg-[#121212]">
+                      {isGroupComp ? 'Team & Members' : 'Contestant & Code'}
                     </th>
                     <th className="py-3.5 px-4 text-center bg-[#121212]">Rank</th>
                     <th className="py-3.5 px-4 text-center w-36 bg-[#121212]">Mark</th>
@@ -1028,28 +1039,29 @@ export const JudgeTabletPortalPage: React.FC = () => {
                           </span>
                         </td>
 
-                        {/* Contestant Code */}
-                        <td className="py-4 px-4 text-center font-bold text-base sm:text-lg text-white tabular-nums">
-                          {isStageComp ? (
-                            <span className="font-bold text-base sm:text-lg text-white">
-                              Code {displayLetter}
+                        {/* Contestant Name, Code Number & Team */}
+                        <td className="py-4 px-4 text-left">
+                          <div className="flex flex-col items-start justify-center">
+                            <span className="font-bold text-sm sm:text-base text-white">
+                              {isGroupComp ? p.team_name : (p.participant_name || `Contestant ${p.participant_code}`)}
                             </span>
-                          ) : isGroupComp ? (
-                            <div>
-                              <div className="font-bold text-white text-sm sm:text-base">
-                                {p.team_name}
-                              </div>
-                              {p.member_names && (
-                                <div className="text-xs text-slate-400 mt-0.5 line-clamp-1" title={p.member_names}>
-                                  {p.member_names}
-                                </div>
+                            <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5 flex-wrap">
+                              <span>Code: <strong className="text-amber-300 font-semibold">{p.participant_code}</strong></span>
+                              <span>•</span>
+                              <span>Lot: <strong className="text-white">{displayLetter}</strong></span>
+                              {p.team_name && !isGroupComp && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-slate-400">{p.team_name}</span>
+                                </>
                               )}
                             </div>
-                          ) : (
-                            <span className="font-bold text-white text-base sm:text-lg tabular-nums">
-                              {p.participant_code}
-                            </span>
-                          )}
+                            {isGroupComp && p.member_names && (
+                              <div className="text-xs text-slate-400 mt-0.5 line-clamp-1" title={p.member_names}>
+                                {p.member_names}
+                              </div>
+                            )}
+                          </div>
                         </td>
 
                         {/* Rank */}
@@ -1192,9 +1204,10 @@ export const JudgeTabletPortalPage: React.FC = () => {
                   }`}
                 >
                   <span>Lot {displayLetter}</span>
+                  <span className="text-[10px] opacity-75 font-mono">({p.participant_code})</span>
                   {isCompleted && (
                     <span className="font-mono text-[10px] font-black">
-                      ({Math.round(pMark)})
+                      • {Math.round(pMark)}
                     </span>
                   )}
                 </button>
@@ -1247,9 +1260,20 @@ export const JudgeTabletPortalPage: React.FC = () => {
                           >
                             {displayLetter}
                           </span>
-                          <span className="truncate text-left">
-                            {isStageComp ? `Code ${displayLetter}` : isGroupComp ? p.team_name : `Code ${p.participant_code}`}
-                          </span>
+                          <div className="min-w-0 flex-1 text-left">
+                            <div className="text-xs font-bold text-white truncate">
+                              {isGroupComp ? p.team_name : (p.participant_name || `Contestant ${p.participant_code}`)}
+                            </div>
+                            <div className="text-[10px] text-slate-400 flex items-center gap-1.5 truncate">
+                              <span>Code: <strong className="text-amber-300 font-semibold">{p.participant_code}</strong></span>
+                              {p.team_name && !isGroupComp && (
+                                <>
+                                  <span>•</span>
+                                  <span>{p.team_name}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
                         </div>
                         {isCompleted ? (
                           <div className="flex items-center gap-1.5 shrink-0">
@@ -1276,10 +1300,18 @@ export const JudgeTabletPortalPage: React.FC = () => {
                       {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-[10px] uppercase font-extrabold tracking-wider text-amber-400">
-                          LOT {activePerformerIndex + 1} OF {participants.length}
+                          LOT {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)} ({activePerformerIndex + 1}/{participants.length})
                         </span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300">
+                          CODE: <strong className="text-amber-300 font-bold">{currentParticipant.participant_code}</strong>
+                        </span>
+                        {currentParticipant.team_name && (
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">
+                            • {currentParticipant.team_name}
+                          </span>
+                        )}
                         {isAllLocked ? (
                           <Badge variant="success" size="sm">
                             Locked
@@ -1290,8 +1322,8 @@ export const JudgeTabletPortalPage: React.FC = () => {
                           </Badge>
                         )}
                       </div>
-                      <h3 className="text-base sm:text-lg font-black text-white truncate">
-                        {isStageComp ? `Contestant Code ${currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}` : isGroupComp ? currentParticipant.team_name : `Code ${currentParticipant.participant_code}`}
+                      <h3 className="text-base sm:text-lg md:text-xl font-black text-white truncate mt-0.5">
+                        {isGroupComp ? currentParticipant.team_name : (currentParticipant.participant_name || `Contestant ${currentParticipant.participant_code}`)}
                       </h3>
                       {isGroupComp && currentParticipant.member_names && (
                         <p className="text-[11px] text-slate-400 line-clamp-1">
@@ -1321,10 +1353,13 @@ export const JudgeTabletPortalPage: React.FC = () => {
                       <Play className="w-7 h-7 ml-0.5 text-amber-400" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-black text-white">
-                        {isStageComp ? `Contestant ${currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)} on Stage` : isGroupComp ? `${currentParticipant.team_name} (Group Evaluation)` : `Contestant Code: ${currentParticipant.participant_code}`}
+                      <h4 className="text-lg sm:text-xl font-black text-white">
+                        {isGroupComp ? currentParticipant.team_name : (currentParticipant.participant_name || `Contestant ${currentParticipant.participant_code}`)}
                       </h4>
-                      <p className="text-xs text-slate-400 mt-1 max-w-sm">
+                      <p className="text-xs text-amber-300/80 font-mono mt-1">
+                        Lot: <strong className="text-white font-bold">{currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}</strong> • Code: <strong className="text-white font-bold">{currentParticipant.participant_code}</strong> {currentParticipant.team_name ? `• ${currentParticipant.team_name}` : ''}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto">
                         {isStageComp ? 'Tap start when contestant begins their performance to activate score controls.' : 'Tap start to begin scoring this submission.'}
                       </p>
                     </div>
@@ -1524,7 +1559,9 @@ export const JudgeTabletPortalPage: React.FC = () => {
                             isLoading={saveIndividualScoresMutation.isPending}
                             disabled={isAllLocked}
                           >
-                            <span>Next: Lot {participants[activePerformerIndex + 1]?.code_letter || String.fromCharCode(65 + activePerformerIndex + 1)} →</span>
+                            <span>
+                              Next: Lot {participants[activePerformerIndex + 1]?.code_letter || String.fromCharCode(65 + activePerformerIndex + 1)} ({participants[activePerformerIndex + 1]?.participant_name || participants[activePerformerIndex + 1]?.participant_code || ''}) →
+                            </span>
                           </Button>
                         ) : (
                           <Button

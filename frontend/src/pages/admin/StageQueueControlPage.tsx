@@ -25,6 +25,7 @@ import {
   ChevronDown,
   ChevronUp,
   Eye,
+  ListOrdered,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card.js';
 import { Badge } from '../../components/ui/Badge.js';
@@ -147,6 +148,9 @@ export const StageQueueControlPage: React.FC = () => {
 
   // Discard Live Programme confirmation modal
   const [isDiscardModalOpen, setIsDiscardModalOpen] = useState(false);
+
+  // Lotted Participants Order Modal state
+  const [isLottedOrderModalOpen, setIsLottedOrderModalOpen] = useState(false);
 
   // 1. Fetch competitions list
   const { data: competitions = [] } = useQuery<Competition[]>({
@@ -778,22 +782,36 @@ export const StageQueueControlPage: React.FC = () => {
 
                 {/* Code Letters Display */}
                 <div className="pt-3 border-t border-white/[0.08] space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-bold text-amber-200">
                       Assigned Code Letters:
                     </span>
-                    <span className="text-[10px] font-bold text-amber-200/60 bg-[#121212] px-2 py-0.5 rounded-full">
-                      {sortedLiveQueue.length} Present Contestants
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsLottedOrderModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-bold border border-amber-500/30 transition-all cursor-pointer shadow-xs"
+                        title="View all lotted participants in order"
+                      >
+                        <ListOrdered className="w-3.5 h-3.5 text-amber-400" />
+                        <span>View Lot Order</span>
+                      </button>
+                      <span className="text-[10px] font-bold text-amber-200/60 bg-[#121212] px-2 py-0.5 rounded-full">
+                        {sortedLiveQueue.length} Present Contestants
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
                     {sortedLiveQueue.map((item) => (
-                      <div
+                      <button
+                        type="button"
                         key={item.id}
-                        className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] bg-[#121212] text-amber-100 text-center shrink-0 font-bold text-xs"
+                        onClick={() => setIsLottedOrderModalOpen(true)}
+                        className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] bg-[#121212] hover:bg-[#181818] hover:border-amber-400/50 text-amber-100 text-center shrink-0 font-bold text-xs cursor-pointer transition-all hover:scale-105"
+                        title={`Click to view lot order (Lot ${item.code_letter}: ${item.participant_name})`}
                       >
                         Code {item.code_letter}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -863,7 +881,7 @@ export const StageQueueControlPage: React.FC = () => {
 
                 {/* Queue Progression Box — Present Participants with Lots (Code A, Code B, Code C) */}
                 <div className="bg-[#121212] rounded-2xl p-4 border border-white/[0.08] shadow-xs space-y-3">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-white text-xs tracking-wide">
                         Queue Progression
@@ -873,20 +891,33 @@ export const StageQueueControlPage: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Late Performer Action */}
-                    <button
-                      disabled={isLiveMarksReceived}
-                      onClick={() => setIsLateModalOpen(true)}
-                      className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-200 text-xs font-semibold border border-white/[0.08] hover:border-amber-500/30 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
-                      title={
-                        isLiveMarksReceived
-                          ? 'Official marks already submitted; late additions are strictly locked.'
-                          : 'Add an arriving contestant to the end of the line'
-                      }
-                    >
-                      <Plus className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Late Performer</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* View Lot Order Modal Button */}
+                      <button
+                        type="button"
+                        onClick={() => setIsLottedOrderModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-amber-200 text-xs font-bold border border-amber-500/30 transition-all hover:scale-[1.02] cursor-pointer shadow-xs"
+                        title="View all lotted participants in performance order"
+                      >
+                        <ListOrdered className="w-3.5 h-3.5 text-amber-400" />
+                        <span>View Lot Order</span>
+                      </button>
+
+                      {/* Late Performer Action */}
+                      <button
+                        disabled={isLiveMarksReceived}
+                        onClick={() => setIsLateModalOpen(true)}
+                        className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#0A0A0A] hover:bg-[#121212] text-amber-200 text-xs font-semibold border border-white/[0.08] hover:border-amber-500/30 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+                        title={
+                          isLiveMarksReceived
+                            ? 'Official marks already submitted; late additions are strictly locked.'
+                            : 'Add an arriving contestant to the end of the line'
+                        }
+                      >
+                        <Plus className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Late Performer</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
@@ -899,9 +930,11 @@ export const StageQueueControlPage: React.FC = () => {
                         const isDraft = item.scoring_status === 'DRAFT';
 
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={item.id}
-                            className={`px-4 py-2 rounded-xl border text-center transition-all shrink-0 font-bold text-xs sm:text-sm shadow-2xs ${
+                            onClick={() => setIsLottedOrderModalOpen(true)}
+                            className={`px-4 py-2 rounded-xl border text-center transition-all shrink-0 font-bold text-xs sm:text-sm shadow-2xs cursor-pointer hover:scale-105 ${
                               isActive
                                 ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-400 shadow-sm ring-2 ring-amber-400'
                                 : isScored
@@ -910,9 +943,10 @@ export const StageQueueControlPage: React.FC = () => {
                                 ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                                 : 'bg-[#0A0A0A] text-amber-100 border-amber-500/30'
                             }`}
+                            title={`Click to view lot order (Lot ${item.code_letter}: ${item.participant_name})`}
                           >
                             Code {item.code_letter}
-                          </div>
+                          </button>
                         );
                       })
                     )}
@@ -1579,6 +1613,77 @@ export const StageQueueControlPage: React.FC = () => {
             >
               <RotateCcw className="w-4 h-4" />
               <span>Yes, Discard Programme</span>
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 4. Live Programme Lotted Participants Order Modal */}
+      <Modal
+        isOpen={isLottedOrderModalOpen}
+        onClose={() => setIsLottedOrderModalOpen(false)}
+        title="Lotted Participants Order"
+        maxWidth="2xl"
+      >
+        <div className="space-y-4 text-white">
+          {liveSchedule && (
+            <div className="pb-2 border-b border-white/[0.08]">
+              <h3 className="text-sm font-bold text-white">
+                {liveSchedule.programme_group ? `${liveSchedule.programme_group} - ` : ''}
+                {liveSchedule.competition_name}
+              </h3>
+              <p className="text-[11px] text-amber-400 font-mono mt-0.5">
+                Total Lotted: {sortedLiveQueue.length}
+              </p>
+            </div>
+          )}
+
+          {sortedLiveQueue.length === 0 ? (
+            <div className="py-8 text-center text-slate-400 text-xs bg-[#0A0A0A] rounded-xl border border-white/[0.05]">
+              No lotted participants found.
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-white/[0.08] bg-[#0A0A0A]">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/[0.08] bg-white/[0.03] text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <th className="py-2.5 px-3 text-center w-16">Lot</th>
+                    <th className="py-2.5 px-3 w-28">Code</th>
+                    <th className="py-2.5 px-3">Name</th>
+                    <th className="py-2.5 px-3 w-36">Team</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.05]">
+                  {sortedLiveQueue.map((item) => (
+                    <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-2.5 px-3 text-center">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 font-black text-xs">
+                          {item.code_letter}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 font-mono font-bold text-amber-300/90">
+                        {item.participant_code}
+                      </td>
+                      <td className="py-2.5 px-3 font-semibold text-white">
+                        {item.is_group ? item.team_name : item.participant_name}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-300">
+                        {item.team_name}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="button"
+              onClick={() => setIsLottedOrderModalOpen(false)}
+              className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all cursor-pointer"
+            >
+              Close
             </button>
           </div>
         </div>

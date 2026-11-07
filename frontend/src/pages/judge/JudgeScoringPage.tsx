@@ -329,7 +329,11 @@ export const JudgeScoringPage: React.FC = () => {
               const isSelected = idx === activePerformerIndex;
               const pMark = getParticipantMark(p.participant_id);
               const isCompleted = pMark > 0;
-              const displayLabel = p.code_letter ? `Code ${p.code_letter}` : `Performer ${idx + 1}`;
+              const displayLabel = p.participant_name
+                ? `${p.code_letter ? `${p.code_letter} - ` : ''}${p.participant_name}`
+                : p.code_letter
+                ? `Code ${p.code_letter}`
+                : `Performer ${idx + 1}`;
 
               return (
                 <button
@@ -352,7 +356,7 @@ export const JudgeScoringPage: React.FC = () => {
                       {p.code_letter}
                     </span>
                   ) : null}
-                  <span>{displayLabel}</span>
+                  <span className="max-w-[140px] truncate">{displayLabel}</span>
                   {isCompleted && <Check className="w-3.5 h-3.5 text-amber-400 ml-0.5" />}
                 </button>
               );
@@ -397,11 +401,10 @@ export const JudgeScoringPage: React.FC = () => {
                         )}
                       </div>
                       <h2 className="text-2xl font-black text-white mt-1">
-                        PERFORMER CODE LETTER{' '}
-                        {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}
+                        {currentParticipant.participant_name || `PERFORMER CODE LETTER ${currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}`}
                       </h2>
-                      <p className="text-xs text-amber-200/60 font-mono mt-0.5">
-                        REG CODE: {currentParticipant.participant_code} • Blind Adjudication Active
+                      <p className="text-xs text-amber-200/80 font-mono mt-0.5">
+                        LOT: {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)} • REG CODE: {currentParticipant.participant_code} {currentParticipant.team_name ? `• ${currentParticipant.team_name}` : ''}
                       </p>
                     </div>
                   </div>
@@ -425,9 +428,11 @@ export const JudgeScoringPage: React.FC = () => {
                   </div>
                   <div className="max-w-md mx-auto">
                     <h3 className="text-xl font-black text-white">
-                      Performer Code {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)} is
-                      Taking Stage
+                      {currentParticipant.participant_name || `Performer Code ${currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)}`}
                     </h3>
+                    <p className="text-xs text-amber-300 font-mono mt-1">
+                      Lot {currentParticipant.code_letter || String.fromCharCode(65 + activePerformerIndex)} • Code {currentParticipant.participant_code} {currentParticipant.team_name ? `• ${currentParticipant.team_name}` : ''}
+                    </p>
                     <p className="text-xs text-slate-400 mt-1">
                       Press start when the contestant begins their performance to activate direct 100-mark scoring.
                     </p>
@@ -670,9 +675,11 @@ export const JudgeScoringPage: React.FC = () => {
                         </td>
                         <td className="py-3.5 px-4">
                           <span className="font-bold text-white block">
-                            Code Letter {p.code_letter || String.fromCharCode(65 + idx)}
+                            {p.participant_name || `Contestant ${p.participant_code}`}
                           </span>
-                          <span className="text-xs text-amber-200/60 font-mono">{p.participant_code}</span>
+                          <span className="text-xs text-amber-200/80 font-mono">
+                            Lot: {p.code_letter || String.fromCharCode(65 + idx)} • Code: {p.participant_code} {p.team_name ? `• ${p.team_name}` : ''}
+                          </span>
                         </td>
                         {/* Direct Score Input for Live Calibration */}
                         <td className="py-3.5 px-4 text-center">
