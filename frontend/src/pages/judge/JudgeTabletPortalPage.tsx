@@ -144,28 +144,57 @@ export const JudgeTabletPortalPage: React.FC = () => {
 
   // Desk state: search query and filter tabs
   const [deskSearch, setDeskSearch] = useState('');
-  const [deskFilter, setDeskFilter] = useState<'ALL' | 'PENDING' | 'SUBMITTED'>('ALL');
+  const [deskFilter, setDeskFilter] = useState<'ALL' | 'PENDING' | 'SUBMITTED' | 'PUBLISHED'>('ALL');
 
   const isOffStageJudge = judge?.judge_type === 'OFF_STAGE' || (offStageComps.length > 0 && !activeLiveComp);
 
-  // Unsubmitted / pending off-stage competitions
-  const pendingComps = useMemo(() => {
-    return offStageComps.filter(
-      (c) =>
-        !(
-          (c.total_registered > 0 && c.total_submitted === c.total_registered) ||
-          completedCompIds.has(c.competition_id)
-        )
+  // Helper functions to categorize competition status accurately
+  const isCompPublished = (c: any): boolean => {
+    return (
+      Number(c?.published_results_count ?? 0) > 0 ||
+      (c?.competition_status || '').toUpperCase() === 'PUBLISHED'
     );
+  };
+
+  const isCompSubmitted = (c: any): boolean => {
+    if (isCompPublished(c)) return false; // Published is its own separate category
+    if (completedCompIds.has(c?.competition_id)) return true;
+    if (Boolean(c?.is_locked)) return true;
+
+    const compStatus = (c?.competition_status || '').toUpperCase();
+    if (compStatus === 'LOCKED' || compStatus === 'SUBMITTED' || compStatus === 'CLOSED') {
+      return true;
+    }
+    const schedStatus = (c?.schedule_status || '').toUpperCase();
+    if (schedStatus === 'COMPLETED') return true;
+
+    const totalReg = Number(c?.total_registered || 0);
+    const totalSub = Number(c?.total_submitted || 0);
+    const totalEval = Number(c?.total_evaluated || 0);
+
+    if (totalReg > 0 && totalSub >= totalReg) return true;
+    if (totalEval > 0 && totalSub >= totalEval) return true;
+
+    return false;
+  };
+
+  const isCompPending = (c: any): boolean => {
+    return !isCompPublished(c) && !isCompSubmitted(c);
+  };
+
+  // Published off-stage competitions (Admin has officially published final results)
+  const publishedComps = useMemo(() => {
+    return offStageComps.filter(isCompPublished);
+  }, [offStageComps]);
+
+  // Submitted off-stage competitions (Judge has locked/submitted marks, awaiting publishing)
+  const submittedComps = useMemo(() => {
+    return offStageComps.filter(isCompSubmitted);
   }, [offStageComps, completedCompIds]);
 
-  // Submitted off-stage competitions
-  const submittedComps = useMemo(() => {
-    return offStageComps.filter(
-      (c) =>
-        (c.total_registered > 0 && c.total_submitted === c.total_registered) ||
-        completedCompIds.has(c.competition_id)
-    );
+  // Unsubmitted / pending off-stage competitions
+  const pendingComps = useMemo(() => {
+    return offStageComps.filter(isCompPending);
   }, [offStageComps, completedCompIds]);
 
   // Filtered off-stage competitions for the desk grid
@@ -175,6 +204,8 @@ export const JudgeTabletPortalPage: React.FC = () => {
       list = pendingComps;
     } else if (deskFilter === 'SUBMITTED') {
       list = submittedComps;
+    } else if (deskFilter === 'PUBLISHED') {
+      list = publishedComps;
     }
 
     if (!deskSearch.trim()) return list;
@@ -185,7 +216,7 @@ export const JudgeTabletPortalPage: React.FC = () => {
         String(c.programme_number || '').toLowerCase().includes(q) ||
         (c.programme_group || '').toLowerCase().includes(q)
     );
-  }, [offStageComps, deskFilter, pendingComps, submittedComps, deskSearch]);
+  }, [offStageComps, deskFilter, pendingComps, submittedComps, publishedComps, deskSearch]);
 
   // Selected competition ID for scoring
   const [selectedCompId, setSelectedCompId] = useState<number | null>(null);
@@ -334,12 +365,10 @@ export const JudgeTabletPortalPage: React.FC = () => {
       participants.length > 0 &&
       participants.every((p) => p.status === 'SUBMITTED' || p.status === 'LOCKED');
     const isLocallyCompleted = selectedCompId !== null && completedCompIds.has(selectedCompId);
-    const isAssignmentSubmitted =
-      !!currentAssignment &&
-      currentAssignment.total_registered > 0 &&
-      currentAssignment.total_submitted === currentAssignment.total_registered;
+    const isAssignmentDone =
+      !!currentAssignment && (isCompPublished(currentAssignment) || isCompSubmitted(currentAssignment));
 
-    return allParticipantsLocked || isLocallyCompleted || isAssignmentSubmitted;
+    return allParticipantsLocked || isLocallyCompleted || isAssignmentDone;
   }, [participants, selectedCompId, completedCompIds, currentAssignment]);
 
   // Check if all performers have a mark > 0
@@ -527,6 +556,7 @@ export const JudgeTabletPortalPage: React.FC = () => {
                       { key: 'ALL', label: `All (${offStageComps.length})` },
                       { key: 'PENDING', label: `Pending (${pendingComps.length})` },
                       { key: 'SUBMITTED', label: `Submitted (${submittedComps.length})` },
+                      { key: 'PUBLISHED', label: `Published (${publishedComps.length})` },
                     ] as const
                   ).map((tab) => (
                     <button
@@ -579,14 +609,13 @@ export const JudgeTabletPortalPage: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {filteredOffStageComps.map((comp) => {
-                    const isSubmitted =
-                      (comp.total_registered > 0 && comp.total_submitted === comp.total_registered) ||
-                      completedCompIds.has(comp.competition_id);
+                    const isPublished = isCompPublished(comp);
+                    const isSubmitted = isCompSubmitted(comp);
                     const isPartiallyScored =
-                      !isSubmitted && ((comp.total_evaluated || 0) > 0 || (comp.total_submitted || 0) > 0);
+                      !isSubmitted && !isPublished && ((comp.total_evaluated || 0) > 0 || (comp.total_submitted || 0) > 0);
                     const progressPct =
                       comp.total_registered > 0
-                        ? Math.round(((comp.total_submitted || 0) / comp.total_registered) * 100)
+                        ? Math.min(100, Math.round(((comp.total_submitted || 0) / comp.total_registered) * 100))
                         : 0;
 
                     return (
@@ -597,7 +626,12 @@ export const JudgeTabletPortalPage: React.FC = () => {
                         {/* Card Top */}
                         <div className="space-y-2.5">
                           <div className="flex items-center justify-end gap-2">
-                            {isSubmitted ? (
+                            {isPublished ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                <Trophy className="w-3 h-3 text-emerald-400" />
+                                <span>Published</span>
+                              </span>
+                            ) : isSubmitted ? (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/15 text-amber-300 border border-amber-400/30">
                                 <CheckCircle2 className="w-3 h-3 text-amber-300" />
                                 <span>Submitted</span>
@@ -626,19 +660,23 @@ export const JudgeTabletPortalPage: React.FC = () => {
                             <div className="flex items-center justify-between text-xs">
                               <span className="font-bold text-slate-400">Evaluation Progress</span>
                               <span className="font-black text-white">
-                                {comp.total_submitted || 0} / {comp.total_registered || 0}{' '}
-                                <span className="font-normal text-slate-400">({progressPct}%)</span>
+                                {isSubmitted || isPublished ? comp.total_registered : (comp.total_submitted || 0)} / {comp.total_registered || 0}{' '}
+                                <span className="font-normal text-slate-400">({isSubmitted || isPublished ? 100 : progressPct}%)</span>
                               </span>
                             </div>
                             <div className="w-full bg-[#121212] h-2 rounded-full overflow-hidden">
                               <div
-                                className="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 h-full rounded-full transition-all duration-300 shadow-xs shadow-amber-400/20"
-                                style={{ width: `${progressPct}%` }}
+                                className={`h-full rounded-full transition-all duration-300 shadow-xs ${
+                                  isPublished
+                                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 shadow-emerald-500/20'
+                                    : 'bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 shadow-amber-400/20'
+                                }`}
+                                style={{ width: `${isSubmitted || isPublished ? 100 : progressPct}%` }}
                               />
                             </div>
                           </div>
 
-                          {isSubmitted ? (
+                          {isPublished || isSubmitted ? (
                             <Button
                               variant="secondary"
                               size="sm"
@@ -649,7 +687,7 @@ export const JudgeTabletPortalPage: React.FC = () => {
                               }}
                             >
                               <Eye className="w-3.5 h-3.5 mr-1.5" />
-                              <span>View Submitted Scores</span>
+                              <span>{isPublished ? 'View Published Results' : 'View Submitted Scores'}</span>
                             </Button>
                           ) : isPartiallyScored ? (
                             <Button
@@ -831,7 +869,12 @@ export const JudgeTabletPortalPage: React.FC = () => {
                   <Save className="w-3.5 h-3.5 text-amber-400" />
                   <span>Save</span>
                 </Button>
-                {isAllLocked ? (
+                {isCompPublished(currentAssignment || competition) ? (
+                  <span className="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+                    <Trophy className="w-4 h-4 text-emerald-400" />
+                    <span>Published</span>
+                  </span>
+                ) : isAllLocked ? (
                   <span className="px-3.5 py-1.5 rounded-xl bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-amber-300" />
                     <span>Submitted</span>
@@ -1312,9 +1355,15 @@ export const JudgeTabletPortalPage: React.FC = () => {
                             • {currentParticipant.team_name}
                           </span>
                         )}
-                        {isAllLocked ? (
+                        {isCompPublished(currentAssignment || competition) ? (
                           <Badge variant="success" size="sm">
-                            Locked
+                            <Trophy className="w-3 h-3 mr-1 text-emerald-400" />
+                            Published
+                          </Badge>
+                        ) : isAllLocked ? (
+                          <Badge variant="warning" size="sm">
+                            <CheckCircle2 className="w-3 h-3 mr-1 text-amber-300" />
+                            Submitted
                           </Badge>
                         ) : (
                           <Badge variant="neutral" size="sm">

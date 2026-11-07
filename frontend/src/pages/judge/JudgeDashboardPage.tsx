@@ -52,8 +52,14 @@ export const JudgeDashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {assignments.map((comp: any) => {
               const isLive = comp.schedule_status === 'LIVE';
-              const isComplete =
-                comp.total_registered > 0 && comp.total_submitted === comp.total_registered;
+              const isPublished =
+                Number(comp.published_results_count ?? 0) > 0 ||
+                (comp.competition_status || '').toUpperCase() === 'PUBLISHED';
+              const isSubmitted =
+                !isPublished &&
+                (Boolean(comp.is_locked) ||
+                  (comp.total_registered > 0 && comp.total_submitted >= comp.total_registered) ||
+                  (comp.total_evaluated > 0 && comp.total_submitted >= comp.total_evaluated));
 
               return (
                 <Card
@@ -71,7 +77,7 @@ export const JudgeDashboardPage: React.FC = () => {
                           PROGRAMME {comp.programme_number}
                         </span>
                         {isLive && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">
                             <Radio className="w-3 h-3 text-amber-400" />
                             LIVE ON STAGE
                           </span>
@@ -81,8 +87,11 @@ export const JudgeDashboardPage: React.FC = () => {
                         {comp.competition_name}
                       </h4>
                     </div>
-                    <Badge variant={isComplete ? 'success' : isLive ? 'primary' : 'warning'} size="sm">
-                      {isComplete ? 'All Scored' : isLive ? 'Live Now' : 'In Queue'}
+                    <Badge
+                      variant={isPublished ? 'success' : isSubmitted ? 'success' : isLive ? 'primary' : 'warning'}
+                      size="sm"
+                    >
+                      {isPublished ? 'Published' : isSubmitted ? 'Submitted' : isLive ? 'Live Now' : 'In Queue'}
                     </Badge>
                   </div>
 

@@ -409,7 +409,16 @@ export class DashboardRepository {
              MAX(s.status) as schedule_status,
              COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END) as total_registered,
              COUNT(DISTINCT ss.id) as total_evaluated,
-             COUNT(DISTINCT CASE WHEN ss.status = 'SUBMITTED' OR ss.status = 'LOCKED' THEN ss.id END) as total_submitted
+             COUNT(DISTINCT CASE WHEN ss.status = 'SUBMITTED' OR ss.status = 'LOCKED' THEN ss.id END) as total_submitted,
+             (SELECT COUNT(*) FROM results res WHERE res.competition_id = c.id AND res.status = 'PUBLISHED') as published_results_count,
+             (
+               c.status IN ('LOCKED', 'SUBMITTED', 'CLOSED', 'PUBLISHED')
+               OR MAX(s.status) = 'COMPLETED'
+               OR (
+                 COUNT(DISTINCT ss.id) > 0 
+                 AND COUNT(DISTINCT CASE WHEN ss.status IN ('SUBMITTED', 'LOCKED') THEN ss.id END) = COUNT(DISTINCT ss.id)
+               )
+             ) as is_locked
       FROM competitions c
       JOIN competition_judges cj ON cj.competition_id = c.id AND cj.judge_id = ? AND cj.status = 'ASSIGNED'
       LEFT JOIN competition_types ct ON ct.id = c.competition_type_id
