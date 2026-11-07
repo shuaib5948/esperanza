@@ -441,6 +441,8 @@ export class JudgeRepository {
       SET status = 'LOCKED', submitted_at = COALESCE(submitted_at, NOW()), locked_at = NOW()
       WHERE id = ?
     `, [sheetId]);
+
+    return Number(sheet.competition_id);
   }
 
   static async unlockScoreSheet(sheetId: number, adminUserId: number, reason: string) {

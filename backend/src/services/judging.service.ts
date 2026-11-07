@@ -1,5 +1,6 @@
 import { JudgeRepository } from '../repositories/judging.repository.js';
 import { CompetitionRepository } from '../repositories/competition.repository.js';
+import { ResultService } from './result_points.service.js';
 
 export class JudgingService {
   static async getAllJudges() {
@@ -219,11 +220,28 @@ export class JudgingService {
       }
     }
 
-    return JudgeRepository.saveBulkScores(competitionId, judgeId, items, isDraft);
+    const result = await JudgeRepository.saveBulkScores(competitionId, judgeId, items, isDraft);
+
+    if (!isDraft) {
+      try {
+        await ResultService.generateResults(competitionId, 'AVERAGE');
+      } catch (err) {
+        console.error(`[JudgingService] Failed to auto-generate results for competition ${competitionId}:`, err);
+      }
+    }
+
+    return result;
   }
 
   static async submitScoreSheet(sheetId: number, judgeId: number) {
-    await JudgeRepository.submitAndLockScoreSheet(sheetId, judgeId);
+    const competitionId = await JudgeRepository.submitAndLockScoreSheet(sheetId, judgeId);
+    if (competitionId) {
+      try {
+        await ResultService.generateResults(competitionId, 'AVERAGE');
+      } catch (err) {
+        console.error(`[JudgingService] Failed to auto-generate results for competition ${competitionId}:`, err);
+      }
+    }
     return { success: true, message: 'Score sheet successfully locked and submitted.' };
   }
 

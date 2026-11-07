@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.js';
@@ -125,10 +125,15 @@ export const ResultsVerificationPage: React.FC = () => {
   // Base list: strictly ONLY finished programmes that have submitted judge marks or completed off-stage awaiting evaluation
   const eligibleCompetitions = useMemo(() => {
     return competitions.filter((c) => {
-      const isCompleted = c.status === 'COMPLETED' || c.schedule_status === 'COMPLETED';
+      const isCompleted =
+        c.status === 'COMPLETED' ||
+        c.schedule_status === 'COMPLETED' ||
+        c.status === 'LOCKED' ||
+        c.status === 'SUBMITTED' ||
+        c.status === 'PUBLISHED';
       const hasMarksOrResults = Number(c.score_sheets_count ?? 0) > 0 || Number(c.results_count ?? 0) > 0;
       const isOffStage = (c.competition_type_name || c.competition_type || '').toUpperCase() === 'OFF_STAGE';
-      return isCompleted && (hasMarksOrResults || isOffStage);
+      return (isCompleted && (hasMarksOrResults || isOffStage)) || hasMarksOrResults;
     });
   }, [competitions]);
 
@@ -141,15 +146,16 @@ export const ResultsVerificationPage: React.FC = () => {
     for (const c of eligibleCompetitions) {
       const pubCount = Number(c.published_results_count ?? 0);
       const verCount = Number(c.verified_results_count ?? 0);
-      const draftCount = Number(c.draft_results_count ?? 0);
-      const resCount = Number(c.results_count ?? 0);
       const ssCount = Number(c.score_sheets_count ?? 0);
 
-      if (pubCount > 0) {
+      const isPublished = pubCount > 0 || c.status === 'PUBLISHED';
+      const isVerified = !isPublished && (verCount > 0 || ssCount > 0);
+
+      if (isPublished) {
         published++;
-      } else if (verCount > 0) {
+      } else if (isVerified) {
         verified++;
-      } else if (draftCount > 0 || ssCount > 0 || resCount === 0) {
+      } else {
         draft++;
       }
     }
@@ -162,18 +168,16 @@ export const ResultsVerificationPage: React.FC = () => {
     };
   }, [eligibleCompetitions]);
 
-  // Filter programmes according to statusFilter chip and searchQuery
+  // Filter programmes according to statusFilter chip and searchQuery, sorted by submitted order (oldest first, newest last)
   const filteredCompetitions = useMemo(() => {
-    return eligibleCompetitions.filter((c) => {
+    const list = eligibleCompetitions.filter((c) => {
       const pubCount = Number(c.published_results_count ?? 0);
       const verCount = Number(c.verified_results_count ?? 0);
-      const draftCount = Number(c.draft_results_count ?? 0);
-      const resCount = Number(c.results_count ?? 0);
       const ssCount = Number(c.score_sheets_count ?? 0);
 
-      const isPublished = pubCount > 0;
-      const isVerified = verCount > 0 && !isPublished;
-      const isDraft = !isPublished && !isVerified && (draftCount > 0 || ssCount > 0 || resCount === 0);
+      const isPublished = pubCount > 0 || c.status === 'PUBLISHED';
+      const isVerified = !isPublished && (verCount > 0 || ssCount > 0);
+      const isDraft = !isPublished && !isVerified;
 
       if (statusFilter === 'PUBLISHED' && !isPublished) return false;
       if (statusFilter === 'VERIFIED' && !isVerified) return false;
@@ -188,6 +192,20 @@ export const ResultsVerificationPage: React.FC = () => {
         return matchesName || matchesCode || matchesNum || matchesGroup;
       }
       return true;
+    });
+
+    // Sort by submitted timestamp: Oldest is first (ASC), Newest is last
+    return [...list].sort((a, b) => {
+      const timeA = a.submitted_at ? new Date(a.submitted_at).getTime() : 0;
+      const timeB = b.submitted_at ? new Date(b.submitted_at).getTime() : 0;
+
+      if (timeA > 0 && timeB > 0 && timeA !== timeB) {
+        return timeA - timeB; // Ascending: earliest submitted at top
+      }
+      if (timeA > 0 && (!timeB || timeB === 0)) return -1;
+      if (timeB > 0 && (!timeA || timeA === 0)) return 1;
+
+      return a.programme_number - b.programme_number;
     });
   }, [eligibleCompetitions, statusFilter, searchQuery]);
 
@@ -262,6 +280,19 @@ export const ResultsVerificationPage: React.FC = () => {
       error(err.message || 'Failed to generate results');
     },
   });
+
+  // Auto-calculate results if judge scores exist but results are not yet compiled
+  useEffect(() => {
+    if (
+      selectedCompId &&
+      !isResultsLoading &&
+      results.length === 0 &&
+      judgeScores.length > 0 &&
+      !generateMutation.isPending
+    ) {
+      generateMutation.mutate();
+    }
+  }, [selectedCompId, isResultsLoading, results.length, judgeScores.length, generateMutation.isPending]);
 
   // 5. 1-Click Master Publish All mutation
   const publishAllMutation = useMutation({
@@ -529,9 +560,11 @@ export const ResultsVerificationPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredCompetitions.map((comp) => {
-              const hasPublished = Number(comp.published_results_count ?? 0) > 0;
-              const hasVerified = Number(comp.verified_results_count ?? 0) > 0 && !hasPublished;
-              const isAwaitingEval = Number(comp.score_sheets_count ?? 0) === 0 && Number(comp.results_count ?? 0) === 0;
+              const hasPublished = Number(comp.published_results_count ?? 0) > 0 || comp.status === 'PUBLISHED';
+              const hasVerified =
+                !hasPublished &&
+                (Number(comp.verified_results_count ?? 0) > 0 || Number(comp.score_sheets_count ?? 0) > 0);
+              const isAwaitingEval = !hasPublished && !hasVerified;
 
               return (
                 <div
@@ -565,17 +598,12 @@ export const ResultsVerificationPage: React.FC = () => {
                       ) : hasVerified ? (
                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center gap-1">
                           <Check className="w-3 h-3 text-sky-400" />
-                          <span>Verified</span>
-                        </span>
-                      ) : isAwaitingEval ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-amber-400" />
-                          <span>Ready for Evaluation</span>
+                          <span>Ready for Verification</span>
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#121212] text-amber-200/60 border border-white/[0.08] flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
                           <Clock className="w-3 h-3 text-amber-400" />
-                          <span>Draft</span>
+                          <span>Awaiting Evaluation</span>
                         </span>
                       )}
                     </div>
