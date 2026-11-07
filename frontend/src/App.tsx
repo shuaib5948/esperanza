@@ -32,6 +32,8 @@ import { AuditLogsPage } from './pages/admin/AuditLogsPage.js';
 import { ProgrammeListPage } from './pages/admin/ProgrammeListPage.js';
 import { AdminLeaderboardPage } from './pages/admin/AdminLeaderboardPage.js';
 import { LiveScreenControlPage } from './pages/admin/LiveScreenControlPage.js';
+import { ConnectedDevicesPage } from './pages/admin/ConnectedDevicesPage.js';
+import { useDeviceHeartbeat } from './hooks/useDeviceHeartbeat.js';
 
 // Team Leader Pages
 import { TeamDashboardPage } from './pages/team/TeamDashboardPage.js';
@@ -54,6 +56,11 @@ const queryClient = new QueryClient({
   },
 });
 
+const HeartbeatTracker: React.FC = () => {
+  useDeviceHeartbeat();
+  return null;
+};
+
 export const App: React.FC = () => {
   const isProduction = import.meta.env.VITE_APP_MODE === 'production';
 
@@ -62,6 +69,7 @@ export const App: React.FC = () => {
       <AuthProvider>
         <ToastProvider>
           <BrowserRouter>
+            <HeartbeatTracker />
             <PwaInstallPrompt />
             <Routes>
               {/* Public Routes */}
@@ -94,6 +102,7 @@ export const App: React.FC = () => {
                 <Route path="/admin/announcements" element={<AnnouncementsManagerPage />} />
                 <Route path="/admin/reports" element={<ReportsExportPage />} />
                 <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
+                <Route path="/admin/devices" element={<ConnectedDevicesPage />} />
               </Route>
 
               {/* Team Leader Routes */}

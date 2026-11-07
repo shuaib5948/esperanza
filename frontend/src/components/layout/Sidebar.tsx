@@ -396,6 +396,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     </>
                   )}
                 </NavLink>
+
+                {/* Connected Devices */}
+                <NavLink
+                  to="/admin/devices"
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all relative ${
+                      isActive
+                        ? THEME.classes.activeTab
+                        : THEME.classes.inactiveTab
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {isActive && (
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 ${THEME.classes.activeIndicator} rounded-r-md -ml-4`} />
+                      )}
+                      <div className="flex items-center gap-3">
+                        <Radio className="w-4 h-4" />
+                        <span>Connected Devices</span>
+                      </div>
+                    </>
+                  )}
+                </NavLink>
               </div>
             </div>
           ) : isTeamLeader ? (
