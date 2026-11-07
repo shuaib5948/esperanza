@@ -398,7 +398,11 @@ export const AdminLeaderboardPage: React.FC = () => {
         <div className="flex items-center gap-2 shrink-0">
           {pendingCompsCount > 0 ? (
             <button
-              onClick={() => publishLeaderboardMutation.mutate()}
+              onClick={() => {
+                if (window.confirm(`Are you ready to announce? This will release ${pendingCompsCount} new competition result(s) (+${formatScore(pendingPointsTotal)} PTS) to the public leaderboard and stage screen.`)) {
+                  publishLeaderboardMutation.mutate();
+                }
+              }}
               disabled={publishLeaderboardMutation.isPending}
               className={`flex items-center gap-2 px-4 py-2 rounded-full ${THEME.classes.primaryBtn} text-xs font-black shadow-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer animate-pulse`}
               title="Click to release pending points to public leaderboard & stage screen"
@@ -448,12 +452,16 @@ export const AdminLeaderboardPage: React.FC = () => {
                 </span>
               </h4>
               <p className="text-[11px] text-amber-200/70 mt-0.5">
-                These scores are verified internally. Click &ldquo;Publish to Public Now&rdquo; to update the live public leaderboard and stage screen.
+                These scores are verified internally. Click &ldquo;Publish to Public Now&rdquo; when announcing on stage to update the live public leaderboard and stage screen.
               </p>
             </div>
           </div>
           <button
-            onClick={() => publishLeaderboardMutation.mutate()}
+            onClick={() => {
+              if (window.confirm(`Are you ready to announce? This will release ${pendingCompsCount} new competition result(s) (+${formatScore(pendingPointsTotal)} PTS) to the public leaderboard and stage screen.`)) {
+                publishLeaderboardMutation.mutate();
+              }
+            }}
             disabled={publishLeaderboardMutation.isPending}
             className={`px-4 py-2 rounded-xl ${THEME.classes.primaryBtn} text-xs font-black shadow-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-1.5`}
           >

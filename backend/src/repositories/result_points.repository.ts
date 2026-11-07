@@ -180,13 +180,13 @@ export class ResultRepository {
         WHERE id = ?
       `, [adminUserId, awarded, id]);
 
-      // 3. Atomically allocate to team_points (automatically calculates team score on leaderboard)
+      // 3. Atomically allocate to team_points (as pending until released via Publish Leaderboard)
       if (result.team_id && awarded > 0) {
         await PointsRepository.ensureSchema();
         await conn.query(`
           INSERT INTO team_points (team_id, competition_id, result_id, points, is_published)
-          VALUES (?, ?, ?, ?, TRUE)
-          ON DUPLICATE KEY UPDATE points = VALUES(points), is_published = TRUE
+          VALUES (?, ?, ?, ?, FALSE)
+          ON DUPLICATE KEY UPDATE points = VALUES(points)
         `, [result.team_id, result.competition_id, id, awarded]);
       }
 
@@ -308,7 +308,7 @@ export class PointsRepository {
              COUNT(DISTINCT CASE WHEN r.position = 2 THEN r.id END) as second_places,
              COUNT(DISTINCT CASE WHEN r.position = 3 THEN r.id END) as third_places,
              COUNT(DISTINCT tp.competition_id) as scored_competitions_count,
-             (SELECT COUNT(DISTINCT competition_id) FROM results WHERE status = 'PUBLISHED') as total_published_competitions
+             (SELECT COUNT(DISTINCT competition_id) FROM team_points WHERE is_published = 1) as total_published_competitions
       FROM teams t
       LEFT JOIN team_points tp ON tp.team_id = t.id AND tp.is_published = 1
       LEFT JOIN results r ON r.id = tp.result_id AND r.status = 'PUBLISHED'

@@ -228,12 +228,12 @@ export class ResultService {
           wasPublished ? publishedAt : null,
         ]);
 
-        // If results were previously published, automatically sync updated points into team_points
+        // If results were previously published, automatically sync updated points into team_points (pending until released)
         if (wasPublished && item.team_id && points > 0) {
           await conn.query(`
             INSERT INTO team_points (team_id, competition_id, result_id, points, is_published)
-            VALUES (?, ?, ?, ?, TRUE)
-            ON DUPLICATE KEY UPDATE points = VALUES(points), is_published = TRUE
+            VALUES (?, ?, ?, ?, FALSE)
+            ON DUPLICATE KEY UPDATE points = VALUES(points)
           `, [item.team_id, competitionId, insertRes.insertId, points]);
         }
       }
