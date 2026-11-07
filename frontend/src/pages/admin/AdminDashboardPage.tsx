@@ -129,7 +129,7 @@ export const AdminDashboardPage: React.FC = () => {
       const N = cumEvents.length;
 
       if (N <= 4) {
-        return cumEvents.map((e, idx) => ({
+        return cumEvents.map((e: any, idx: number) => ({
           label: idx === N - 1 ? 'Live' : `P${String(e.progNum || idx + 1).padStart(2, '0')}`,
           diraya: e.diraya,
           rivaya: e.rivaya,
@@ -156,7 +156,7 @@ export const AdminDashboardPage: React.FC = () => {
       }
 
       const indices = [idx1, idx2, idx3, idx4];
-      return indices.map((eventIdx, i) => {
+      return indices.map((eventIdx: number, i: number) => {
         const e = cumEvents[eventIdx - 1];
         const label = i === 3 ? 'Live' : `After ${eventIdx}`;
         return {
