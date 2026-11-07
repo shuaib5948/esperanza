@@ -109,41 +109,83 @@ export const AdminDashboardPage: React.FC = () => {
   // 2-Line Battle Graph Data (Programme vs Points)
   const recentResults = data?.recent_results || [];
   const battlePointsData = React.useMemo(() => {
-    if (recentResults && recentResults.length > 1) {
+    if (recentResults && recentResults.length > 0) {
       let dCum = 0;
       let rCum = 0;
-      return recentResults.map((r: any, idx: number) => {
+      const cumEvents = recentResults.map((r: any, idx: number) => {
         dCum += Number(r.diraya_score || 0);
         rCum += Number(r.rivaya_score || 0);
         return {
-          id: r.competition_id || idx,
-          label: r.programme_number ? `${r.programme_number}` : `P${idx + 1}`,
+          num: idx + 1,
+          progNum: r.programme_number,
           name: r.competition_name || `Prog ${idx + 1}`,
-          diraya: dCum || Number(r.diraya_score || 0),
-          rivaya: rCum || Number(r.rivaya_score || 0),
+          diraya: dCum,
+          rivaya: rCum,
+          dirayaEvent: Number(r.diraya_score || 0),
+          rivayaEvent: Number(r.rivaya_score || 0),
+        };
+      });
+
+      const N = cumEvents.length;
+
+      if (N <= 4) {
+        return cumEvents.map((e, idx) => ({
+          label: idx === N - 1 ? 'Live' : `P${String(e.progNum || idx + 1).padStart(2, '0')}`,
+          diraya: e.diraya,
+          rivaya: e.rivaya,
+          name: e.name,
+          variation: `+${e.dirayaEvent} vs +${e.rivayaEvent}`,
+        }));
+      }
+
+      // Rolling 4-Checkpoint Window (drops earliest checkpoint every 5 events)
+      let idx1: number;
+      let idx2: number;
+      let idx3: number;
+      const idx4 = N; // Always the latest live event
+
+      if (N % 5 === 0) {
+        idx1 = Math.max(1, N - 10);
+        idx2 = Math.max(1, N - 5);
+        idx3 = Math.max(1, N - 2);
+      } else {
+        const last5 = Math.floor(N / 5) * 5;
+        idx1 = Math.max(1, last5 - 10);
+        idx2 = Math.max(1, last5 - 5);
+        idx3 = last5;
+      }
+
+      const indices = [idx1, idx2, idx3, idx4];
+      return indices.map((eventIdx, i) => {
+        const e = cumEvents[eventIdx - 1];
+        const label = i === 3 ? 'Live' : `After ${eventIdx}`;
+        return {
+          label,
+          diraya: e ? e.diraya : (i === 3 ? dirayaPoints : 0),
+          rivaya: e ? e.rivaya : (i === 3 ? rivayaPoints : 0),
+          name: e ? e.name : `Checkpoint ${eventIdx}`,
+          variation: e ? `+${e.dirayaEvent} vs +${e.rivayaEvent}` : '',
         };
       });
     }
+
     const dSteps = [
-      Math.round(dirayaPoints * 0.18),
-      Math.round(dirayaPoints * 0.42),
-      Math.round(dirayaPoints * 0.65),
-      Math.round(dirayaPoints * 0.84),
+      Math.round(dirayaPoints * 0.20),
+      Math.round(dirayaPoints * 0.45),
+      Math.round(dirayaPoints * 0.75),
       dirayaPoints,
     ];
     const rSteps = [
-      Math.round(rivayaPoints * 0.22),
-      Math.round(rivayaPoints * 0.38),
-      Math.round(rivayaPoints * 0.61),
-      Math.round(rivayaPoints * 0.88),
+      Math.round(rivayaPoints * 0.25),
+      Math.round(rivayaPoints * 0.40),
+      Math.round(rivayaPoints * 0.70),
       rivayaPoints,
     ];
     return [
-      { label: 'P1', diraya: dSteps[0], rivaya: rSteps[0], name: 'General - DTP' },
-      { label: 'P4', diraya: dSteps[1], rivaya: rSteps[1], name: 'Senior - Quiz' },
-      { label: 'P8', diraya: dSteps[2], rivaya: rSteps[2], name: 'Junior - Elocution' },
-      { label: 'P14', diraya: dSteps[3], rivaya: rSteps[3], name: 'Sub-Junior - Story' },
-      { label: 'LIVE', diraya: dSteps[4], rivaya: rSteps[4], name: 'Current Total' },
+      { label: 'After 5', diraya: dSteps[0], rivaya: rSteps[0], name: 'Checkpoint 1' },
+      { label: 'After 10', diraya: dSteps[1], rivaya: rSteps[1], name: 'Checkpoint 2' },
+      { label: 'After 15', diraya: dSteps[2], rivaya: rSteps[2], name: 'Checkpoint 3' },
+      { label: 'Live', diraya: dSteps[3], rivaya: rSteps[3], name: 'Current Total' },
     ];
   }, [recentResults, dirayaPoints, rivayaPoints]);
 
@@ -158,7 +200,7 @@ export const AdminDashboardPage: React.FC = () => {
   const pointRange = (maxBattlePoint - minBattlePoint) || 1;
   const svgWidth = 320;
   const svgHeight = 90;
-  const padX = 22;
+  const padX = 26;
   const padYTop = 10;
   const padYBot = 18;
   const plotW = svgWidth - padX * 2;
@@ -167,13 +209,13 @@ export const AdminDashboardPage: React.FC = () => {
   const pointsDiraya = battlePointsData.map((d: any, i: number) => {
     const x = padX + (i / (battlePointsData.length - 1 || 1)) * plotW;
     const y = padYTop + plotH - ((d.diraya - minBattlePoint) / pointRange) * plotH;
-    return { x, y, val: d.diraya, label: d.label, name: d.name };
+    return { x, y, val: d.diraya, label: d.label, name: d.name, variation: d.variation };
   });
 
   const pointsRivaya = battlePointsData.map((d: any, i: number) => {
     const x = padX + (i / (battlePointsData.length - 1 || 1)) * plotW;
     const y = padYTop + plotH - ((d.rivaya - minBattlePoint) / pointRange) * plotH;
-    return { x, y, val: d.rivaya, label: d.label, name: d.name };
+    return { x, y, val: d.rivaya, label: d.label, name: d.name, variation: d.variation };
   });
 
   const dPathDiraya = pointsDiraya.reduce(
@@ -410,11 +452,15 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Node points & X labels */}
                   {pointsRivaya.map((p: any, idx: number) => (
-                    <circle key={`r-${idx}`} cx={p.x} cy={p.y} r="3" fill="#FF2A6D" stroke="#0A0A0A" strokeWidth="1.5" />
+                    <circle key={`r-${idx}`} cx={p.x} cy={p.y} r="3.5" fill="#FF2A6D" stroke="#0A0A0A" strokeWidth="1.5">
+                      <title>{`${p.label} • Rivaya: ${p.val} pts`}</title>
+                    </circle>
                   ))}
                   {pointsDiraya.map((p: any, idx: number) => (
                     <g key={`d-${idx}`}>
-                      <circle cx={p.x} cy={p.y} r="3" fill="#00E676" stroke="#0A0A0A" strokeWidth="1.5" />
+                      <circle cx={p.x} cy={p.y} r="3.5" fill="#00E676" stroke="#0A0A0A" strokeWidth="1.5">
+                        <title>{`${p.label} • Diraya: ${p.val} pts`}</title>
+                      </circle>
                       <text
                         x={p.x}
                         y={svgHeight - 4}

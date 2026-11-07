@@ -198,42 +198,83 @@ const BattleProgressionGraphView: React.FC<{
   }, [dirayaPoints, rivayaPoints, tiePoint]);
 
   const battlePointsData = React.useMemo(() => {
-    if (recentResults && recentResults.length > 1) {
+    if (recentResults && recentResults.length > 0) {
       let dCum = 0;
       let rCum = 0;
-      return recentResults.map((r: any, idx: number) => {
+      const cumEvents = recentResults.map((r: any, idx: number) => {
         dCum += Number(r.diraya_score || 0);
         rCum += Number(r.rivaya_score || 0);
         return {
-          id: r.competition_id || idx,
-          label: r.programme_number ? `P${String(r.programme_number).padStart(2, '0')}` : `P${idx + 1}`,
+          num: idx + 1,
+          progNum: r.programme_number,
           name: r.competition_name || `Prog ${idx + 1}`,
-          diraya: dCum || Number(r.diraya_score || 0),
-          rivaya: rCum || Number(r.rivaya_score || 0),
+          diraya: dCum,
+          rivaya: rCum,
+          dirayaEvent: Number(r.diraya_score || 0),
+          rivayaEvent: Number(r.rivaya_score || 0),
+        };
+      });
+
+      const N = cumEvents.length;
+
+      if (N <= 4) {
+        return cumEvents.map((e, idx) => ({
+          label: idx === N - 1 ? 'Live' : `P${String(e.progNum || idx + 1).padStart(2, '0')}`,
+          diraya: e.diraya,
+          rivaya: e.rivaya,
+          name: e.name,
+          variation: `+${e.dirayaEvent} vs +${e.rivayaEvent}`,
+        }));
+      }
+
+      // Rolling 4-Checkpoint Window (drops earliest milestone every 5 events)
+      let idx1: number;
+      let idx2: number;
+      let idx3: number;
+      const idx4 = N; // Always the latest live event
+
+      if (N % 5 === 0) {
+        idx1 = Math.max(1, N - 10);
+        idx2 = Math.max(1, N - 5);
+        idx3 = Math.max(1, N - 2);
+      } else {
+        const last5 = Math.floor(N / 5) * 5;
+        idx1 = Math.max(1, last5 - 10);
+        idx2 = Math.max(1, last5 - 5);
+        idx3 = last5;
+      }
+
+      const indices = [idx1, idx2, idx3, idx4];
+      return indices.map((eventIdx, i) => {
+        const e = cumEvents[eventIdx - 1];
+        const label = i === 3 ? 'Live' : `After ${eventIdx}`;
+        return {
+          label,
+          diraya: e ? e.diraya : (i === 3 ? dirayaPoints : 0),
+          rivaya: e ? e.rivaya : (i === 3 ? rivayaPoints : 0),
+          name: e ? e.name : `Checkpoint ${eventIdx}`,
+          variation: e ? `+${e.dirayaEvent} vs +${e.rivayaEvent}` : '',
         };
       });
     }
-    // High-fidelity fallback milestones up to live points
+
     const dSteps = [
-      Math.round(dirayaPoints * 0.16),
-      Math.round(dirayaPoints * 0.38),
-      Math.round(dirayaPoints * 0.62),
-      Math.round(dirayaPoints * 0.84),
+      Math.round(dirayaPoints * 0.20),
+      Math.round(dirayaPoints * 0.45),
+      Math.round(dirayaPoints * 0.75),
       dirayaPoints,
     ];
     const rSteps = [
-      Math.round(rivayaPoints * 0.20),
-      Math.round(rivayaPoints * 0.35),
-      Math.round(rivayaPoints * 0.64),
-      Math.round(rivayaPoints * 0.88),
+      Math.round(rivayaPoints * 0.25),
+      Math.round(rivayaPoints * 0.40),
+      Math.round(rivayaPoints * 0.70),
       rivayaPoints,
     ];
     return [
-      { label: 'P01', diraya: dSteps[0], rivaya: rSteps[0], name: 'General - Magazine' },
-      { label: 'P04', diraya: dSteps[1], rivaya: rSteps[1], name: 'Senior - Quiz' },
-      { label: 'P08', diraya: dSteps[2], rivaya: rSteps[2], name: 'Junior - Elocution' },
-      { label: 'P14', diraya: dSteps[3], rivaya: rSteps[3], name: 'General - DTP' },
-      { label: 'LIVE', diraya: dSteps[4], rivaya: rSteps[4], name: 'Current Total' },
+      { label: 'After 5', diraya: dSteps[0], rivaya: rSteps[0], name: 'Checkpoint 1' },
+      { label: 'After 10', diraya: dSteps[1], rivaya: rSteps[1], name: 'Checkpoint 2' },
+      { label: 'After 15', diraya: dSteps[2], rivaya: rSteps[2], name: 'Checkpoint 3' },
+      { label: 'Live', diraya: dSteps[3], rivaya: rSteps[3], name: 'Current Total' },
     ];
   }, [recentResults, dirayaPoints, rivayaPoints]);
 

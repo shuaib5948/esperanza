@@ -38,17 +38,15 @@ export class DashboardRepository {
     let recentResults: any[] = [];
     try {
       recentResults = await query<any[]>(`
-        SELECT c.id as competition_id, c.programme_number, c.name as competition_name, c.type as category, c.status,
+        SELECT c.id as competition_id, c.programme_number, c.name as competition_name,
                COALESCE(SUM(CASE WHEN UPPER(t.code) = 'DIRAYA' OR UPPER(t.name) LIKE '%DIRAYA%' THEN tp.points ELSE 0 END), 0) as diraya_score,
                COALESCE(SUM(CASE WHEN UPPER(t.code) = 'RIVAYA' OR UPPER(t.name) LIKE '%RIVAYA%' THEN tp.points ELSE 0 END), 0) as rivaya_score
         FROM competitions c
-        LEFT JOIN team_points tp ON tp.competition_id = c.id
-        LEFT JOIN teams t ON t.id = tp.team_id
-        WHERE c.status IN ('CLOSED', 'COMPLETED', 'ACTIVE')
-        GROUP BY c.id, c.programme_number, c.name, c.type, c.status
+        JOIN team_points tp ON tp.competition_id = c.id
+        JOIN teams t ON t.id = tp.team_id
+        GROUP BY c.id, c.programme_number, c.name
         HAVING diraya_score > 0 OR rivaya_score > 0
-        ORDER BY c.id ASC
-        LIMIT 8
+        ORDER BY c.programme_number ASC, c.id ASC
       `);
     } catch {
       recentResults = [];

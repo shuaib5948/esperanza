@@ -274,14 +274,12 @@ export class LiveScreenRepository {
                COALESCE(SUM(CASE WHEN UPPER(t.code) = 'DIRAYA' OR UPPER(t.name) LIKE '%DIRAYA%' THEN tp.points ELSE 0 END), 0) as diraya_score,
                COALESCE(SUM(CASE WHEN UPPER(t.code) = 'RIVAYA' OR UPPER(t.name) LIKE '%RIVAYA%' THEN tp.points ELSE 0 END), 0) as rivaya_score
         FROM competitions c
-        JOIN results r ON r.competition_id = c.id AND r.status = 'PUBLISHED'
+        JOIN team_points tp ON tp.competition_id = c.id
+        JOIN teams t ON t.id = tp.team_id
         LEFT JOIN programme_groups pg ON pg.id = c.programme_group_id
-        LEFT JOIN team_points tp ON tp.competition_id = c.id
-        LEFT JOIN teams t ON t.id = tp.team_id
         GROUP BY c.id, c.programme_number, c.name, c.participation_type, pg.name
         HAVING diraya_score > 0 OR rivaya_score > 0
         ORDER BY c.programme_number ASC, c.id ASC
-        LIMIT 10
       `);
     } catch {
       recentResults = [];
