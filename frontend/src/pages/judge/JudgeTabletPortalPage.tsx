@@ -159,13 +159,17 @@ export const JudgeTabletPortalPage: React.FC = () => {
   const isCompSubmitted = (c: any): boolean => {
     if (isCompPublished(c)) return false; // Published is its own separate category
     if (completedCompIds.has(c?.competition_id)) return true;
+
+    const schedStatus = (c?.schedule_status || '').toUpperCase();
+    // If currently live on stage, it is actively being scored — not submitted unless judge finalized it!
+    if (schedStatus === 'LIVE') return false;
+
     if (Boolean(c?.is_locked)) return true;
 
     const compStatus = (c?.competition_status || '').toUpperCase();
-    if (compStatus === 'LOCKED' || compStatus === 'SUBMITTED' || compStatus === 'CLOSED') {
+    if (compStatus === 'LOCKED' || compStatus === 'SUBMITTED') {
       return true;
     }
-    const schedStatus = (c?.schedule_status || '').toUpperCase();
     if (schedStatus === 'COMPLETED') return true;
 
     const totalReg = Number(c?.total_registered || 0);
@@ -361,15 +365,23 @@ export const JudgeTabletPortalPage: React.FC = () => {
   const isGroupComp = (competition?.participation_type || '').toUpperCase() === 'GROUP' || !!competition?.is_group || !!currentParticipant?.is_group;
 
   const isAllLocked = useMemo(() => {
+    const isLive = (currentAssignment?.schedule_status || '').toUpperCase() === 'LIVE' ||
+                   (activeLiveComp && activeLiveComp.competition_id === selectedCompId);
+
     const allParticipantsLocked =
       participants.length > 0 &&
       participants.every((p) => p.status === 'SUBMITTED' || p.status === 'LOCKED');
     const isLocallyCompleted = selectedCompId !== null && completedCompIds.has(selectedCompId);
+
+    if (isLive) {
+      return allParticipantsLocked || isLocallyCompleted;
+    }
+
     const isAssignmentDone =
       !!currentAssignment && (isCompPublished(currentAssignment) || isCompSubmitted(currentAssignment));
 
     return allParticipantsLocked || isLocallyCompleted || isAssignmentDone;
-  }, [participants, selectedCompId, completedCompIds, currentAssignment]);
+  }, [participants, selectedCompId, completedCompIds, currentAssignment, activeLiveComp]);
 
   // Check if all performers have a mark > 0
   const isEveryPerformerMarked = useMemo(() => {

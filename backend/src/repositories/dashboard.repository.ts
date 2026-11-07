@@ -412,12 +412,26 @@ export class DashboardRepository {
              COUNT(DISTINCT CASE WHEN ss.status = 'SUBMITTED' OR ss.status = 'LOCKED' THEN ss.id END) as total_submitted,
              (SELECT COUNT(*) FROM results res WHERE res.competition_id = c.id AND res.status = 'PUBLISHED') as published_results_count,
              (
-               c.status IN ('LOCKED', 'SUBMITTED', 'CLOSED', 'PUBLISHED')
-               OR MAX(s.status) = 'COMPLETED'
-               OR (
-                 COUNT(DISTINCT ss.id) > 0 
-                 AND COUNT(DISTINCT CASE WHEN ss.status IN ('SUBMITTED', 'LOCKED') THEN ss.id END) = COUNT(DISTINCT ss.id)
-               )
+               CASE 
+                 WHEN MAX(s.status) = 'LIVE' THEN (
+                   COUNT(DISTINCT ss.id) > 0 
+                   AND COUNT(DISTINCT CASE WHEN ss.status IN ('SUBMITTED', 'LOCKED') THEN ss.id END) = COUNT(DISTINCT ss.id)
+                   AND COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END) > 0
+                   AND COUNT(DISTINCT ss.id) >= COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END)
+                 )
+                 ELSE (
+                   c.status IN ('LOCKED', 'SUBMITTED', 'PUBLISHED')
+                   OR MAX(s.status) = 'COMPLETED'
+                   OR (
+                     COUNT(DISTINCT ss.id) > 0 
+                     AND COUNT(DISTINCT CASE WHEN ss.status IN ('SUBMITTED', 'LOCKED') THEN ss.id END) = COUNT(DISTINCT ss.id)
+                     AND (
+                       COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END) = 0
+                       OR COUNT(DISTINCT ss.id) >= COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END)
+                     )
+                   )
+                 )
+               END
              ) as is_locked
       FROM competitions c
       JOIN competition_judges cj ON cj.competition_id = c.id AND cj.judge_id = ? AND cj.status = 'ASSIGNED'
