@@ -275,6 +275,9 @@ export const ResultsVerificationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['competition-results', selectedCompId] });
       queryClient.invalidateQueries({ queryKey: ['competition-judge-scores', selectedCompId] });
       queryClient.invalidateQueries({ queryKey: ['competitions-list'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-individual-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-points-log'] });
     },
     onError: (err: any) => {
       error(err.message || 'Failed to generate results');
@@ -308,6 +311,11 @@ export const ResultsVerificationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['schedules'] });
       queryClient.invalidateQueries({ queryKey: ['public-schedules-full'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['public-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['live-screen'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-individual-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-points-log'] });
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
     },
     onError: (err: any) => {
@@ -329,6 +337,11 @@ export const ResultsVerificationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['schedules'] });
       queryClient.invalidateQueries({ queryKey: ['public-schedules-full'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['public-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['live-screen'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-individual-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-points-log'] });
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
     },
     onError: (err: any) => {
@@ -354,6 +367,11 @@ export const ResultsVerificationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['competition-judge-scores', selectedCompId] });
       queryClient.invalidateQueries({ queryKey: ['competitions-list'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['public-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['live-screen'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-individual-leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-points-log'] });
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
     },
     onError: (err: any) => {

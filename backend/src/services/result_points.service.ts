@@ -323,10 +323,8 @@ export class ResultService {
       throw { statusCode: 400, code: 'NO_RESULTS_TO_PUBLISH', message: 'No results found to publish for this competition.' };
     }
     for (const r of results) {
-      if (r.status !== 'PUBLISHED') {
-        const points = Number(r.points_awarded) > 0 ? Number(r.points_awarded) : (Number(r.final_score) || 0);
-        await ResultRepository.publishResult(r.id, adminUserId, points);
-      }
+      const points = Number(r.points_awarded) > 0 ? Number(r.points_awarded) : (Number(r.final_score) || 0);
+      await ResultRepository.publishResult(r.id, adminUserId, points);
     }
     return ResultRepository.findByCompetition(competitionId);
   }

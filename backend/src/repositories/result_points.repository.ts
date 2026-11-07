@@ -165,32 +165,37 @@ export class ResultRepository {
       }
       const result = resRows[0];
 
-      if (result.status === 'PUBLISHED') {
-        throw { statusCode: 400, code: 'RESULT_ALREADY_PUBLISHED', message: 'This result is already published' };
-      }
-
       const awarded = Number(pointsToAward) > 0
         ? Number(pointsToAward)
         : (Number(result.points_awarded) > 0 ? Number(result.points_awarded) : (Number(result.final_score) || 0));
 
+      // Resolve teamId if missing on results
+      let teamId = result.team_id;
+      if (!teamId && result.participant_id) {
+        const [pRows] = await conn.query<any[]>('SELECT team_id FROM participants WHERE id = ?', [result.participant_id]);
+        if (pRows && pRows[0]?.team_id) {
+          teamId = pRows[0].team_id;
+        }
+      }
+
       // 2. Mark as PUBLISHED
       await conn.query(`
         UPDATE results
-        SET status = 'PUBLISHED', published_by = ?, published_at = NOW(), points_awarded = ?
+        SET status = 'PUBLISHED', published_by = ?, published_at = NOW(), points_awarded = ?, team_id = COALESCE(team_id, ?)
         WHERE id = ?
-      `, [adminUserId, awarded, id]);
+      `, [adminUserId, awarded, teamId, id]);
 
       // 3. Atomically allocate to team_points (as pending until released via Publish Leaderboard)
-      if (result.team_id && awarded > 0) {
+      if (teamId && awarded > 0) {
         await PointsRepository.ensureSchema();
         await conn.query(`
           INSERT INTO team_points (team_id, competition_id, result_id, points, is_published)
           VALUES (?, ?, ?, ?, FALSE)
-          ON DUPLICATE KEY UPDATE points = VALUES(points)
-        `, [result.team_id, result.competition_id, id, awarded]);
+          ON DUPLICATE KEY UPDATE points = VALUES(points), is_published = FALSE
+        `, [teamId, result.competition_id, id, awarded]);
       }
 
-      // 4. Update competition status to CLOSED if all results are published
+      // 4. Update competition status to CLOSED
       await conn.query(`
         UPDATE competitions
         SET status = 'CLOSED'
@@ -205,10 +210,10 @@ export class ResultRepository {
         adminUserId,
         id,
         JSON.stringify({ status: result.status, points: result.points_awarded }),
-        JSON.stringify({ status: 'PUBLISHED', points: pointsToAward, published_by: adminUserId }),
+        JSON.stringify({ status: 'PUBLISHED', points: awarded, published_by: adminUserId }),
       ]);
 
-      return { success: true, pointsAwarded: pointsToAward };
+      return { success: true, pointsAwarded: awarded };
     });
   }
 
@@ -322,6 +327,19 @@ export class PointsRepository {
    */
   static async getAdminTeamBreakdown() {
     await this.ensureSchema();
+
+    // Auto-heal / sync any published results into team_points as pending if missing
+    await query(`
+      INSERT INTO team_points (team_id, competition_id, result_id, points, is_published)
+      SELECT r.team_id, r.competition_id, r.id, 
+             COALESCE(NULLIF(r.points_awarded, 0), NULLIF(r.final_score, 0), 0) as pts,
+             FALSE
+      FROM results r
+      LEFT JOIN team_points tp ON tp.result_id = r.id
+      WHERE r.status = 'PUBLISHED' AND r.team_id IS NOT NULL AND tp.id IS NULL
+        AND COALESCE(NULLIF(r.points_awarded, 0), NULLIF(r.final_score, 0), 0) > 0
+    `);
+
     const teams = await query<any[]>(`
       SELECT t.id, t.name, t.code, t.color, t.logo_url,
              COALESCE(SUM(tp.points), 0) as total_points,
@@ -549,6 +567,18 @@ export class PointsRepository {
   static async publishLeaderboard(adminUserId: number) {
     await this.ensureSchema();
     return withTransaction(async (conn) => {
+      // 1. Ensure any published results missing from team_points are staged first
+      await conn.query(`
+        INSERT INTO team_points (team_id, competition_id, result_id, points, is_published)
+        SELECT r.team_id, r.competition_id, r.id, 
+               COALESCE(NULLIF(r.points_awarded, 0), NULLIF(r.final_score, 0), 0) as pts,
+               FALSE
+        FROM results r
+        LEFT JOIN team_points tp ON tp.result_id = r.id
+        WHERE r.status = 'PUBLISHED' AND r.team_id IS NOT NULL AND tp.id IS NULL
+          AND COALESCE(NULLIF(r.points_awarded, 0), NULLIF(r.final_score, 0), 0) > 0
+      `);
+
       const [pendingRows] = await conn.query<any[]>(`
         SELECT COUNT(DISTINCT competition_id) as comp_count,
                COUNT(id) as point_count,
