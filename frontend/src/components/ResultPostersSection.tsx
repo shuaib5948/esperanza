@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Download, Trophy, Loader2, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client.js';
+import { useToast } from '../context/ToastContext.js';
 import { FestivalBokehField } from './ui/FestivalBokehField.js';
 import { OfficialResultPosterCard } from './OfficialResultPosterCard.js';
+import { downloadPosterImage } from '../utils/posterDownload.js';
 
 export interface PosterCardItem {
   id?: number;
@@ -107,6 +109,39 @@ export const ResultPostersSection: React.FC = () => {
   const [isInteracting, setIsInteracting] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(true);
+
+  const { success, error: toastError } = useToast();
+  const [isAllResultsOpen, setIsAllResultsOpen] = useState(false);
+  const [resultsSearch, setResultsSearch] = useState('');
+  const [downloadingId, setDownloadingId] = useState<number | string | null>(null);
+
+  const handleDownload = async (poster: PosterCardItem) => {
+    const id = poster.competition_id || poster.id || poster.competition_name || 'poster';
+    try {
+      setDownloadingId(id);
+      await downloadPosterImage(poster);
+      success('Poster downloaded successfully!');
+    } catch (err: any) {
+      console.error('Download error:', err);
+      toastError('Could not download poster. Please try again.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  const filteredPublishedPosters = React.useMemo(() => {
+    if (!resultsSearch.trim()) return basePosters;
+    const q = resultsSearch.toLowerCase().trim();
+    return basePosters.filter((p: PosterCardItem) => {
+      const name = (p.competition_name || '').toLowerCase();
+      const group = (p.programme_group || '').toLowerCase();
+      const winners = (p.winners || [])
+        .map((w: any) => `${w.participant_name || ''} ${w.team_name || ''}`)
+        .join(' ')
+        .toLowerCase();
+      return name.includes(q) || group.includes(q) || winners.includes(q);
+    });
+  }, [basePosters, resultsSearch]);
 
   // Window viewport measurement for responsive center offset
   const [windowWidth, setWindowWidth] = useState(() =>
@@ -227,6 +262,17 @@ export const ResultPostersSection: React.FC = () => {
             <div className="w-2 h-2 rotate-45 bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
             <div className="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400/70 to-amber-400" />
           </div>
+
+          {/* Small "View Results" Button */}
+          <button
+            type="button"
+            onClick={() => setIsAllResultsOpen(true)}
+            className="mt-2.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 hover:text-amber-200 border border-amber-400/30 hover:border-amber-400/60 transition-all text-xs font-bold cursor-pointer shadow-xs active:scale-95 group"
+            title="View all published result posters"
+          >
+            <Trophy className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform" />
+            <span>View Results</span>
+          </button>
         </div>
 
         {/* ===================================================================
@@ -316,6 +362,24 @@ export const ResultPostersSection: React.FC = () => {
                       }`}
                     >
                       <OfficialResultPosterCard poster={poster} className="w-full h-full" />
+                      {isCenter && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(poster);
+                          }}
+                          disabled={downloadingId === (poster.competition_id || poster.id)}
+                          className="absolute top-2.5 right-2.5 z-30 w-8 h-8 rounded-full bg-black/80 hover:bg-black text-amber-300 hover:text-white border border-amber-400/40 hover:border-amber-400 flex items-center justify-center transition-all cursor-pointer shadow-md backdrop-blur-xs active:scale-90"
+                          title="Download poster"
+                        >
+                          {downloadingId === (poster.competition_id || poster.id) ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                          ) : (
+                            <Download className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 );
@@ -387,8 +451,185 @@ export const ResultPostersSection: React.FC = () => {
               </button>
 
               {/* Exact 866x1024 Aspect Ratio Container (Showing THAT Poster Only) */}
-              <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-amber-400/90 shadow-[0_0_50px_rgba(245,158,11,0.35),0_20px_50px_rgba(0,0,0,0.9)] max-h-[82vh] w-[320px] sm:w-[410px] md:w-[470px]">
+              <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-amber-400/90 shadow-[0_0_50px_rgba(245,158,11,0.35),0_20px_50px_rgba(0,0,0,0.9)] max-h-[76vh] w-[310px] sm:w-[390px] md:w-[440px]">
                 <OfficialResultPosterCard poster={selectedPoster} />
+              </div>
+
+              {/* Action Buttons: Download & Close */}
+              <div className="flex items-center justify-center gap-2.5 mt-3.5 w-full">
+                <button
+                  type="button"
+                  onClick={() => handleDownload(selectedPoster)}
+                  disabled={downloadingId === (selectedPoster.competition_id || selectedPoster.id)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs transition-all shadow-[0_4px_20px_rgba(245,158,11,0.4)] cursor-pointer active:scale-95 disabled:opacity-60"
+                  title="Download poster image"
+                >
+                  {downloadingId === (selectedPoster.competition_id || selectedPoster.id) ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                      <span>Generating Image...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 text-slate-950" />
+                      <span>Download Poster</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPoster(null)}
+                  className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ===================================================================
+          ALL PUBLISHED RESULTS MODAL (GRID VIEW WITH DOWNLOADS)
+      =================================================================== */}
+      <AnimatePresence>
+        {isAllResultsOpen && (
+          <div
+            onClick={() => setIsAllResultsOpen(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md select-none"
+          >
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="relative w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl sm:rounded-3xl bg-[#0A0A0A] border border-white/[0.1] shadow-[0_10px_50px_rgba(0,0,0,0.9)] overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 border-b border-white/[0.08] bg-white/[0.02]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center shrink-0">
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-black text-white">
+                        Published Results
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-[11px] font-mono font-bold">
+                        {basePosters.length} Posters
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Official published results and victory posters for download.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  {/* Search Input */}
+                  <div className="relative flex-1 sm:w-64">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={resultsSearch}
+                      onChange={(e) => setResultsSearch(e.target.value)}
+                      placeholder="Search competition..."
+                      className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[#121212] border border-white/[0.1] text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-400 transition-colors"
+                    />
+                    {resultsSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setResultsSearch('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsAllResultsOpen(false)}
+                    className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                    title="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body: Grid of Posters */}
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] scrollbar-thin">
+                {filteredPublishedPosters.length === 0 ? (
+                  <div className="py-16 text-center text-slate-400 text-xs space-y-2">
+                    <Trophy className="w-8 h-8 text-slate-600 mx-auto" />
+                    <p>No published result posters found matching &ldquo;{resultsSearch}&rdquo;.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+                    {filteredPublishedPosters.map((poster: PosterCardItem, idx: number) => {
+                      const pid = poster.competition_id || poster.id || idx;
+                      const isCurrentDownloading = downloadingId === pid;
+
+                      return (
+                        <div
+                          key={`${pid}-${idx}`}
+                          className="rounded-2xl bg-[#111111] border border-white/[0.08] hover:border-amber-400/40 p-2.5 flex flex-col justify-between transition-all group shadow-md"
+                        >
+                          {/* Poster Thumbnail (Click to open in large viewer) */}
+                          <div
+                            onClick={() => setSelectedPoster(poster)}
+                            className="relative w-full rounded-xl overflow-hidden cursor-pointer shadow-inner"
+                          >
+                            <OfficialResultPosterCard poster={poster} />
+                          </div>
+
+                          {/* Card Footer: Download Button */}
+                          <div className="pt-2.5 mt-auto">
+                            <button
+                              type="button"
+                              onClick={() => handleDownload(poster)}
+                              disabled={isCurrentDownloading}
+                              className="w-full py-2 px-3 rounded-xl bg-amber-400/10 hover:bg-amber-400 text-amber-300 hover:text-slate-950 border border-amber-400/30 hover:border-amber-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-60"
+                              title="Download official result poster image"
+                            >
+                              {isCurrentDownloading ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  <span>Downloading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Download Poster</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-between p-3.5 sm:p-4 border-t border-white/[0.08] bg-white/[0.02] text-xs">
+                <span className="text-slate-400">
+                  Showing <strong className="text-white">{filteredPublishedPosters.length}</strong> of{' '}
+                  <strong className="text-amber-400">{basePosters.length}</strong> result posters
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsAllResultsOpen(false)}
+                  className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-all cursor-pointer"
+                >
+                  Close
+                </button>
               </div>
             </motion.div>
           </div>
