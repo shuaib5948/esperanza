@@ -164,20 +164,10 @@ export const JudgeTabletPortalPage: React.FC = () => {
     // If currently live on stage, it is actively being scored — not submitted unless judge finalized it!
     if (schedStatus === 'LIVE') return false;
 
-    if (Boolean(c?.is_locked)) return true;
-
-    const compStatus = (c?.competition_status || '').toUpperCase();
-    if (compStatus === 'LOCKED' || compStatus === 'SUBMITTED') {
-      return true;
-    }
-    if (schedStatus === 'COMPLETED') return true;
-
     const totalReg = Number(c?.total_registered || 0);
     const totalSub = Number(c?.total_submitted || 0);
-    const totalEval = Number(c?.total_evaluated || 0);
 
     if (totalReg > 0 && totalSub >= totalReg) return true;
-    if (totalEval > 0 && totalSub >= totalEval) return true;
 
     return false;
   };

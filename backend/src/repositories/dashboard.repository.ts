@@ -418,8 +418,7 @@ export class DashboardRepository {
                    AND COUNT(DISTINCT ss.id) >= COUNT(DISTINCT CASE WHEN c.participation_type = 'GROUP' THEN p.team_id ELSE r.id END)
                  )
                  ELSE (
-                   c.status IN ('LOCKED', 'SUBMITTED', 'PUBLISHED')
-                   OR MAX(s.status) = 'COMPLETED'
+                   c.status = 'PUBLISHED'
                    OR (
                      COUNT(DISTINCT ss.id) > 0 
                      AND COUNT(DISTINCT CASE WHEN ss.status IN ('SUBMITTED', 'LOCKED') THEN ss.id END) = COUNT(DISTINCT ss.id)

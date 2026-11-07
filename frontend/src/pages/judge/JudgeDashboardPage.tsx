@@ -58,9 +58,7 @@ export const JudgeDashboardPage: React.FC = () => {
               const isSubmitted =
                 !isPublished &&
                 !isLive &&
-                (Boolean(comp.is_locked) ||
-                  (comp.total_registered > 0 && comp.total_submitted >= comp.total_registered) ||
-                  (comp.total_evaluated > 0 && comp.total_submitted >= comp.total_evaluated));
+                (comp.total_registered > 0 && comp.total_submitted >= comp.total_registered);
 
               return (
                 <Card
